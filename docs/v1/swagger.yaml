@@ -150,6 +150,303 @@ components:
           example: "AGENT123"
           description: "Optional referral code from agent"
     
+    AuthTokens:
+      type: object
+      properties:
+        access_token:
+          type: string
+          example: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.access"
+        refresh_token:
+          type: string
+          example: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.refresh"
+        token_type:
+          type: string
+          example: "Bearer"
+        expires_in:
+          type: integer
+          example: 3600
+
+    AuthUserResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+          example: true
+        message:
+          type: string
+          example: "Login successful"
+        data:
+          type: object
+          properties:
+            user:
+              $ref: '#/components/schemas/User'
+            tokens:
+              $ref: '#/components/schemas/AuthTokens'
+
+    AuthTokenResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+          example: true
+        message:
+          type: string
+          example: "Token refreshed successfully"
+        data:
+          $ref: '#/components/schemas/AuthTokens'
+
+    AuthLoginRequest:
+      type: object
+      required:
+        - email
+        - password
+      properties:
+        email:
+          type: string
+          format: email
+          example: "john.doe@example.com"
+        password:
+          type: string
+          format: password
+          example: "securePassword123"
+        device_id:
+          type: string
+          example: "ios-device-123"
+
+    LogoutRequest:
+      type: object
+      properties:
+        refresh_token:
+          type: string
+          description: "Refresh token to revoke"
+          example: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.refresh"
+        device_id:
+          type: string
+          description: "Optional device identifier for session management"
+          example: "ios-device-123"
+
+    RefreshTokenRequest:
+      type: object
+      required:
+        - refresh_token
+      properties:
+        refresh_token:
+          type: string
+          example: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.refresh"
+        device_id:
+          type: string
+          example: "ios-device-123"
+
+    ForgotPasswordRequest:
+      type: object
+      required:
+        - email
+      properties:
+        email:
+          type: string
+          format: email
+          example: "john.doe@example.com"
+
+    ResetPasswordRequest:
+      type: object
+      required:
+        - token
+        - password
+      properties:
+        token:
+          type: string
+          description: "Password reset token received via email"
+          example: "RESET-123456"
+        password:
+          type: string
+          format: password
+          example: "NewSecurePassword#2024"
+        confirm_password:
+          type: string
+          format: password
+          example: "NewSecurePassword#2024"
+
+    VerifyEmailRequest:
+      type: object
+      required:
+        - token
+      properties:
+        token:
+          type: string
+          description: "Email verification token"
+          example: "VERIFY-123456"
+
+    UserUpdate:
+      type: object
+      required:
+        - first_name
+        - last_name
+        - phone_number
+      properties:
+        first_name:
+          type: string
+          example: "John"
+        last_name:
+          type: string
+          example: "Doe"
+        phone_number:
+          type: string
+          example: "+250788123456"
+        default_city:
+          type: string
+          example: "Kigali"
+        avatar_url:
+          type: string
+          example: "https://cdn.zoearwanda.com/avatars/user12345.jpg"
+
+    UserPatch:
+      type: object
+      properties:
+        first_name:
+          type: string
+        last_name:
+          type: string
+        phone_number:
+          type: string
+        default_city:
+          type: string
+        avatar_url:
+          type: string
+
+    AvatarUpdateRequest:
+      type: object
+      required:
+        - avatar_url
+      properties:
+        avatar_url:
+          type: string
+          format: uri
+          example: "https://cdn.zoearwanda.com/avatars/user12345.jpg"
+
+    SavedLocation:
+      type: object
+      properties:
+        saved_location_id:
+          type: integer
+          example: 10
+        label:
+          type: string
+          example: "Home"
+        city:
+          type: string
+          example: "Kigali"
+        district:
+          type: string
+          example: "Gasabo"
+        neighborhood:
+          type: string
+          example: "Kacyiru"
+        address_line_1:
+          type: string
+          example: "KN 4 Ave"
+        address_line_2:
+          type: string
+          example: "Apartment 2B"
+        latitude:
+          type: number
+          format: float
+          example: -1.9441
+        longitude:
+          type: number
+          format: float
+          example: 30.0619
+        created_at:
+          type: string
+          format: date-time
+          example: "2024-01-20T08:15:00Z"
+
+    SavedLocationCreate:
+      type: object
+      required:
+        - label
+        - city
+      properties:
+        label:
+          type: string
+          example: "Home"
+        city:
+          type: string
+          example: "Kigali"
+        district:
+          type: string
+          example: "Gasabo"
+        neighborhood:
+          type: string
+          example: "Kacyiru"
+        address_line_1:
+          type: string
+          example: "KN 4 Ave"
+        address_line_2:
+          type: string
+          example: "Apartment 2B"
+        latitude:
+          type: number
+          format: float
+          example: -1.9441
+        longitude:
+          type: number
+          format: float
+          example: 30.0619
+
+    SavedLocationUpdate:
+      type: object
+      properties:
+        label:
+          type: string
+        city:
+          type: string
+        district:
+          type: string
+        neighborhood:
+          type: string
+        address_line_1:
+          type: string
+        address_line_2:
+          type: string
+        latitude:
+          type: number
+          format: float
+        longitude:
+          type: number
+          format: float
+
+    FavoriteRequest:
+      type: object
+      required:
+        - listing_id
+      properties:
+        listing_id:
+          type: integer
+          example: 5001
+
+    SearchHistoryEntry:
+      type: object
+      properties:
+        search_id:
+          type: integer
+          example: 25
+        search_query:
+          type: string
+          example: "Hotels in Kigali"
+        filters:
+          type: object
+          additionalProperties: true
+          example:
+            category: "hotel"
+            rating_min: 4
+        location:
+          type: string
+          example: "Kigali"
+        searched_at:
+          type: string
+          format: date-time
+          example: "2024-02-10T12:00:00Z"
+
     # Location Schemas
     Location:
       type: object
@@ -564,7 +861,7 @@ components:
 
 paths:
   # AUTH ENDPOINTS
-  /auth/register:
+  /api/v1/auth/register:
     post:
       summary: Register a new user
       tags: [Authentication]
@@ -576,26 +873,11 @@ paths:
               $ref: '#/components/schemas/UserCreate'
       responses:
         '201':
-          description: User created successfully
+          description: User registered successfully
           content:
             application/json:
               schema:
-                type: object
-                properties:
-                  success:
-                    type: boolean
-                    example: true
-                  message:
-                    type: string
-                    example: "User registered successfully"
-                  data:
-                    type: object
-                    properties:
-                      user:
-                        $ref: '#/components/schemas/User'
-                      token:
-                        type: string
-                        example: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
+                $ref: '#/components/schemas/AuthUserResponse'
         '400':
           description: Validation error
           content:
@@ -603,27 +885,151 @@ paths:
               schema:
                 $ref: '#/components/schemas/ErrorResponse'
 
-  /auth/login:
+  /api/v1/auth/login:
     post:
-      summary: User login
+      summary: Authenticate user credentials
       tags: [Authentication]
       requestBody:
         required: true
         content:
           application/json:
             schema:
-              type: object
-              required: [email, password]
-              properties:
-                email:
-                  type: string
-                  example: "john.doe@example.com"
-                password:
-                  type: string
-                  example: "securePassword123"
+              $ref: '#/components/schemas/AuthLoginRequest'
       responses:
         '200':
           description: Login successful
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AuthUserResponse'
+        '401':
+          description: Invalid credentials
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /api/v1/auth/logout:
+    post:
+      summary: Invalidate the current session
+      tags: [Authentication]
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: false
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/LogoutRequest'
+      responses:
+        '200':
+          description: Logout completed successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SuccessResponse'
+
+  /api/v1/auth/refresh-token:
+    post:
+      summary: Refresh access tokens
+      tags: [Authentication]
+      security: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RefreshTokenRequest'
+      responses:
+        '200':
+          description: Token refreshed successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AuthTokenResponse'
+        '401':
+          description: Invalid refresh token
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /api/v1/auth/forgot-password:
+    post:
+      summary: Request password reset link
+      tags: [Authentication]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ForgotPasswordRequest'
+      responses:
+        '200':
+          description: Password reset email sent
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SuccessResponse'
+
+  /api/v1/auth/reset-password:
+    post:
+      summary: Reset password using a reset token
+      tags: [Authentication]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ResetPasswordRequest'
+      responses:
+        '200':
+          description: Password reset successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SuccessResponse'
+        '400':
+          description: Invalid or expired token
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /api/v1/auth/verify-email:
+    post:
+      summary: Verify a user's email address
+      tags: [Authentication]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/VerifyEmailRequest'
+      responses:
+        '200':
+          description: Email verified successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SuccessResponse'
+        '400':
+          description: Invalid verification token
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  # USER ENDPOINTS
+  /api/v1/users/me:
+    get:
+      summary: Get current user profile
+      tags: [Users]
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: User profile retrieved
           content:
             application/json:
               schema:
@@ -632,17 +1038,368 @@ paths:
                   success:
                     type: boolean
                     example: true
-                  message:
-                    type: string
-                    example: "Login successful"
+                  data:
+                    $ref: '#/components/schemas/User'
+    put:
+      summary: Update user profile (replace)
+      tags: [Users]
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UserUpdate'
+      responses:
+        '200':
+          description: User profile updated
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: true
+                  data:
+                    $ref: '#/components/schemas/User'
+    patch:
+      summary: Partially update user profile
+      tags: [Users]
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UserPatch'
+      responses:
+        '200':
+          description: User profile updated
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: true
+                  data:
+                    $ref: '#/components/schemas/User'
+    delete:
+      summary: Delete user account
+      tags: [Users]
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: Account deleted successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SuccessResponse'
+
+  /api/v1/users/{user_id}:
+    get:
+      summary: Get public profile for a user
+      tags: [Users]
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: path
+          name: user_id
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: User profile retrieved
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: true
+                  data:
+                    $ref: '#/components/schemas/User'
+
+  /api/v1/users/{user_id}/avatar:
+    put:
+      summary: Update a user's avatar image
+      tags: [Users]
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: path
+          name: user_id
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AvatarUpdateRequest'
+      responses:
+        '200':
+          description: Avatar updated successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: true
+                  data:
+                    $ref: '#/components/schemas/User'
+
+  /api/v1/users/me/saved-locations:
+    get:
+      summary: List saved locations for current user
+      tags: [Users]
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: Saved locations retrieved
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: true
+                  data:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/SavedLocation'
+    post:
+      summary: Create a saved location
+      tags: [Users]
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SavedLocationCreate'
+      responses:
+        '201':
+          description: Saved location created
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: true
+                  data:
+                    $ref: '#/components/schemas/SavedLocation'
+
+  /api/v1/users/me/saved-locations/{saved_location_id}:
+    put:
+      summary: Update a saved location
+      tags: [Users]
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: path
+          name: saved_location_id
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SavedLocationUpdate'
+      responses:
+        '200':
+          description: Saved location updated
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: true
+                  data:
+                    $ref: '#/components/schemas/SavedLocation'
+    delete:
+      summary: Delete a saved location
+      tags: [Users]
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: path
+          name: saved_location_id
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Saved location deleted
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SuccessResponse'
+
+  /api/v1/users/me/favorites:
+    get:
+      summary: Get user's favorite listings
+      tags: [Users]
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: query
+          name: page
+          schema:
+            type: integer
+            default: 1
+        - in: query
+          name: limit
+          schema:
+            type: integer
+            default: 20
+      responses:
+        '200':
+          description: Favorites retrieved
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: true
                   data:
                     type: object
                     properties:
-                      user:
-                        $ref: '#/components/schemas/User'
-                      token:
-                        type: string
-                        example: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
+                      favorites:
+                        type: array
+                        items:
+                          $ref: '#/components/schemas/Listing'
+                      pagination:
+                        $ref: '#/components/schemas/Pagination'
+    post:
+      summary: Add listing to favorites
+      tags: [Users]
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/FavoriteRequest'
+      responses:
+        '201':
+          description: Listing added to favorites
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SuccessResponse'
+
+  /api/v1/users/me/favorites/{listing_id}:
+    delete:
+      summary: Remove listing from favorites
+      tags: [Users]
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: path
+          name: listing_id
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Listing removed from favorites
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SuccessResponse'
+
+  /api/v1/users/me/search-history:
+    get:
+      summary: Get saved search history
+      tags: [Users]
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: query
+          name: page
+          schema:
+            type: integer
+            default: 1
+        - in: query
+          name: limit
+          schema:
+            type: integer
+            default: 20
+      responses:
+        '200':
+          description: Search history retrieved
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: true
+                  data:
+                    type: object
+                    properties:
+                      history:
+                        type: array
+                        items:
+                          $ref: '#/components/schemas/SearchHistoryEntry'
+                      pagination:
+                        $ref: '#/components/schemas/Pagination'
+    delete:
+      summary: Clear entire search history
+      tags: [Users]
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: Search history cleared
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SuccessResponse'
+
+  /api/v1/users/me/search-history/{search_id}:
+    delete:
+      summary: Remove a specific search entry
+      tags: [Users]
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: path
+          name: search_id
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Search history entry deleted
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SuccessResponse'
 
   # LISTINGS ENDPOINTS
   /listings:
@@ -1272,89 +2029,6 @@ paths:
       responses:
         '201':
           description: Review created successfully
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/SuccessResponse'
-
-  # USER PROFILE ENDPOINTS
-  /users/me:
-    get:
-      summary: Get current user profile
-      tags: [Users]
-      security:
-        - bearerAuth: []
-      responses:
-        '200':
-          description: User profile retrieved
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  success:
-                    type: boolean
-                    example: true
-                  data:
-                    $ref: '#/components/schemas/User'
-
-  /users/favorites:
-    get:
-      summary: Get user's favorite listings
-      tags: [Users]
-      security:
-        - bearerAuth: []
-      parameters:
-        - in: query
-          name: page
-          schema:
-            type: integer
-            default: 1
-        - in: query
-          name: limit
-          schema:
-            type: integer
-            default: 20
-      responses:
-        '200':
-          description: Favorites retrieved
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  success:
-                    type: boolean
-                    example: true
-                  data:
-                    type: object
-                    properties:
-                      favorites:
-                        type: array
-                        items:
-                          $ref: '#/components/schemas/Listing'
-                      pagination:
-                        $ref: '#/components/schemas/Pagination'
-
-    post:
-      summary: Add listing to favorites
-      tags: [Users]
-      security:
-        - bearerAuth: []
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              type: object
-              required: [listing_id]
-              properties:
-                listing_id:
-                  type: integer
-                  example: 5001
-      responses:
-        '201':
-          description: Added to favorites
           content:
             application/json:
               schema:
