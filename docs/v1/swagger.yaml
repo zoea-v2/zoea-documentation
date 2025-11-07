@@ -49,26 +49,35 @@ components:
       required:
         - status
         - message
-        - timestamp
+        - data
       properties:
         status:
           type: string
-          example: "success"
+          enum: [success]
+          description: "Indicates the API operation completed successfully"
         message:
           type: string
+          description: "User-friendly description of the operation result"
           example: "Operation completed successfully"
         data:
-          type: object
+          description: "Payload returned by the API. Use an empty object when no data is available."
           nullable: true
-        timestamp:
-          type: string
-          format: date-time
-          example: "2025-01-15T10:30:00Z"
+          oneOf:
+            - type: object
+              additionalProperties: true
+            - type: array
+              items: {}
+            - type: string
+            - type: number
+            - type: boolean
+          default: {}
 
     PaginatedResponse:
       allOf:
         - $ref: '#/components/schemas/SuccessResponse'
         - type: object
+          required:
+            - pagination
           properties:
             pagination:
               $ref: '#/components/schemas/Pagination'
@@ -78,27 +87,38 @@ components:
       required:
         - status
         - message
-        - errorCode
-        - timestamp
+        - error
       properties:
         status:
           type: string
-          example: "error"
+          enum: [error]
+          description: "Indicates the API operation resulted in an error"
         message:
           type: string
+          description: "High-level description of the error"
           example: "Invalid request parameters"
-        errorCode:
-          type: string
-          example: "VALIDATION_ERROR"
-        timestamp:
-          type: string
-          format: date-time
-          example: "2025-01-15T10:31:00Z"
-        details:
-          type: array
-          items:
-            type: object
-            additionalProperties: true
+        error:
+          type: object
+          required:
+            - code
+            - details
+          properties:
+            code:
+              type: string
+              description: "Machine-readable error code"
+              example: "VALIDATION_ERROR"
+            details:
+              type: array
+              description: "Field specific validation errors or additional context"
+              items:
+                type: object
+                properties:
+                  field:
+                    type: string
+                    example: "email"
+                  message:
+                    type: string
+                    example: "Invalid email format"
     
     # User Schemas
     User:
