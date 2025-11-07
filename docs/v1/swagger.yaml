@@ -29,58 +29,76 @@ components:
     Pagination:
       type: object
       properties:
-        current_page:
+        page:
           type: integer
+          minimum: 1
           example: 1
-        total_pages:
+        limit:
           type: integer
-          example: 5
-        total_items:
+          minimum: 1
+          example: 20
+        total:
           type: integer
           example: 125
-        items_per_page:
+        totalPages:
           type: integer
-          example: 25
-        has_next:
-          type: boolean
-          example: true
-        has_prev:
-          type: boolean
-          example: false
+          example: 7
+
+    SuccessResponse:
+      type: object
+      required:
+        - status
+        - message
+        - timestamp
+      properties:
+        status:
+          type: string
+          example: "success"
+        message:
+          type: string
+          example: "Operation completed successfully"
+        data:
+          type: object
+          nullable: true
+        timestamp:
+          type: string
+          format: date-time
+          example: "2025-01-15T10:30:00Z"
+
+    PaginatedResponse:
+      allOf:
+        - $ref: '#/components/schemas/SuccessResponse'
+        - type: object
+          properties:
+            pagination:
+              $ref: '#/components/schemas/Pagination'
     
     ErrorResponse:
       type: object
+      required:
+        - status
+        - message
+        - errorCode
+        - timestamp
       properties:
-        success:
-          type: boolean
-          example: false
-        error:
+        status:
+          type: string
+          example: "error"
+        message:
           type: string
           example: "Invalid request parameters"
-        code:
+        errorCode:
           type: string
           example: "VALIDATION_ERROR"
+        timestamp:
+          type: string
+          format: date-time
+          example: "2025-01-15T10:31:00Z"
         details:
           type: array
           items:
             type: object
-            properties:
-              field:
-                type: string
-                example: "email"
-              message:
-                type: string
-                example: "Invalid email format"
-    
-    SuccessResponse:
-      type: object
-      properties:
-        success:
-          type: boolean
-          example: true
-        message:
-          type: string
-          example: "Operation completed successfully"
+            additionalProperties: true
     
     # User Schemas
     User:
@@ -167,33 +185,25 @@ components:
           example: 3600
 
     AuthUserResponse:
-      type: object
-      properties:
-        success:
-          type: boolean
-          example: true
-        message:
-          type: string
-          example: "Login successful"
-        data:
-          type: object
+      allOf:
+        - $ref: '#/components/schemas/SuccessResponse'
+        - type: object
           properties:
-            user:
-              $ref: '#/components/schemas/User'
-            tokens:
-              $ref: '#/components/schemas/AuthTokens'
+            data:
+              type: object
+              properties:
+                user:
+                  $ref: '#/components/schemas/User'
+                tokens:
+                  $ref: '#/components/schemas/AuthTokens'
 
     AuthTokenResponse:
-      type: object
-      properties:
-        success:
-          type: boolean
-          example: true
-        message:
-          type: string
-          example: "Token refreshed successfully"
-        data:
-          $ref: '#/components/schemas/AuthTokens'
+      allOf:
+        - $ref: '#/components/schemas/SuccessResponse'
+        - type: object
+          properties:
+            data:
+              $ref: '#/components/schemas/AuthTokens'
 
     AuthLoginRequest:
       type: object
@@ -447,6 +457,686 @@ components:
           format: date-time
           example: "2024-02-10T12:00:00Z"
 
+    UserProfileResponse:
+      allOf:
+        - $ref: '#/components/schemas/SuccessResponse'
+        - type: object
+          properties:
+            data:
+              $ref: '#/components/schemas/User'
+
+    SavedLocationResponse:
+      allOf:
+        - $ref: '#/components/schemas/SuccessResponse'
+        - type: object
+          properties:
+            data:
+              $ref: '#/components/schemas/SavedLocation'
+
+    SavedLocationListResponse:
+      allOf:
+        - $ref: '#/components/schemas/SuccessResponse'
+        - type: object
+          properties:
+            data:
+              type: array
+              items:
+                $ref: '#/components/schemas/SavedLocation'
+
+    FavoritesListResponse:
+      allOf:
+        - $ref: '#/components/schemas/PaginatedResponse'
+        - type: object
+          properties:
+            data:
+              type: array
+              items:
+                $ref: '#/components/schemas/Listing'
+
+    SearchHistoryListResponse:
+      allOf:
+        - $ref: '#/components/schemas/PaginatedResponse'
+        - type: object
+          properties:
+            data:
+              type: array
+              items:
+                $ref: '#/components/schemas/SearchHistoryEntry'
+
+    ListingResponse:
+      allOf:
+        - $ref: '#/components/schemas/SuccessResponse'
+        - type: object
+          properties:
+            data:
+              $ref: '#/components/schemas/Listing'
+
+    ListingListResponse:
+      allOf:
+        - $ref: '#/components/schemas/PaginatedResponse'
+        - type: object
+          properties:
+            data:
+              type: array
+              items:
+                $ref: '#/components/schemas/Listing'
+            filters:
+              type: object
+              nullable: true
+              additionalProperties: true
+
+    BookingResponse:
+      allOf:
+        - $ref: '#/components/schemas/SuccessResponse'
+        - type: object
+          properties:
+            data:
+              $ref: '#/components/schemas/Booking'
+
+    BookingListResponse:
+      allOf:
+        - $ref: '#/components/schemas/PaginatedResponse'
+        - type: object
+          properties:
+            data:
+              type: array
+              items:
+                $ref: '#/components/schemas/Booking'
+
+    PaymentInitiateResponse:
+      allOf:
+        - $ref: '#/components/schemas/SuccessResponse'
+        - type: object
+          properties:
+            data:
+              type: object
+              properties:
+                payment_id:
+                  type: integer
+                  example: 9001
+                transaction_id:
+                  type: string
+                  example: "TXN_2024_8001"
+                payment_url:
+                  type: string
+                  format: uri
+                  example: "https://payment.zoearwanda.com/checkout/txn_2024_8001"
+                expires_at:
+                  type: string
+                  format: date-time
+                  example: "2024-03-01T11:15:00Z"
+
+    ReviewResponse:
+      allOf:
+        - $ref: '#/components/schemas/SuccessResponse'
+        - type: object
+          properties:
+            data:
+              $ref: '#/components/schemas/Review'
+
+    Review:
+      type: object
+      properties:
+        review_id:
+          type: integer
+          example: 3001
+        user_id:
+          type: integer
+          example: 12345
+        listing_id:
+          type: integer
+          example: 5001
+        booking_id:
+          type: integer
+          nullable: true
+          example: 8001
+        order_id:
+          type: integer
+          nullable: true
+        rating_overall:
+          type: integer
+          minimum: 1
+          maximum: 5
+          example: 5
+        rating_quality:
+          type: integer
+          minimum: 1
+          maximum: 5
+          example: 5
+        rating_value:
+          type: integer
+          minimum: 1
+          maximum: 5
+          example: 4
+        rating_service:
+          type: integer
+          minimum: 1
+          maximum: 5
+          example: 5
+        rating_experience:
+          type: integer
+          minimum: 1
+          maximum: 5
+          example: 5
+        comment:
+          type: string
+          example: "Excellent stay! The staff was very helpful."
+        review_photos:
+          type: array
+          items:
+            type: string
+            format: uri
+        is_verified:
+          type: boolean
+          example: true
+        is_featured:
+          type: boolean
+          example: false
+        helpful_count:
+          type: integer
+          example: 12
+        status:
+          type: string
+          example: "active"
+        created_at:
+          type: string
+          format: date-time
+          example: "2024-03-05T10:00:00Z"
+        updated_at:
+          type: string
+          format: date-time
+          example: "2024-03-06T08:00:00Z"
+
+    Merchant:
+      type: object
+      properties:
+        merchant_id:
+          type: integer
+          example: 2001
+        user_id:
+          type: integer
+          example: 12345
+        business_name:
+          type: string
+          example: "Kigali Luxury Hotel"
+        description:
+          type: string
+          example: "Premium hospitality services in Kigali"
+        category:
+          type: string
+          example: "hotel"
+        contact_phone:
+          type: string
+          example: "+250788000000"
+        contact_email:
+          type: string
+          format: email
+          example: "info@kigaliluxury.com"
+        business_license:
+          type: string
+          example: "LIC-2025-001"
+        is_verified:
+          type: boolean
+          example: false
+        status:
+          type: string
+          example: "pending"
+        onboarding_status:
+          type: string
+          example: "in_review"
+        agent_id:
+          type: integer
+          nullable: true
+          example: 551
+        created_at:
+          type: string
+          format: date-time
+          example: "2025-01-05T09:30:00Z"
+        updated_at:
+          type: string
+          format: date-time
+          example: "2025-01-10T08:15:00Z"
+
+    MerchantApplicationRequest:
+      type: object
+      required:
+        - business_name
+        - category
+        - contact_phone
+        - contact_email
+      properties:
+        business_name:
+          type: string
+        description:
+          type: string
+        category:
+          type: string
+          description: "hotel, restaurant, event_venue, tour_operator, shop, service"
+          example: "hotel"
+        contact_phone:
+          type: string
+        contact_email:
+          type: string
+          format: email
+        business_license:
+          type: string
+        agent_code:
+          type: string
+          description: "Referral agent code"
+
+    MerchantApplicationResponse:
+      allOf:
+        - $ref: '#/components/schemas/SuccessResponse'
+        - type: object
+          properties:
+            data:
+              type: object
+              properties:
+                merchant:
+                  $ref: '#/components/schemas/Merchant'
+
+    MerchantOnboardingStatus:
+      type: object
+      properties:
+        merchant_id:
+          type: integer
+          example: 2001
+        status:
+          type: string
+          example: "pending"
+        onboarding_status:
+          type: string
+          example: "in_review"
+        pending_documents:
+          type: array
+          items:
+            type: string
+          example: ["business_license", "tax_clearance"]
+        last_updated:
+          type: string
+          format: date-time
+          example: "2025-01-12T11:00:00Z"
+
+    MerchantOnboardingStatusResponse:
+      allOf:
+        - $ref: '#/components/schemas/SuccessResponse'
+        - type: object
+          properties:
+            data:
+              $ref: '#/components/schemas/MerchantOnboardingStatus'
+
+    MerchantUpdateRequest:
+      type: object
+      properties:
+        business_name:
+          type: string
+        description:
+          type: string
+        contact_phone:
+          type: string
+        contact_email:
+          type: string
+          format: email
+        category:
+          type: string
+        status:
+          type: string
+        onboarding_status:
+          type: string
+        is_verified:
+          type: boolean
+
+    MerchantResponse:
+      allOf:
+        - $ref: '#/components/schemas/SuccessResponse'
+        - type: object
+          properties:
+            data:
+              $ref: '#/components/schemas/Merchant'
+
+    MerchantOnboardingUpdateRequest:
+      type: object
+      properties:
+        status:
+          type: string
+          example: "approved"
+        onboarding_status:
+          type: string
+          example: "approved"
+        notes:
+          type: string
+
+    MerchantDocumentUploadRequest:
+      type: object
+      required:
+        - document_type
+        - file_url
+      properties:
+        document_type:
+          type: string
+          example: "business_license"
+        file_url:
+          type: string
+          format: uri
+          example: "https://cdn.zoea.com/docs/license.pdf"
+        issued_at:
+          type: string
+          format: date
+        expires_at:
+          type: string
+          format: date
+
+    MerchantSearchParams:
+      type: object
+      properties:
+        page:
+          type: integer
+          example: 1
+        limit:
+          type: integer
+          example: 20
+        sort:
+          type: string
+          example: "business_name"
+        order:
+          type: string
+          enum: [asc, desc]
+          example: "asc"
+        search:
+          type: string
+          example: "kigali"
+        status:
+          type: string
+          example: "active"
+        category:
+          type: string
+          example: "hotel"
+
+    MerchantSearchResponse:
+      allOf:
+        - $ref: '#/components/schemas/PaginatedResponse'
+        - type: object
+          properties:
+            data:
+              type: array
+              items:
+                $ref: '#/components/schemas/Merchant'
+
+    MerchantLocation:
+      type: object
+      properties:
+        location_id:
+          type: integer
+          example: 301
+        address_line_1:
+          type: string
+          example: "KG 7 Ave"
+        address_line_2:
+          type: string
+          example: "Suite 10"
+        city:
+          type: string
+          example: "Kigali"
+        district:
+          type: string
+          example: "Gasabo"
+        neighborhood:
+          type: string
+          example: "Kacyiru"
+        latitude:
+          type: number
+          format: float
+          example: -1.944
+        longitude:
+          type: number
+          format: float
+          example: 30.062
+        timezone:
+          type: string
+          example: "Africa/Kigali"
+
+    MerchantLocationCreate:
+      type: object
+      required:
+        - address_line_1
+        - city
+        - district
+      properties:
+        address_line_1:
+          type: string
+        address_line_2:
+          type: string
+        city:
+          type: string
+        district:
+          type: string
+        neighborhood:
+          type: string
+        latitude:
+          type: number
+          format: float
+        longitude:
+          type: number
+          format: float
+        timezone:
+          type: string
+
+    MerchantLocationUpdate:
+      type: object
+      properties:
+        address_line_1:
+          type: string
+        address_line_2:
+          type: string
+        city:
+          type: string
+        district:
+          type: string
+        neighborhood:
+          type: string
+        latitude:
+          type: number
+          format: float
+        longitude:
+          type: number
+          format: float
+        timezone:
+          type: string
+
+    MerchantLocationResponse:
+      allOf:
+        - $ref: '#/components/schemas/SuccessResponse'
+        - type: object
+          properties:
+            data:
+              $ref: '#/components/schemas/MerchantLocation'
+
+    MerchantLocationListResponse:
+      allOf:
+        - $ref: '#/components/schemas/SuccessResponse'
+        - type: object
+          properties:
+            data:
+              type: array
+              items:
+                $ref: '#/components/schemas/MerchantLocation'
+
+    MerchantSubscription:
+      type: object
+      properties:
+        subscription_id:
+          type: integer
+          example: 7001
+        plan:
+          type: string
+          example: "premium"
+        start_date:
+          type: string
+          format: date
+        end_date:
+          type: string
+          format: date
+        status:
+          type: string
+          example: "active"
+        payment_id:
+          type: integer
+          nullable: true
+          example: 9101
+        created_at:
+          type: string
+          format: date-time
+        updated_at:
+          type: string
+          format: date-time
+
+    MerchantSubscriptionRequest:
+      type: object
+      required:
+        - plan
+      properties:
+        plan:
+          type: string
+          example: "premium"
+        start_date:
+          type: string
+          format: date
+        end_date:
+          type: string
+          format: date
+
+    MerchantSubscriptionResponse:
+      allOf:
+        - $ref: '#/components/schemas/SuccessResponse'
+        - type: object
+          properties:
+            data:
+              $ref: '#/components/schemas/MerchantSubscription'
+
+    MerchantSubscriptionListResponse:
+      allOf:
+        - $ref: '#/components/schemas/PaginatedResponse'
+        - type: object
+          properties:
+            data:
+              type: array
+              items:
+                $ref: '#/components/schemas/MerchantSubscription'
+
+    MerchantPromotion:
+      type: object
+      properties:
+        promotion_id:
+          type: integer
+          example: 8001
+        title:
+          type: string
+          example: "Holiday Flash Sale"
+        description:
+          type: string
+        promotion_type:
+          type: string
+          example: "flash_sale"
+        start_date:
+          type: string
+          format: date
+        end_date:
+          type: string
+          format: date
+        discount_percent:
+          type: number
+          format: float
+          example: 15
+        discount_amount:
+          type: number
+          format: float
+          nullable: true
+        status:
+          type: string
+          example: "scheduled"
+        created_at:
+          type: string
+          format: date-time
+        updated_at:
+          type: string
+          format: date-time
+
+    MerchantPromotionRequest:
+      type: object
+      required:
+        - title
+        - promotion_type
+        - start_date
+        - end_date
+      properties:
+        title:
+          type: string
+        description:
+          type: string
+        promotion_type:
+          type: string
+        start_date:
+          type: string
+          format: date
+        end_date:
+          type: string
+          format: date
+        discount_percent:
+          type: number
+          format: float
+        discount_amount:
+          type: number
+          format: float
+        status:
+          type: string
+          example: "scheduled"
+
+    MerchantPromotionResponse:
+      allOf:
+        - $ref: '#/components/schemas/SuccessResponse'
+        - type: object
+          properties:
+            data:
+              $ref: '#/components/schemas/MerchantPromotion'
+
+    MerchantPromotionListResponse:
+      allOf:
+        - $ref: '#/components/schemas/PaginatedResponse'
+        - type: object
+          properties:
+            data:
+              type: array
+              items:
+                $ref: '#/components/schemas/MerchantPromotion'
+
+    MerchantAnalytics:
+      type: object
+      properties:
+        visits:
+          type: integer
+          example: 1250
+        orders:
+          type: integer
+          example: 89
+        bookings:
+          type: integer
+          example: 45
+        revenue:
+          type: number
+          format: float
+          example: 12500.5
+        period:
+          type: string
+          example: "monthly"
+
+    MerchantAnalyticsResponse:
+      allOf:
+        - $ref: '#/components/schemas/SuccessResponse'
+        - type: object
+          properties:
+            data:
+              $ref: '#/components/schemas/MerchantAnalytics'
+    
     # Location Schemas
     Location:
       type: object
@@ -848,10 +1538,16 @@ components:
         guests:
           type: integer
           example: 2
-        sort_by:
+        sort:
           type: string
-          enum: [distance, rating, price_low, price_high, popularity]
+          description: "Field to sort by"
+          enum: [distance, rating, price, popularity]
           example: "rating"
+        order:
+          type: string
+          description: "Sort direction"
+          enum: [asc, desc]
+          example: "asc"
         page:
           type: integer
           example: 1
@@ -1033,13 +1729,7 @@ paths:
           content:
             application/json:
               schema:
-                type: object
-                properties:
-                  success:
-                    type: boolean
-                    example: true
-                  data:
-                    $ref: '#/components/schemas/User'
+                $ref: '#/components/schemas/UserProfileResponse'
     put:
       summary: Update user profile (replace)
       tags: [Users]
@@ -1057,13 +1747,7 @@ paths:
           content:
             application/json:
               schema:
-                type: object
-                properties:
-                  success:
-                    type: boolean
-                    example: true
-                  data:
-                    $ref: '#/components/schemas/User'
+                $ref: '#/components/schemas/UserProfileResponse'
     patch:
       summary: Partially update user profile
       tags: [Users]
@@ -1081,13 +1765,7 @@ paths:
           content:
             application/json:
               schema:
-                type: object
-                properties:
-                  success:
-                    type: boolean
-                    example: true
-                  data:
-                    $ref: '#/components/schemas/User'
+                $ref: '#/components/schemas/UserProfileResponse'
     delete:
       summary: Delete user account
       tags: [Users]
@@ -1119,13 +1797,7 @@ paths:
           content:
             application/json:
               schema:
-                type: object
-                properties:
-                  success:
-                    type: boolean
-                    example: true
-                  data:
-                    $ref: '#/components/schemas/User'
+                $ref: '#/components/schemas/UserProfileResponse'
 
   /api/v1/users/{user_id}/avatar:
     put:
@@ -1151,13 +1823,7 @@ paths:
           content:
             application/json:
               schema:
-                type: object
-                properties:
-                  success:
-                    type: boolean
-                    example: true
-                  data:
-                    $ref: '#/components/schemas/User'
+                $ref: '#/components/schemas/UserProfileResponse'
 
   /api/v1/users/me/saved-locations:
     get:
@@ -1171,15 +1837,7 @@ paths:
           content:
             application/json:
               schema:
-                type: object
-                properties:
-                  success:
-                    type: boolean
-                    example: true
-                  data:
-                    type: array
-                    items:
-                      $ref: '#/components/schemas/SavedLocation'
+                $ref: '#/components/schemas/SavedLocationListResponse'
     post:
       summary: Create a saved location
       tags: [Users]
@@ -1197,13 +1855,7 @@ paths:
           content:
             application/json:
               schema:
-                type: object
-                properties:
-                  success:
-                    type: boolean
-                    example: true
-                  data:
-                    $ref: '#/components/schemas/SavedLocation'
+                $ref: '#/components/schemas/SavedLocationResponse'
 
   /api/v1/users/me/saved-locations/{saved_location_id}:
     put:
@@ -1229,13 +1881,7 @@ paths:
           content:
             application/json:
               schema:
-                type: object
-                properties:
-                  success:
-                    type: boolean
-                    example: true
-                  data:
-                    $ref: '#/components/schemas/SavedLocation'
+                $ref: '#/components/schemas/SavedLocationResponse'
     delete:
       summary: Delete a saved location
       tags: [Users]
@@ -1272,26 +1918,26 @@ paths:
           schema:
             type: integer
             default: 20
+         - in: query
+           name: sort
+           schema:
+                  type: string
+             example: "created_at"
+           description: Sort field
+         - in: query
+           name: order
+           schema:
+                  type: string
+             enum: [asc, desc]
+             default: desc
+           description: Sort direction
       responses:
         '200':
           description: Favorites retrieved
           content:
             application/json:
               schema:
-                type: object
-                properties:
-                  success:
-                    type: boolean
-                    example: true
-                  data:
-                    type: object
-                    properties:
-                      favorites:
-                        type: array
-                        items:
-                          $ref: '#/components/schemas/Listing'
-                      pagination:
-                        $ref: '#/components/schemas/Pagination'
+                $ref: '#/components/schemas/FavoritesListResponse'
     post:
       summary: Add listing to favorites
       tags: [Users]
@@ -1348,26 +1994,29 @@ paths:
           schema:
             type: integer
             default: 20
+         - in: query
+           name: sort
+           schema:
+                    type: string
+             example: "searched_at"
+         - in: query
+           name: order
+           schema:
+                        type: string
+             enum: [asc, desc]
+             default: desc
+         - in: query
+           name: search
+           schema:
+             type: string
+           description: Filter by query text
       responses:
         '200':
           description: Search history retrieved
           content:
             application/json:
               schema:
-                type: object
-                properties:
-                  success:
-                    type: boolean
-                    example: true
-                  data:
-                    type: object
-                    properties:
-                      history:
-                        type: array
-                        items:
-                          $ref: '#/components/schemas/SearchHistoryEntry'
-                      pagination:
-                        $ref: '#/components/schemas/Pagination'
+                $ref: '#/components/schemas/SearchHistoryListResponse'
     delete:
       summary: Clear entire search history
       tags: [Users]
@@ -1402,7 +2051,7 @@ paths:
                 $ref: '#/components/schemas/SuccessResponse'
 
   # LISTINGS ENDPOINTS
-  /listings:
+  /api/v1/listings:
     get:
       summary: Search and filter listings
       tags: [Listings]
@@ -1477,11 +2126,18 @@ paths:
             type: integer
           description: Number of guests
         - in: query
-          name: sort_by
+          name: sort
           schema:
             type: string
-            enum: [distance, rating, price_low, price_high, popularity]
-          description: Sort results by
+            enum: [distance, rating, price, popularity]
+          description: Field to sort by
+        - in: query
+          name: order
+          schema:
+            type: string
+            enum: [asc, desc]
+            default: desc
+          description: Sort direction
         - in: query
           name: page
           schema:
@@ -1501,69 +2157,7 @@ paths:
           content:
             application/json:
               schema:
-                type: object
-                properties:
-                  success:
-                    type: boolean
-                    example: true
-                  data:
-                    type: object
-                    properties:
-                      listings:
-                        type: array
-                        items:
-                          $ref: '#/components/schemas/Listing'
-                      pagination:
-                        $ref: '#/components/schemas/Pagination'
-                      filters:
-                        type: object
-                        properties:
-                          applied:
-                            $ref: '#/components/schemas/SearchParams'
-                          available:
-                            type: object
-                            example:
-                              categories: ["hotel", "restaurant", "event"]
-                              price_ranges: [{"min": 0, "max": 50}, {"min": 50, "max": 100}]
-          examples:
-            hotel_listing:
-              summary: Hotel listing response
-              value:
-                success: true
-                data:
-                  listings:
-                    - listing_id: 5001
-                      merchant_id: 1001
-                      title: "Kigali Marriott Hotel"
-                      description: "Luxury hotel in the heart of Kigali"
-                      type: "hotel"
-                      base_price: 150.00
-                      is_active: true
-                      location:
-                        location_id: 1
-                        address_line_1: "KN 4 Ave"
-                        city: "Kigali"
-                        district: "Gasabo"
-                        latitude: -1.9441
-                        longitude: 30.0619
-                      gallery_images: ["https://cdn.zoearwanda.com/listings/5001/1.jpg"]
-                      hotel_room_types:
-                        - room_type_id: 1
-                          name: "Deluxe King Room"
-                          description: "Spacious room with king bed"
-                          max_occupancy: 2
-                          total_rooms: 10
-                          amenities: ["wifi", "air_conditioning", "tv"]
-                          base_price: 200.00
-                      restaurant_tables: []
-                      events: []
-                  pagination:
-                    current_page: 1
-                    total_pages: 5
-                    total_items: 95
-                    items_per_page: 20
-                    has_next: true
-                    has_prev: false
+                $ref: '#/components/schemas/ListingListResponse'
 
     post:
       summary: Create a new listing (Merchant only)
@@ -1611,18 +2205,9 @@ paths:
           content:
             application/json:
               schema:
-                type: object
-                properties:
-                  success:
-                    type: boolean
-                    example: true
-                  message:
-                    type: string
-                    example: "Listing created successfully"
-                  data:
-                    $ref: '#/components/schemas/Listing'
+                $ref: '#/components/schemas/ListingResponse'
 
-  /listings/{listing_id}:
+  /api/v1/listings/{listing_id}:
     get:
       summary: Get listing details by ID
       tags: [Listings]
@@ -1639,89 +2224,10 @@ paths:
           content:
             application/json:
               schema:
-                type: object
-                properties:
-                  success:
-                    type: boolean
-                    example: true
-                  data:
-                    $ref: '#/components/schemas/Listing'
-          examples:
-            hotel_detail:
-              summary: Hotel listing detail
-              value:
-                success: true
-                data:
-                  listing_id: 5001
-                  merchant_id: 1001
-                  title: "Kigali Marriott Hotel"
-                  description: "Luxury 5-star hotel in Kigali city center"
-                  type: "hotel"
-                  base_price: 150.00
-                  is_active: true
-                  location:
-                    location_id: 1
-                    address_line_1: "KN 4 Ave"
-                    city: "Kigali"
-                    district: "Gasabo"
-                    neighborhood: "Kacyiru"
-                    latitude: -1.9441
-                    longitude: 30.0619
-                  gallery_images: 
-                    - "https://cdn.zoearwanda.com/listings/5001/1.jpg"
-                    - "https://cdn.zoearwanda.com/listings/5001/2.jpg"
-                  hotel_room_types:
-                    - room_type_id: 1
-                      name: "Deluxe King Room"
-                      description: "Spacious room with king bed and city view"
-                      max_occupancy: 2
-                      total_rooms: 10
-                      amenities: ["wifi", "air_conditioning", "tv", "minibar", "safe"]
-                      board_type: "BB"
-                      is_refundable: true
-                      base_price: 200.00
-                      rate_plans:
-                        - rate_plan_id: 1
-                          name: "Standard Rate"
-                          price: 200.00
-                          is_refundable: true
-                          min_stay: 1
-                          max_stay: 14
-            restaurant_detail:
-              summary: Restaurant listing detail
-              value:
-                success: true
-                data:
-                  listing_id: 5002
-                  merchant_id: 1002
-                  title: "Heaven Restaurant & Boutique Hotel"
-                  description: "Panoramic views of Kigali with international cuisine"
-                  type: "restaurant"
-                  base_price: 35.00
-                  is_active: true
-                  location:
-                    location_id: 2
-                    address_line_1: "KG 7 Ave"
-                    city: "Kigali"
-                    district: "Kicukiro"
-                    latitude: -1.9686
-                    longitude: 30.1044
-                  gallery_images: 
-                    - "https://cdn.zoearwanda.com/listings/5002/1.jpg"
-                  restaurant_tables:
-                    - table_id: 1
-                      table_type: "outdoor"
-                      capacity: 4
-                      table_count: 12
-                      min_booking_duration_minutes: 90
-                    - table_id: 2
-                      table_type: "private"
-                      capacity: 8
-                      table_count: 2
-                      min_booking_duration_minutes: 120
+                $ref: '#/components/schemas/ListingResponse'
 
   # BOOKINGS ENDPOINTS
-  /bookings:
+  /api/v1/bookings:
     get:
       summary: Get user's bookings
       tags: [Bookings]
@@ -1741,6 +2247,19 @@ paths:
             enum: [hotel_stay, event_ticket, restaurant, tour, product, service]
           description: Filter by booking type
         - in: query
+          name: sort
+          schema:
+            type: string
+            enum: [created_at, start_time, end_time, status]
+          description: Field to sort by
+        - in: query
+          name: order
+          schema:
+            type: string
+            enum: [asc, desc]
+            default: desc
+          description: Sort direction
+        - in: query
           name: page
           schema:
             type: integer
@@ -1758,20 +2277,7 @@ paths:
           content:
             application/json:
               schema:
-                type: object
-                properties:
-                  success:
-                    type: boolean
-                    example: true
-                  data:
-                    type: object
-                    properties:
-                      bookings:
-                        type: array
-                        items:
-                          $ref: '#/components/schemas/Booking'
-                      pagination:
-                        $ref: '#/components/schemas/Pagination'
+                $ref: '#/components/schemas/BookingListResponse'
 
     post:
       summary: Create a new booking
@@ -1841,18 +2347,9 @@ paths:
           content:
             application/json:
               schema:
-                type: object
-                properties:
-                  success:
-                    type: boolean
-                    example: true
-                  message:
-                    type: string
-                    example: "Booking created successfully"
-                  data:
-                    $ref: '#/components/schemas/Booking'
+                $ref: '#/components/schemas/BookingResponse'
 
-  /bookings/{booking_id}:
+  /api/v1/bookings/{booking_id}:
     get:
       summary: Get booking details
       tags: [Bookings]
@@ -1870,13 +2367,7 @@ paths:
           content:
             application/json:
               schema:
-                type: object
-                properties:
-                  success:
-                    type: boolean
-                    example: true
-                  data:
-                    $ref: '#/components/schemas/Booking'
+                $ref: '#/components/schemas/BookingResponse'
 
     patch:
       summary: Update booking (cancel, modify)
@@ -1912,7 +2403,7 @@ paths:
                 $ref: '#/components/schemas/SuccessResponse'
 
   # PAYMENTS ENDPOINTS
-  /payments/initiate:
+  /api/v1/payments/initiate:
     post:
       summary: Initiate a payment
       tags: [Payments]
@@ -1950,30 +2441,10 @@ paths:
           content:
             application/json:
               schema:
-                type: object
-                properties:
-                  success:
-                    type: boolean
-                    example: true
-                  data:
-                    type: object
-                    properties:
-                      payment_id:
-                        type: integer
-                        example: 9001
-                      transaction_id:
-                        type: string
-                        example: "TXN_2024_8001"
-                      payment_url:
-                        type: string
-                        example: "https://payment.zoearwanda.com/checkout/txn_2024_8001"
-                      expires_at:
-                        type: string
-                        format: date-time
-                        example: "2024-03-01T11:15:00Z"
+                $ref: '#/components/schemas/PaymentInitiateResponse'
 
   # REVIEWS ENDPOINTS
-  /reviews:
+  /api/v1/reviews:
     post:
       summary: Create a review
       tags: [Reviews]
@@ -2032,10 +2503,477 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/SuccessResponse'
+                $ref: '#/components/schemas/ReviewResponse'
 
   # MERCHANT ENDPOINTS
-  /merchants/{merchant_id}/analytics:
+  /api/v1/merchants/apply:
+    post:
+      summary: Submit merchant onboarding application
+      tags: [Merchants]
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/MerchantApplicationRequest'
+      responses:
+        '201':
+          description: Application submitted
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MerchantApplicationResponse'
+        '400':
+          description: Validation error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /api/v1/merchants/onboarding-status:
+    get:
+      summary: Get current merchant onboarding status
+      tags: [Merchants]
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: Onboarding status retrieved
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MerchantOnboardingStatusResponse'
+
+  /api/v1/merchants/onboarding/{merchant_id}:
+    put:
+      summary: Update merchant onboarding review
+      tags: [Merchants]
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: path
+          name: merchant_id
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/MerchantOnboardingUpdateRequest'
+      responses:
+        '200':
+          description: Onboarding status updated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MerchantResponse'
+        '404':
+          description: Merchant not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /api/v1/merchants/{merchant_id}/documents:
+    post:
+      summary: Upload merchant onboarding document
+      tags: [Merchants]
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: path
+          name: merchant_id
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/MerchantDocumentUploadRequest'
+      responses:
+        '201':
+          description: Document uploaded
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SuccessResponse'
+
+  /api/v1/merchants/me:
+    get:
+      summary: Get merchant profile for current user
+      tags: [Merchants]
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: Merchant profile retrieved
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MerchantResponse'
+    put:
+      summary: Update merchant profile
+      tags: [Merchants]
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/MerchantUpdateRequest'
+      responses:
+        '200':
+          description: Merchant profile updated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MerchantResponse'
+
+  /api/v1/merchants/{merchant_id}:
+    get:
+      summary: Get merchant profile by ID
+      tags: [Merchants]
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: path
+          name: merchant_id
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Merchant profile retrieved
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MerchantResponse'
+        '404':
+          description: Merchant not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /api/v1/merchants/search:
+    get:
+      summary: Search and filter merchants
+      tags: [Merchants]
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: query
+          name: page
+          schema:
+            type: integer
+            default: 1
+        - in: query
+          name: limit
+          schema:
+            type: integer
+            default: 20
+        - in: query
+          name: sort
+          schema:
+            type: string
+            example: "business_name"
+        - in: query
+          name: order
+          schema:
+            type: string
+            enum: [asc, desc]
+            default: asc
+        - in: query
+          name: search
+          schema:
+            type: string
+            description: "Search text for merchant name or description"
+        - in: query
+          name: status
+          schema:
+            type: string
+            example: "active"
+        - in: query
+          name: category
+          schema:
+            type: string
+            example: "hotel"
+        - in: query
+          name: city
+          schema:
+            type: string
+            example: "Kigali"
+      responses:
+        '200':
+          description: Merchants retrieved
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MerchantSearchResponse'
+
+  /api/v1/merchants/me/locations:
+    get:
+      summary: List merchant locations
+      tags: [Merchants]
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: Merchant locations retrieved
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MerchantLocationListResponse'
+    post:
+      summary: Create a merchant location
+      tags: [Merchants]
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/MerchantLocationCreate'
+      responses:
+        '201':
+          description: Merchant location created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MerchantLocationResponse'
+
+  /api/v1/merchants/me/locations/{location_id}:
+    put:
+      summary: Update a merchant location
+      tags: [Merchants]
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: path
+          name: location_id
+          required: true
+          schema:
+                  type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/MerchantLocationUpdate'
+      responses:
+        '200':
+          description: Merchant location updated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MerchantLocationResponse'
+    delete:
+      summary: Delete a merchant location
+      tags: [Merchants]
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: path
+          name: location_id
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Merchant location deleted
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SuccessResponse'
+
+  /api/v1/merchants/me/subscriptions:
+    get:
+      summary: List merchant subscriptions
+      tags: [Merchants]
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: query
+          name: page
+          schema:
+            type: integer
+            default: 1
+        - in: query
+          name: limit
+          schema:
+            type: integer
+            default: 20
+      responses:
+        '200':
+          description: Merchant subscriptions retrieved
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MerchantSubscriptionListResponse'
+    post:
+      summary: Create a merchant subscription
+      tags: [Merchants]
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/MerchantSubscriptionRequest'
+      responses:
+        '201':
+          description: Merchant subscription created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MerchantSubscriptionResponse'
+
+  /api/v1/merchants/me/subscriptions/{subscription_id}:
+    put:
+      summary: Update a merchant subscription
+      tags: [Merchants]
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: path
+          name: subscription_id
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/MerchantSubscriptionRequest'
+      responses:
+        '200':
+          description: Merchant subscription updated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MerchantSubscriptionResponse'
+    delete:
+      summary: Cancel a merchant subscription
+      tags: [Merchants]
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: path
+          name: subscription_id
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Merchant subscription cancelled
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SuccessResponse'
+
+  /api/v1/merchants/me/promotions:
+    get:
+      summary: List merchant promotions
+      tags: [Merchants]
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: query
+          name: page
+          schema:
+            type: integer
+            default: 1
+        - in: query
+          name: limit
+          schema:
+            type: integer
+            default: 20
+        - in: query
+          name: status
+          schema:
+            type: string
+            example: "active"
+      responses:
+        '200':
+          description: Merchant promotions retrieved
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MerchantPromotionListResponse'
+    post:
+      summary: Create a merchant promotion
+      tags: [Merchants]
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/MerchantPromotionRequest'
+      responses:
+        '201':
+          description: Merchant promotion created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MerchantPromotionResponse'
+
+  /api/v1/merchants/me/promotions/{promotion_id}:
+    put:
+      summary: Update a merchant promotion
+      tags: [Merchants]
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: path
+          name: promotion_id
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/MerchantPromotionRequest'
+      responses:
+        '200':
+          description: Merchant promotion updated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MerchantPromotionResponse'
+    delete:
+      summary: Delete a merchant promotion
+      tags: [Merchants]
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: path
+          name: promotion_id
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Merchant promotion deleted
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SuccessResponse'
+
+  /api/v1/merchants/{merchant_id}/analytics:
     get:
       summary: Get merchant analytics
       tags: [Merchants]
@@ -2069,30 +3007,7 @@ paths:
           content:
             application/json:
               schema:
-                type: object
-                properties:
-                  success:
-                    type: boolean
-                    example: true
-                  data:
-                    type: object
-                    properties:
-                      visits:
-                        type: integer
-                        example: 1250
-                      orders:
-                        type: integer
-                        example: 89
-                      bookings:
-                        type: integer
-                        example: 45
-                      revenue:
-                        type: number
-                        format: float
-                        example: 12500.50
-                      period:
-                        type: string
-                        example: "monthly"
+                $ref: '#/components/schemas/MerchantAnalyticsResponse'
 
 tags:
   - name: Authentication

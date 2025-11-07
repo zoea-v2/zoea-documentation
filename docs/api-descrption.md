@@ -17,7 +17,7 @@
 
 ## Authentication & Users
 
-### User Registration & Authentication
+### User Registration & Authentication ✅
 ```http
 POST /api/v1/auth/register
 POST /api/v1/auth/login
