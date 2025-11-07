@@ -15,9 +15,9 @@
 
 ---
 
-## Authentication & Users
+## Authentication & Users ✅
 
-### User Registration & Authentication ✅
+### User Registration & Authentication 
 ```http
 POST /api/v1/auth/register
 POST /api/v1/auth/login
@@ -62,7 +62,7 @@ DELETE /api/v1/users/me/search-history
 
 ---
 
-## Merchant Management
+## Merchant Management ✅ , subscription(to discuss)
 
 ### Merchant Onboarding
 ```http
@@ -106,7 +106,7 @@ DELETE /api/v1/merchants/me/promotions/{promotion_id}
 
 ---
 
-## Agent System
+## Agent System 
 
 ### Agent Registration & Management
 ```http

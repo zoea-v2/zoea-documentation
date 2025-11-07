@@ -9,6 +9,16 @@ servers:
   - url: https://api.zoea.local
     description: Zoea V2 primary API server
 tags:
+  - name: Authentication
+    description: Account registration, login, and credential management.
+  - name: Users
+    description: User profile and account management.
+  - name: Saved Locations
+    description: Manage user saved locations.
+  - name: User Favorites
+    description: Manage favorite listings for a user.
+  - name: Search History
+    description: Manage user search history records.
   - name: Merchant Onboarding
     description: Onboarding workflows for new merchants.
   - name: Merchant Profile
@@ -20,6 +30,757 @@ tags:
   - name: Merchant Promotions
     description: Manage merchant promotional campaigns.
 paths:
+  /api/v1/auth/register:
+    post:
+      tags:
+        - Authentication
+      summary: Register a new user account
+      operationId: registerUserAccount
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UserRegistrationRequest'
+      responses:
+        '201':
+          description: User registered successfully
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/SuccessResponse'
+                  - type: object
+                    properties:
+                      data:
+                        $ref: '#/components/schemas/AuthResponse'
+              examples:
+                userRegistered:
+                  value:
+                    status: success
+                    message: User registered successfully
+                    data:
+                      user:
+                        user_id: 2001
+                        first_name: Alice
+                        last_name: Umutesi
+                        email: alice@example.com
+                        phone_number: '+250788000111'
+                        avatar_url: https://cdn.zoea.rw/avatars/2001.png
+                        default_city: Kigali
+                        is_verified: false
+                        created_at: 2025-11-07T08:00:00Z
+                        updated_at: 2025-11-07T08:00:00Z
+                      tokens:
+                        access_token: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
+                        refresh_token: 3b2f6d4b-9c5a-4ac5-9f5b-87f6ecddc6bb
+                        expires_in: 3600
+        '400':
+          $ref: '#/components/responses/BadRequestError'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+  /api/v1/auth/login:
+    post:
+      tags:
+        - Authentication
+      summary: Authenticate an existing user
+      operationId: loginUser
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UserLoginRequest'
+      responses:
+        '200':
+          description: User authenticated successfully
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/SuccessResponse'
+                  - type: object
+                    properties:
+                      data:
+                        $ref: '#/components/schemas/AuthResponse'
+              examples:
+                userLogin:
+                  value:
+                    status: success
+                    message: Login successful
+                    data:
+                      user:
+                        user_id: 2001
+                        first_name: Alice
+                        last_name: Umutesi
+                        email: alice@example.com
+                        phone_number: '+250788000111'
+                        avatar_url: https://cdn.zoea.rw/avatars/2001.png
+                        default_city: Kigali
+                        is_verified: true
+                        created_at: 2025-01-10T09:00:00Z
+                        updated_at: 2025-11-07T07:32:00Z
+                      tokens:
+                        access_token: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
+                        refresh_token: 13a2cbf5-25ba-43f5-9e0b-5aef2c6782e4
+                        expires_in: 3600
+        '400':
+          $ref: '#/components/responses/BadRequestError'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+  /api/v1/auth/logout:
+    post:
+      tags:
+        - Authentication
+      summary: Logout the current session
+      operationId: logoutUser
+      security:
+        - BearerAuth: []
+      responses:
+        '200':
+          description: User logged out successfully
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/SuccessResponse'
+                  - type: object
+                    properties:
+                      data:
+                        $ref: '#/components/schemas/Acknowledgement'
+              examples:
+                userLogout:
+                  value:
+                    status: success
+                    message: Logout successful
+                    data:
+                      acknowledged: true
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+  /api/v1/auth/refresh-token:
+    post:
+      tags:
+        - Authentication
+      summary: Refresh access and refresh tokens
+      operationId: refreshAuthToken
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RefreshTokenRequest'
+      responses:
+        '200':
+          description: Tokens refreshed successfully
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/SuccessResponse'
+                  - type: object
+                    properties:
+                      data:
+                        $ref: '#/components/schemas/AuthTokens'
+              examples:
+                tokenRefresh:
+                  value:
+                    status: success
+                    message: Tokens refreshed
+                    data:
+                      access_token: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
+                      refresh_token: 8d6e2df0-8895-4b54-b1f1-bd8d2b7aa122
+                      expires_in: 3600
+        '400':
+          $ref: '#/components/responses/BadRequestError'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+  /api/v1/auth/forgot-password:
+    post:
+      tags:
+        - Authentication
+      summary: Initiate password reset flow
+      operationId: initiatePasswordReset
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ForgotPasswordRequest'
+      responses:
+        '200':
+          description: Password reset email dispatched
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/SuccessResponse'
+                  - type: object
+                    properties:
+                      data:
+                        $ref: '#/components/schemas/PasswordResetDispatch'
+              examples:
+                passwordResetInit:
+                  value:
+                    status: success
+                    message: Password reset instructions sent
+                    data:
+                      email: alice@example.com
+                      reset_token_sent: true
+                      expires_in: 900
+        '400':
+          $ref: '#/components/responses/BadRequestError'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+  /api/v1/auth/reset-password:
+    post:
+      tags:
+        - Authentication
+      summary: Complete password reset
+      operationId: resetPassword
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ResetPasswordRequest'
+      responses:
+        '200':
+          description: Password reset successfully
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/SuccessResponse'
+                  - type: object
+                    properties:
+                      data:
+                        $ref: '#/components/schemas/PasswordResetResult'
+              examples:
+                passwordResetComplete:
+                  value:
+                    status: success
+                    message: Password reset completed
+                    data:
+                      password_reset: true
+        '400':
+          $ref: '#/components/responses/BadRequestError'
+        '404':
+          $ref: '#/components/responses/NotFoundError'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+  /api/v1/auth/verify-email:
+    post:
+      tags:
+        - Authentication
+      summary: Verify a user email address
+      operationId: verifyEmail
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/VerifyEmailRequest'
+      responses:
+        '200':
+          description: Email verified successfully
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/SuccessResponse'
+                  - type: object
+                    properties:
+                      data:
+                        $ref: '#/components/schemas/EmailVerificationResult'
+              examples:
+                emailVerified:
+                  value:
+                    status: success
+                    message: Email verified successfully
+                    data:
+                      verified: true
+        '400':
+          $ref: '#/components/responses/BadRequestError'
+        '404':
+          $ref: '#/components/responses/NotFoundError'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+  /api/v1/users/me:
+    get:
+      tags:
+        - Users
+      summary: Retrieve the authenticated user profile
+      operationId: getAuthenticatedUser
+      security:
+        - BearerAuth: []
+      responses:
+        '200':
+          description: Authenticated user profile retrieved
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/SuccessResponse'
+                  - type: object
+                    properties:
+                      data:
+                        $ref: '#/components/schemas/User'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+    put:
+      tags:
+        - Users
+      summary: Replace the authenticated user profile
+      operationId: updateAuthenticatedUser
+      security:
+        - BearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UserProfileUpdateRequest'
+      responses:
+        '200':
+          description: Authenticated user profile updated
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/SuccessResponse'
+                  - type: object
+                    properties:
+                      data:
+                        $ref: '#/components/schemas/User'
+        '400':
+          $ref: '#/components/responses/BadRequestError'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+    patch:
+      tags:
+        - Users
+      summary: Partially update the authenticated user profile
+      operationId: patchAuthenticatedUser
+      security:
+        - BearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UserProfilePatchRequest'
+      responses:
+        '200':
+          description: Authenticated user profile updated
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/SuccessResponse'
+                  - type: object
+                    properties:
+                      data:
+                        $ref: '#/components/schemas/User'
+        '400':
+          $ref: '#/components/responses/BadRequestError'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+    delete:
+      tags:
+        - Users
+      summary: Deactivate the authenticated user account
+      operationId: deleteAuthenticatedUser
+      security:
+        - BearerAuth: []
+      responses:
+        '200':
+          description: Authenticated user account deactivated
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/SuccessResponse'
+                  - type: object
+                    properties:
+                      data:
+                        $ref: '#/components/schemas/AccountDeletionResult'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+  /api/v1/users/{user_id}:
+    get:
+      tags:
+        - Users
+      summary: Retrieve a user profile by identifier
+      operationId: getUserById
+      security:
+        - BearerAuth: []
+      parameters:
+        - $ref: '#/components/parameters/UserIdParam'
+      responses:
+        '200':
+          description: User profile retrieved
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/SuccessResponse'
+                  - type: object
+                    properties:
+                      data:
+                        $ref: '#/components/schemas/User'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '404':
+          $ref: '#/components/responses/NotFoundError'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+  /api/v1/users/{user_id}/avatar:
+    put:
+      tags:
+        - Users
+      summary: Update a user avatar
+      operationId: updateUserAvatar
+      security:
+        - BearerAuth: []
+      parameters:
+        - $ref: '#/components/parameters/UserIdParam'
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/UserAvatarUploadRequest'
+      responses:
+        '200':
+          description: User avatar updated
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/SuccessResponse'
+                  - type: object
+                    properties:
+                      data:
+                        $ref: '#/components/schemas/User'
+        '400':
+          $ref: '#/components/responses/BadRequestError'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '404':
+          $ref: '#/components/responses/NotFoundError'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+  /api/v1/users/me/saved-locations:
+    get:
+      tags:
+        - Saved Locations
+      summary: List saved locations for the authenticated user
+      operationId: listSavedLocations
+      security:
+        - BearerAuth: []
+      parameters:
+        - $ref: '#/components/parameters/PageParam'
+        - $ref: '#/components/parameters/LimitParam'
+        - $ref: '#/components/parameters/SortParam'
+        - $ref: '#/components/parameters/SearchParam'
+      responses:
+        '200':
+          description: Saved locations retrieved
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/PaginatedSuccessResponse'
+                  - type: object
+                    properties:
+                      data:
+                        type: array
+                        items:
+                          $ref: '#/components/schemas/SavedLocation'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+    post:
+      tags:
+        - Saved Locations
+      summary: Create a saved location for the authenticated user
+      operationId: createSavedLocation
+      security:
+        - BearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SavedLocationRequest'
+      responses:
+        '201':
+          description: Saved location created
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/SuccessResponse'
+                  - type: object
+                    properties:
+                      data:
+                        $ref: '#/components/schemas/SavedLocation'
+        '400':
+          $ref: '#/components/responses/BadRequestError'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+  /api/v1/users/me/saved-locations/{saved_location_id}:
+    put:
+      tags:
+        - Saved Locations
+      summary: Update a saved location
+      operationId: updateSavedLocation
+      security:
+        - BearerAuth: []
+      parameters:
+        - $ref: '#/components/parameters/SavedLocationIdParam'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SavedLocationRequest'
+      responses:
+        '200':
+          description: Saved location updated
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/SuccessResponse'
+                  - type: object
+                    properties:
+                      data:
+                        $ref: '#/components/schemas/SavedLocation'
+        '400':
+          $ref: '#/components/responses/BadRequestError'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '404':
+          $ref: '#/components/responses/NotFoundError'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+    delete:
+      tags:
+        - Saved Locations
+      summary: Delete a saved location
+      operationId: deleteSavedLocation
+      security:
+        - BearerAuth: []
+      parameters:
+        - $ref: '#/components/parameters/SavedLocationIdParam'
+      responses:
+        '200':
+          description: Saved location deleted
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/SuccessResponse'
+                  - type: object
+                    properties:
+                      data:
+                        $ref: '#/components/schemas/Acknowledgement'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '404':
+          $ref: '#/components/responses/NotFoundError'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+  /api/v1/users/me/favorites:
+    get:
+      tags:
+        - User Favorites
+      summary: List favorite listings for the authenticated user
+      operationId: listUserFavorites
+      security:
+        - BearerAuth: []
+      parameters:
+        - $ref: '#/components/parameters/PageParam'
+        - $ref: '#/components/parameters/LimitParam'
+        - $ref: '#/components/parameters/SortParam'
+        - $ref: '#/components/parameters/SearchParam'
+      responses:
+        '200':
+          description: Favorite listings retrieved
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/PaginatedSuccessResponse'
+                  - type: object
+                    properties:
+                      data:
+                        type: array
+                        items:
+                          $ref: '#/components/schemas/UserFavorite'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+    post:
+      tags:
+        - User Favorites
+      summary: Add a listing to user favorites
+      operationId: createUserFavorite
+      security:
+        - BearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UserFavoriteRequest'
+      responses:
+        '201':
+          description: Favorite listing created
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/SuccessResponse'
+                  - type: object
+                    properties:
+                      data:
+                        $ref: '#/components/schemas/UserFavorite'
+        '400':
+          $ref: '#/components/responses/BadRequestError'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+  /api/v1/users/me/favorites/{listing_id}:
+    delete:
+      tags:
+        - User Favorites
+      summary: Remove a listing from user favorites
+      operationId: deleteUserFavorite
+      security:
+        - BearerAuth: []
+      parameters:
+        - $ref: '#/components/parameters/ListingIdParam'
+      responses:
+        '200':
+          description: Favorite listing removed
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/SuccessResponse'
+                  - type: object
+                    properties:
+                      data:
+                        $ref: '#/components/schemas/Acknowledgement'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '404':
+          $ref: '#/components/responses/NotFoundError'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+  /api/v1/users/me/search-history:
+    get:
+      tags:
+        - Search History
+      summary: List search history for the authenticated user
+      operationId: listUserSearchHistory
+      security:
+        - BearerAuth: []
+      parameters:
+        - $ref: '#/components/parameters/PageParam'
+        - $ref: '#/components/parameters/LimitParam'
+        - $ref: '#/components/parameters/SortParam'
+        - $ref: '#/components/parameters/SearchParam'
+      responses:
+        '200':
+          description: Search history entries retrieved
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/PaginatedSuccessResponse'
+                  - type: object
+                    properties:
+                      data:
+                        type: array
+                        items:
+                          $ref: '#/components/schemas/UserSearchHistoryEntry'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+    delete:
+      tags:
+        - Search History
+      summary: Clear all search history for the authenticated user
+      operationId: deleteUserSearchHistory
+      security:
+        - BearerAuth: []
+      responses:
+        '200':
+          description: Search history cleared
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/SuccessResponse'
+                  - type: object
+                    properties:
+                      data:
+                        $ref: '#/components/schemas/SearchHistoryClearResult'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+  /api/v1/users/me/search-history/{search_id}:
+    delete:
+      tags:
+        - Search History
+      summary: Delete a single search history entry
+      operationId: deleteUserSearchHistoryEntry
+      security:
+        - BearerAuth: []
+      parameters:
+        - $ref: '#/components/parameters/SearchIdParam'
+      responses:
+        '200':
+          description: Search history entry deleted
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/SuccessResponse'
+                  - type: object
+                    properties:
+                      data:
+                        $ref: '#/components/schemas/SearchHistoryDeleteResult'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '404':
+          $ref: '#/components/responses/NotFoundError'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
   /api/v1/merchants/apply:
     post:
       tags:
@@ -816,6 +1577,14 @@ components:
       schema:
         type: string
       description: Free text search query
+    UserIdParam:
+      in: path
+      name: user_id
+      required: true
+      schema:
+        type: integer
+        format: int64
+      description: Unique user identifier
     MerchantIdParam:
       in: path
       name: merchant_id
@@ -824,6 +1593,30 @@ components:
         type: integer
         format: int64
       description: Unique merchant identifier
+    SavedLocationIdParam:
+      in: path
+      name: saved_location_id
+      required: true
+      schema:
+        type: integer
+        format: int64
+      description: Unique saved location identifier
+    ListingIdParam:
+      in: path
+      name: listing_id
+      required: true
+      schema:
+        type: integer
+        format: int64
+      description: Unique listing identifier
+    SearchIdParam:
+      in: path
+      name: search_id
+      required: true
+      schema:
+        type: integer
+        format: int64
+      description: Unique search history identifier
     LocationIdParam:
       in: path
       name: location_id
@@ -987,6 +1780,371 @@ components:
                   pointer:
                     type: string
                     description: JSON pointer to the field in error
+    AuthTokens:
+      type: object
+      required:
+        - access_token
+        - refresh_token
+        - expires_in
+      properties:
+        access_token:
+          type: string
+        refresh_token:
+          type: string
+        expires_in:
+          type: integer
+          description: Lifetime of the access token in seconds
+    AuthResponse:
+      type: object
+      required:
+        - user
+        - tokens
+      properties:
+        user:
+          $ref: '#/components/schemas/User'
+        tokens:
+          $ref: '#/components/schemas/AuthTokens'
+    Acknowledgement:
+      type: object
+      required:
+        - acknowledged
+      properties:
+        acknowledged:
+          type: boolean
+        reference_id:
+          type: string
+          nullable: true
+    PasswordResetDispatch:
+      type: object
+      required:
+        - email
+        - reset_token_sent
+      properties:
+        email:
+          type: string
+          format: email
+        reset_token_sent:
+          type: boolean
+        expires_in:
+          type: integer
+          nullable: true
+          description: Number of seconds until reset token expires
+    PasswordResetResult:
+      type: object
+      required:
+        - password_reset
+      properties:
+        password_reset:
+          type: boolean
+    EmailVerificationResult:
+      type: object
+      required:
+        - verified
+      properties:
+        verified:
+          type: boolean
+    AccountDeletionResult:
+      type: object
+      required:
+        - deactivated
+      properties:
+        deactivated:
+          type: boolean
+        scheduled_at:
+          type: string
+          format: date-time
+          nullable: true
+          description: When the account will be fully purged, if applicable
+    SearchHistoryClearResult:
+      type: object
+      required:
+        - cleared
+      properties:
+        cleared:
+          type: boolean
+        removed_count:
+          type: integer
+          nullable: true
+    SearchHistoryDeleteResult:
+      type: object
+      required:
+        - deleted
+      properties:
+        deleted:
+          type: boolean
+        search_id:
+          type: integer
+          format: int64
+    User:
+      type: object
+      required:
+        - user_id
+        - first_name
+        - last_name
+        - email
+        - is_verified
+        - created_at
+        - updated_at
+      properties:
+        user_id:
+          type: integer
+          format: int64
+        first_name:
+          type: string
+        last_name:
+          type: string
+        email:
+          type: string
+          format: email
+        phone_number:
+          type: string
+          nullable: true
+        avatar_url:
+          type: string
+          format: uri
+          nullable: true
+        default_city:
+          type: string
+          nullable: true
+        is_verified:
+          type: boolean
+        created_at:
+          type: string
+          format: date-time
+        updated_at:
+          type: string
+          format: date-time
+    UserRegistrationRequest:
+      type: object
+      required:
+        - first_name
+        - last_name
+        - email
+        - password
+      properties:
+        first_name:
+          type: string
+          maxLength: 120
+        last_name:
+          type: string
+          maxLength: 120
+        email:
+          type: string
+          format: email
+        phone_number:
+          type: string
+        password:
+          type: string
+          format: password
+          minLength: 8
+        default_city:
+          type: string
+        referral_code:
+          type: string
+          nullable: true
+    UserLoginRequest:
+      type: object
+      required:
+        - email
+        - password
+      properties:
+        email:
+          type: string
+          format: email
+        password:
+          type: string
+          format: password
+    RefreshTokenRequest:
+      type: object
+      required:
+        - refresh_token
+      properties:
+        refresh_token:
+          type: string
+    ForgotPasswordRequest:
+      type: object
+      required:
+        - email
+      properties:
+        email:
+          type: string
+          format: email
+    ResetPasswordRequest:
+      type: object
+      required:
+        - token
+        - new_password
+      properties:
+        token:
+          type: string
+        new_password:
+          type: string
+          format: password
+          minLength: 8
+    VerifyEmailRequest:
+      type: object
+      required:
+        - token
+      properties:
+        token:
+          type: string
+    UserProfileUpdateRequest:
+      type: object
+      required:
+        - first_name
+        - last_name
+        - email
+      properties:
+        first_name:
+          type: string
+        last_name:
+          type: string
+        email:
+          type: string
+          format: email
+        phone_number:
+          type: string
+        default_city:
+          type: string
+        avatar_url:
+          type: string
+          format: uri
+    UserProfilePatchRequest:
+      type: object
+      properties:
+        first_name:
+          type: string
+        last_name:
+          type: string
+        email:
+          type: string
+          format: email
+        phone_number:
+          type: string
+        default_city:
+          type: string
+        avatar_url:
+          type: string
+          format: uri
+    UserAvatarUploadRequest:
+      type: object
+      required:
+        - avatar
+      properties:
+        avatar:
+          type: string
+          format: binary
+    SavedLocationRequest:
+      type: object
+      required:
+        - city
+        - district
+        - label
+      properties:
+        city:
+          type: string
+        district:
+          type: string
+        neighborhood:
+          type: string
+        label:
+          type: string
+        latitude:
+          type: number
+          format: float
+        longitude:
+          type: number
+          format: float
+    SavedLocation:
+      type: object
+      required:
+        - saved_location_id
+        - user_id
+        - city
+        - district
+        - label
+        - created_at
+      properties:
+        saved_location_id:
+          type: integer
+          format: int64
+        user_id:
+          type: integer
+          format: int64
+        city:
+          type: string
+        district:
+          type: string
+        neighborhood:
+          type: string
+          nullable: true
+        label:
+          type: string
+        latitude:
+          type: number
+          format: float
+          nullable: true
+        longitude:
+          type: number
+          format: float
+          nullable: true
+        created_at:
+          type: string
+          format: date-time
+    UserFavoriteRequest:
+      type: object
+      required:
+        - listing_id
+      properties:
+        listing_id:
+          type: integer
+          format: int64
+    UserFavorite:
+      type: object
+      required:
+        - favorite_id
+        - user_id
+        - listing_id
+        - created_at
+      properties:
+        favorite_id:
+          type: integer
+          format: int64
+        user_id:
+          type: integer
+          format: int64
+        listing_id:
+          type: integer
+          format: int64
+        created_at:
+          type: string
+          format: date-time
+    UserSearchHistoryEntry:
+      type: object
+      required:
+        - search_id
+        - user_id
+        - search_query
+        - searched_at
+      properties:
+        search_id:
+          type: integer
+          format: int64
+        user_id:
+          type: integer
+          format: int64
+        search_query:
+          type: string
+        filters:
+          type: object
+          additionalProperties: true
+          nullable: true
+        location:
+          type: string
+          nullable: true
+        searched_at:
+          type: string
+          format: date-time
     MerchantCategory:
       type: string
       enum:
