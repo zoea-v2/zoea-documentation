@@ -1938,19 +1938,19 @@ paths:
           schema:
             type: integer
             default: 20
-         - in: query
-           name: sort
-           schema:
-                  type: string
-             example: "created_at"
-           description: Sort field
-         - in: query
-           name: order
-           schema:
-                  type: string
-             enum: [asc, desc]
-             default: desc
-           description: Sort direction
+        - in: query
+          name: sort
+          schema:
+            type: string
+          example: "created_at"
+          description: Sort field
+        - in: query
+          name: order
+          schema:
+            type: string
+            enum: [asc, desc]
+            default: desc
+          description: Sort direction
       responses:
         '200':
           description: Favorites retrieved
@@ -2014,22 +2014,22 @@ paths:
           schema:
             type: integer
             default: 20
-         - in: query
-           name: sort
-           schema:
-                    type: string
-             example: "searched_at"
-         - in: query
-           name: order
-           schema:
-                        type: string
-             enum: [asc, desc]
-             default: desc
-         - in: query
-           name: search
-           schema:
-             type: string
-           description: Filter by query text
+        - in: query
+          name: sort
+          schema:
+            type: string
+          example: "searched_at"
+        - in: query
+          name: order
+          schema:
+            type: string
+            enum: [asc, desc]
+            default: desc
+        - in: query
+          name: search
+          schema:
+            type: string
+          description: Filter by query text
       responses:
         '200':
           description: Search history retrieved
