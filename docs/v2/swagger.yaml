@@ -19,6 +19,36 @@ tags:
     description: Manage favorite listings for a user.
   - name: Search History
     description: Manage user search history records.
+  - name: Agent Accounts
+    description: Agent registration and profile management.
+  - name: Agent Onboarding
+    description: Tools for agents onboarding users and merchants.
+  - name: Agent Commissions
+    description: Commission tracking and payouts for agents.
+  - name: Agent Leaderboard
+    description: Agent ranking and leaderboard insights.
+  - name: Agent Analytics
+    description: Agent performance analytics and reporting.
+  - name: Listings
+    description: Manage core listings catalog.
+  - name: Listing Locations
+    description: Manage locations attached to listings.
+  - name: Hotel Room Types
+    description: Manage hotel room types and related configurations.
+  - name: Rate Plans
+    description: Manage hotel rate plans and restrictions.
+  - name: Listing Availability
+    description: Manage availability calendars for listings and resources.
+  - name: Events
+    description: Manage events and associated ticket tiers.
+  - name: Restaurant Tables
+    description: Manage restaurant table configurations and availability checks.
+  - name: Products
+    description: Manage product inventory for listings.
+  - name: Services
+    description: Manage service offerings and availability.
+  - name: Tours
+    description: Manage tour packages, schedules, and add-ons.
   - name: Merchant Onboarding
     description: Onboarding workflows for new merchants.
   - name: Merchant Profile
@@ -779,6 +809,452 @@ paths:
           $ref: '#/components/responses/UnauthorizedError'
         '404':
           $ref: '#/components/responses/NotFoundError'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+  /api/v1/agents/apply:
+    post:
+      tags:
+        - Agent Accounts
+      summary: Apply to become an agent
+      operationId: applyForAgent
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AgentApplicationRequest'
+      responses:
+        '201':
+          description: Agent application submitted successfully
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/SuccessResponse'
+                  - type: object
+                    properties:
+                      data:
+                        $ref: '#/components/schemas/Agent'
+        '400':
+          $ref: '#/components/responses/BadRequestError'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+  /api/v1/agents/me:
+    get:
+      tags:
+        - Agent Accounts
+      summary: Retrieve the authenticated agent profile
+      operationId: getAuthenticatedAgent
+      security:
+        - BearerAuth: []
+      responses:
+        '200':
+          description: Authenticated agent profile retrieved
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/SuccessResponse'
+                  - type: object
+                    properties:
+                      data:
+                        $ref: '#/components/schemas/Agent'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+    put:
+      tags:
+        - Agent Accounts
+      summary: Update the authenticated agent profile
+      operationId: updateAuthenticatedAgent
+      security:
+        - BearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AgentProfileUpdateRequest'
+      responses:
+        '200':
+          description: Authenticated agent profile updated
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/SuccessResponse'
+                  - type: object
+                    properties:
+                      data:
+                        $ref: '#/components/schemas/Agent'
+        '400':
+          $ref: '#/components/responses/BadRequestError'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+  /api/v1/agents/{agent_id}:
+    get:
+      tags:
+        - Agent Accounts
+      summary: Retrieve an agent profile by identifier
+      operationId: getAgentById
+      security:
+        - BearerAuth: []
+      parameters:
+        - $ref: '#/components/parameters/AgentIdParam'
+      responses:
+        '200':
+          description: Agent profile retrieved
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/SuccessResponse'
+                  - type: object
+                    properties:
+                      data:
+                        $ref: '#/components/schemas/Agent'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '404':
+          $ref: '#/components/responses/NotFoundError'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+  /api/v1/agents/onboard-user:
+    post:
+      tags:
+        - Agent Onboarding
+      summary: Onboard a new user via agent
+      operationId: agentOnboardUser
+      security:
+        - BearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AgentOnboardUserRequest'
+      responses:
+        '201':
+          description: User onboarded successfully
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/SuccessResponse'
+                  - type: object
+                    properties:
+                      data:
+                        $ref: '#/components/schemas/AgentOnboardingResult'
+        '400':
+          $ref: '#/components/responses/BadRequestError'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+  /api/v1/agents/onboard-merchant:
+    post:
+      tags:
+        - Agent Onboarding
+      summary: Onboard a new merchant via agent
+      operationId: agentOnboardMerchant
+      security:
+        - BearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AgentOnboardMerchantRequest'
+      responses:
+        '201':
+          description: Merchant onboarded successfully
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/SuccessResponse'
+                  - type: object
+                    properties:
+                      data:
+                        $ref: '#/components/schemas/AgentOnboardingResult'
+        '400':
+          $ref: '#/components/responses/BadRequestError'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+  /api/v1/agents/onboarding-stats:
+    get:
+      tags:
+        - Agent Onboarding
+      summary: Retrieve onboarding statistics for the authenticated agent
+      operationId: getAgentOnboardingStats
+      security:
+        - BearerAuth: []
+      responses:
+        '200':
+          description: Agent onboarding statistics retrieved
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/SuccessResponse'
+                  - type: object
+                    properties:
+                      data:
+                        $ref: '#/components/schemas/AgentOnboardingStats'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+  /api/v1/agents/me/commissions:
+    get:
+      tags:
+        - Agent Commissions
+      summary: List commissions earned by the authenticated agent
+      operationId: listAgentCommissions
+      security:
+        - BearerAuth: []
+      parameters:
+        - $ref: '#/components/parameters/PageParam'
+        - $ref: '#/components/parameters/LimitParam'
+        - $ref: '#/components/parameters/SortParam'
+        - in: query
+          name: status
+          schema:
+            $ref: '#/components/schemas/CommissionStatus'
+          description: Filter by commission payment status
+        - in: query
+          name: commission_type
+          schema:
+            $ref: '#/components/schemas/CommissionType'
+          description: Filter by commission type
+      responses:
+        '200':
+          description: Agent commissions retrieved
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/PaginatedSuccessResponse'
+                  - type: object
+                    properties:
+                      data:
+                        type: array
+                        items:
+                          $ref: '#/components/schemas/Commission'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+  /api/v1/agents/me/commissions/summary:
+    get:
+      tags:
+        - Agent Commissions
+      summary: Retrieve commissions summary for the authenticated agent
+      operationId: getAgentCommissionSummary
+      security:
+        - BearerAuth: []
+      responses:
+        '200':
+          description: Agent commission summary retrieved
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/SuccessResponse'
+                  - type: object
+                    properties:
+                      data:
+                        $ref: '#/components/schemas/CommissionSummary'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+  /api/v1/agents/me/commissions/{commission_id}/payout:
+    post:
+      tags:
+        - Agent Commissions
+      summary: Request payout for a commission
+      operationId: payoutAgentCommission
+      security:
+        - BearerAuth: []
+      parameters:
+        - $ref: '#/components/parameters/CommissionIdParam'
+      responses:
+        '200':
+          description: Commission payout initiated
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/SuccessResponse'
+                  - type: object
+                    properties:
+                      data:
+                        $ref: '#/components/schemas/CommissionPayoutResult'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '404':
+          $ref: '#/components/responses/NotFoundError'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+  /api/v1/agents/leaderboard:
+    get:
+      tags:
+        - Agent Leaderboard
+      summary: Retrieve leaderboard standings for agents
+      operationId: getAgentLeaderboard
+      parameters:
+        - $ref: '#/components/parameters/PageParam'
+        - $ref: '#/components/parameters/LimitParam'
+        - $ref: '#/components/parameters/SortParam'
+        - in: query
+          name: period
+          schema:
+            $ref: '#/components/schemas/LeaderboardPeriod'
+          description: Filter leaderboard by period
+        - in: query
+          name: tier
+          schema:
+            $ref: '#/components/schemas/AgentTier'
+          description: Filter leaderboard by agent tier
+      responses:
+        '200':
+          description: Agent leaderboard retrieved
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/PaginatedSuccessResponse'
+                  - type: object
+                    properties:
+                      data:
+                        type: array
+                        items:
+                          $ref: '#/components/schemas/AgentLeaderboardEntry'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+  /api/v1/agents/leaderboard/{period}:
+    get:
+      tags:
+        - Agent Leaderboard
+      summary: Retrieve leaderboard standings for a specific period
+      operationId: getAgentLeaderboardByPeriod
+      parameters:
+        - $ref: '#/components/parameters/LeaderboardPeriodParam'
+        - $ref: '#/components/parameters/PageParam'
+        - $ref: '#/components/parameters/LimitParam'
+      responses:
+        '200':
+          description: Agent leaderboard retrieved for period
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/PaginatedSuccessResponse'
+                  - type: object
+                    properties:
+                      data:
+                        type: array
+                        items:
+                          $ref: '#/components/schemas/AgentLeaderboardEntry'
+        '404':
+          $ref: '#/components/responses/NotFoundError'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+  /api/v1/agents/me/leaderboard-position:
+    get:
+      tags:
+        - Agent Leaderboard
+      summary: Retrieve the authenticated agent leaderboard position
+      operationId: getAgentLeaderboardPosition
+      security:
+        - BearerAuth: []
+      responses:
+        '200':
+          description: Agent leaderboard position retrieved
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/SuccessResponse'
+                  - type: object
+                    properties:
+                      data:
+                        $ref: '#/components/schemas/AgentLeaderboardPosition'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+  /api/v1/agents/me/analytics:
+    get:
+      tags:
+        - Agent Analytics
+      summary: Retrieve analytics for the authenticated agent
+      operationId: getAgentAnalytics
+      security:
+        - BearerAuth: []
+      parameters:
+        - in: query
+          name: from
+          schema:
+            type: string
+            format: date
+          description: Start date filter
+        - in: query
+          name: to
+          schema:
+            type: string
+            format: date
+          description: End date filter
+      responses:
+        '200':
+          description: Agent analytics retrieved
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/SuccessResponse'
+                  - type: object
+                    properties:
+                      data:
+                        $ref: '#/components/schemas/AgentAnalytics'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+  /api/v1/agents/me/performance:
+    get:
+      tags:
+        - Agent Analytics
+      summary: Retrieve performance metrics for the authenticated agent
+      operationId: getAgentPerformance
+      security:
+        - BearerAuth: []
+      parameters:
+        - in: query
+          name: period
+          schema:
+            $ref: '#/components/schemas/LeaderboardPeriod'
+          description: Period over which to aggregate performance
+      responses:
+        '200':
+          description: Agent performance metrics retrieved
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/SuccessResponse'
+                  - type: object
+                    properties:
+                      data:
+                        $ref: '#/components/schemas/AgentPerformance'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
         '500':
           $ref: '#/components/responses/InternalServerError'
   /api/v1/merchants/apply:
@@ -1585,6 +2061,14 @@ components:
         type: integer
         format: int64
       description: Unique user identifier
+    AgentIdParam:
+      in: path
+      name: agent_id
+      required: true
+      schema:
+        type: integer
+        format: int64
+      description: Unique agent identifier
     MerchantIdParam:
       in: path
       name: merchant_id
@@ -1617,6 +2101,14 @@ components:
         type: integer
         format: int64
       description: Unique search history identifier
+    CommissionIdParam:
+      in: path
+      name: commission_id
+      required: true
+      schema:
+        type: integer
+        format: int64
+      description: Unique commission identifier
     LocationIdParam:
       in: path
       name: location_id
@@ -1641,6 +2133,13 @@ components:
         type: integer
         format: int64
       description: Unique promotion identifier
+    LeaderboardPeriodParam:
+      in: path
+      name: period
+      required: true
+      schema:
+        $ref: '#/components/schemas/LeaderboardPeriod'
+      description: Leaderboard aggregation period
   responses:
     BadRequestError:
       description: The request payload or parameters were invalid
@@ -2145,6 +2644,455 @@ components:
         searched_at:
           type: string
           format: date-time
+    AgentTier:
+      type: string
+      enum:
+        - bronze
+        - silver
+        - gold
+    AgentBadge:
+      type: string
+      enum:
+        - top_performer
+        - certified
+        - elite
+    Agent:
+      type: object
+      required:
+        - agent_id
+        - user_id
+        - agent_code
+        - tier
+        - commission_balance
+        - total_earnings
+        - momo_number
+        - successful_referrals
+        - is_certified
+        - joined_at
+        - updated_at
+      properties:
+        agent_id:
+          type: integer
+          format: int64
+        user_id:
+          type: integer
+          format: int64
+        agent_code:
+          type: string
+        tier:
+          $ref: '#/components/schemas/AgentTier'
+        badge:
+          $ref: '#/components/schemas/AgentBadge'
+          nullable: true
+        commission_balance:
+          type: number
+          format: float
+        total_earnings:
+          type: number
+          format: float
+        momo_number:
+          type: string
+        leaderboard_rank:
+          type: integer
+          nullable: true
+        successful_referrals:
+          type: integer
+        is_certified:
+          type: boolean
+        joined_at:
+          type: string
+          format: date-time
+        updated_at:
+          type: string
+          format: date-time
+    AgentApplicationRequest:
+      type: object
+      required:
+        - momo_number
+        - experience_summary
+      properties:
+        momo_number:
+          type: string
+        experience_summary:
+          type: string
+        preferred_tier:
+          $ref: '#/components/schemas/AgentTier'
+          nullable: true
+        regions_served:
+          type: array
+          items:
+            type: string
+        referral_code:
+          type: string
+          nullable: true
+    AgentProfileUpdateRequest:
+      type: object
+      properties:
+        momo_number:
+          type: string
+        badge:
+          $ref: '#/components/schemas/AgentBadge'
+        tier:
+          $ref: '#/components/schemas/AgentTier'
+        status_note:
+          type: string
+        leaderboard_rank:
+          type: integer
+        is_certified:
+          type: boolean
+    AgentOnboardUserRequest:
+      type: object
+      required:
+        - first_name
+        - last_name
+        - phone_number
+      properties:
+        first_name:
+          type: string
+        last_name:
+          type: string
+        email:
+          type: string
+          format: email
+          nullable: true
+        phone_number:
+          type: string
+        city:
+          type: string
+          nullable: true
+        referral_code:
+          type: string
+          nullable: true
+    AgentOnboardMerchantRequest:
+      type: object
+      required:
+        - business_name
+        - contact_phone
+        - category
+      properties:
+        business_name:
+          type: string
+        contact_person:
+          type: string
+          nullable: true
+        contact_email:
+          type: string
+          format: email
+          nullable: true
+        contact_phone:
+          type: string
+        category:
+          $ref: '#/components/schemas/MerchantCategory'
+        city:
+          type: string
+          nullable: true
+        district:
+          type: string
+          nullable: true
+        notes:
+          type: string
+          nullable: true
+    AgentOnboardingResult:
+      type: object
+      required:
+        - resource_type
+        - resource_id
+        - commission_awarded
+      properties:
+        resource_type:
+          type: string
+          enum:
+            - user
+            - merchant
+        resource_id:
+          type: integer
+          format: int64
+        commission_awarded:
+          type: number
+          format: float
+        currency:
+          type: string
+        referral_code:
+          type: string
+          nullable: true
+    AgentOnboardingStats:
+      type: object
+      required:
+        - total_users_onboarded
+        - total_merchants_onboarded
+        - conversions_last_30_days
+      properties:
+        total_users_onboarded:
+          type: integer
+        total_merchants_onboarded:
+          type: integer
+        active_merchants:
+          type: integer
+        active_users:
+          type: integer
+        conversions_last_30_days:
+          type: integer
+        pending_applications:
+          type: integer
+        last_synced_at:
+          type: string
+          format: date-time
+          nullable: true
+    CommissionStatus:
+      type: string
+      enum:
+        - pending
+        - paid
+    CommissionType:
+      type: string
+      enum:
+        - subscription
+        - booking
+        - order
+    Commission:
+      type: object
+      required:
+        - commission_id
+        - agent_id
+        - commission_type
+        - amount
+        - currency
+        - status
+        - created_at
+      properties:
+        commission_id:
+          type: integer
+          format: int64
+        agent_id:
+          type: integer
+          format: int64
+        merchant_id:
+          type: integer
+          format: int64
+          nullable: true
+        user_id:
+          type: integer
+          format: int64
+          nullable: true
+        commission_type:
+          $ref: '#/components/schemas/CommissionType'
+        amount:
+          type: number
+          format: float
+        currency:
+          type: string
+        status:
+          $ref: '#/components/schemas/CommissionStatus'
+        related_id:
+          type: integer
+          format: int64
+          nullable: true
+        created_at:
+          type: string
+          format: date-time
+        updated_at:
+          type: string
+          format: date-time
+          nullable: true
+    CommissionSummary:
+      type: object
+      required:
+        - total_commissions
+        - pending_amount
+        - paid_amount
+      properties:
+        total_commissions:
+          type: number
+          format: float
+        pending_amount:
+          type: number
+          format: float
+        paid_amount:
+          type: number
+          format: float
+        total_transactions:
+          type: integer
+        last_payout_at:
+          type: string
+          format: date-time
+          nullable: true
+    CommissionPayoutResult:
+      type: object
+      required:
+        - payout_initiated
+      properties:
+        payout_initiated:
+          type: boolean
+        payout_reference:
+          type: string
+          nullable: true
+        expected_settlement_at:
+          type: string
+          format: date-time
+          nullable: true
+    LeaderboardPeriod:
+      type: string
+      enum:
+        - daily
+        - weekly
+        - monthly
+    AgentLeaderboardEntry:
+      type: object
+      required:
+        - rank
+        - agent_id
+        - agent_code
+        - tier
+        - points
+        - period
+      properties:
+        rank:
+          type: integer
+        agent_id:
+          type: integer
+          format: int64
+        agent_code:
+          type: string
+        agent_name:
+          type: string
+          nullable: true
+        tier:
+          $ref: '#/components/schemas/AgentTier'
+        badge:
+          $ref: '#/components/schemas/AgentBadge'
+          nullable: true
+        points:
+          type: integer
+        period:
+          $ref: '#/components/schemas/LeaderboardPeriod'
+        successful_referrals:
+          type: integer
+        commission_earned:
+          type: number
+          format: float
+        city:
+          type: string
+          nullable: true
+    AgentLeaderboardPosition:
+      type: object
+      required:
+        - rank
+        - period
+        - points
+        - total_agents
+      properties:
+        rank:
+          type: integer
+        period:
+          $ref: '#/components/schemas/LeaderboardPeriod'
+        points:
+          type: integer
+        total_agents:
+          type: integer
+        percentile:
+          type: number
+          format: float
+          nullable: true
+    AgentAnalytics:
+      type: object
+      required:
+        - summary
+      properties:
+        summary:
+          type: object
+          required:
+            - total_commissions
+            - total_clients
+            - active_merchants
+            - active_users
+          properties:
+            total_commissions:
+              type: number
+              format: float
+            total_clients:
+              type: integer
+            active_merchants:
+              type: integer
+            active_users:
+              type: integer
+            conversion_rate:
+              type: number
+              format: float
+        weekly_trends:
+          type: array
+          items:
+            type: object
+            required:
+              - week_start
+              - commissions
+              - onboardings
+            properties:
+              week_start:
+                type: string
+                format: date
+              commissions:
+                type: number
+                format: float
+              onboardings:
+                type: integer
+        top_merchants:
+          type: array
+          items:
+            type: object
+            required:
+              - merchant_id
+              - business_name
+              - revenue_contribution
+            properties:
+              merchant_id:
+                type: integer
+                format: int64
+              business_name:
+                type: string
+              revenue_contribution:
+                type: number
+                format: float
+        generated_at:
+          type: string
+          format: date-time
+    AgentPerformance:
+      type: object
+      required:
+        - period
+        - metrics
+      properties:
+        period:
+          $ref: '#/components/schemas/LeaderboardPeriod'
+        metrics:
+          type: object
+          required:
+            - onboarded_users
+            - onboarded_merchants
+            - conversion_rate
+            - commissions_earned
+          properties:
+            onboarded_users:
+              type: integer
+            onboarded_merchants:
+              type: integer
+            conversion_rate:
+              type: number
+              format: float
+            commissions_earned:
+              type: number
+              format: float
+            average_response_time_minutes:
+              type: number
+              format: float
+              nullable: true
+        comparison:
+          type: object
+          properties:
+            previous_period:
+              type: string
+            delta_percentage:
+              type: number
+              format: float
     MerchantCategory:
       type: string
       enum:
