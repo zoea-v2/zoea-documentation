@@ -1942,7 +1942,8 @@ paths:
           name: sort
           schema:
             type: string
-          example: "created_at"
+            enum: [created_at]
+            default: created_at
           description: Sort field
         - in: query
           name: order
