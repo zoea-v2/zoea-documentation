@@ -1,0 +1,1400 @@
+openapi: 3.0.3
+info:
+  title: Zoea V2 API
+  version: "2.0.0"
+  description: |
+    Zoea V2 Merchant Management module OpenAPI specification.
+    All success and error responses adhere to standardized envelope structures.
+servers:
+  - url: https://api.zoea.local
+    description: Zoea V2 primary API server
+tags:
+  - name: Merchant Onboarding
+    description: Onboarding workflows for new merchants.
+  - name: Merchant Profile
+    description: Merchant profile management endpoints.
+  - name: Merchant Locations
+    description: CRUD operations for merchant locations.
+  - name: Merchant Subscriptions
+    description: Manage merchant subscription plans.
+  - name: Merchant Promotions
+    description: Manage merchant promotional campaigns.
+paths:
+  /api/v1/merchants/apply:
+    post:
+      tags:
+        - Merchant Onboarding
+      summary: Submit a merchant application
+      operationId: submitMerchantApplication
+      security:
+        - BearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/MerchantApplicationRequest'
+      responses:
+        '201':
+          description: Merchant application submitted successfully
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/SuccessResponse'
+                  - type: object
+                    properties:
+                      data:
+                        $ref: '#/components/schemas/Merchant'
+              examples:
+                merchantApplication:
+                  value:
+                    status: success
+                    message: Merchant application submitted
+                    data:
+                      merchant_id: 101
+                      user_id: 55
+                      business_name: Sunrise Hotel
+                      description: Boutique hotel in Kigali city center.
+                      category: hotel
+                      contact_phone: '+250788123456'
+                      contact_email: info@sunrisehotel.rw
+                      business_license: LIC-2025-001
+                      is_verified: false
+                      status: pending
+                      onboarding_status: in_review
+                      agent_id: 12
+                      created_at: 2025-11-07T09:30:00Z
+                      updated_at: 2025-11-07T09:30:00Z
+        '400':
+          $ref: '#/components/responses/BadRequestError'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+  /api/v1/merchants/onboarding-status:
+    get:
+      tags:
+        - Merchant Onboarding
+      summary: Retrieve current merchant onboarding status
+      operationId: getMerchantOnboardingStatus
+      security:
+        - BearerAuth: []
+      responses:
+        '200':
+          description: Merchant onboarding status retrieved
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/SuccessResponse'
+                  - type: object
+                    properties:
+                      data:
+                        $ref: '#/components/schemas/MerchantOnboardingStatus'
+              examples:
+                onboardingStatus:
+                  value:
+                    status: success
+                    message: Onboarding status retrieved
+                    data:
+                      merchant_id: 101
+                      onboarding_status: in_review
+                      status: pending
+                      required_documents:
+                        - business_license
+                        - tax_clearance
+                      submitted_documents:
+                        - business_license
+                      missing_documents:
+                        - tax_clearance
+                      last_reviewed_at: 2025-11-07T10:15:00Z
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '404':
+          $ref: '#/components/responses/NotFoundError'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+  /api/v1/merchants/onboarding/{merchant_id}:
+    put:
+      tags:
+        - Merchant Onboarding
+      summary: Update merchant onboarding status
+      operationId: updateMerchantOnboardingStatus
+      security:
+        - BearerAuth: []
+      parameters:
+        - $ref: '#/components/parameters/MerchantIdParam'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/MerchantOnboardingUpdateRequest'
+      responses:
+        '200':
+          description: Merchant onboarding status updated
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/SuccessResponse'
+                  - type: object
+                    properties:
+                      data:
+                        $ref: '#/components/schemas/MerchantOnboardingStatus'
+              examples:
+                updatedOnboarding:
+                  value:
+                    status: success
+                    message: Merchant onboarding status updated
+                    data:
+                      merchant_id: 101
+                      onboarding_status: approved
+                      status: active
+                      required_documents:
+                        - business_license
+                        - tax_clearance
+                      submitted_documents:
+                        - business_license
+                        - tax_clearance
+                      missing_documents: []
+                      last_reviewed_at: 2025-11-07T12:05:00Z
+        '400':
+          $ref: '#/components/responses/BadRequestError'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '404':
+          $ref: '#/components/responses/NotFoundError'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+  /api/v1/merchants/{merchant_id}/documents:
+    post:
+      tags:
+        - Merchant Onboarding
+      summary: Upload a merchant onboarding document
+      operationId: uploadMerchantDocument
+      security:
+        - BearerAuth: []
+      parameters:
+        - $ref: '#/components/parameters/MerchantIdParam'
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/MerchantDocumentUploadRequest'
+      responses:
+        '201':
+          description: Merchant document uploaded successfully
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/SuccessResponse'
+                  - type: object
+                    properties:
+                      data:
+                        $ref: '#/components/schemas/MerchantDocument'
+              examples:
+                documentUploaded:
+                  value:
+                    status: success
+                    message: Document uploaded successfully
+                    data:
+                      document_id: 501
+                      merchant_id: 101
+                      document_type: tax_clearance
+                      file_name: tax-clearance-2025.pdf
+                      uploaded_at: 2025-11-07T09:45:00Z
+        '400':
+          $ref: '#/components/responses/BadRequestError'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '404':
+          $ref: '#/components/responses/NotFoundError'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+  /api/v1/merchants/me:
+    get:
+      tags:
+        - Merchant Profile
+      summary: Get the authenticated merchant profile
+      operationId: getOwnMerchantProfile
+      security:
+        - BearerAuth: []
+      responses:
+        '200':
+          description: Merchant profile retrieved
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/SuccessResponse'
+                  - type: object
+                    properties:
+                      data:
+                        $ref: '#/components/schemas/Merchant'
+              examples:
+                merchantProfile:
+                  value:
+                    status: success
+                    message: Merchant profile retrieved
+                    data:
+                      merchant_id: 101
+                      user_id: 55
+                      business_name: Sunrise Hotel
+                      description: Boutique hotel in Kigali city center.
+                      category: hotel
+                      contact_phone: '+250788123456'
+                      contact_email: info@sunrisehotel.rw
+                      business_license: LIC-2025-001
+                      is_verified: true
+                      status: active
+                      onboarding_status: approved
+                      agent_id: 12
+                      created_at: 2025-01-15T08:00:00Z
+                      updated_at: 2025-11-07T10:00:00Z
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+    put:
+      tags:
+        - Merchant Profile
+      summary: Update the authenticated merchant profile
+      operationId: updateOwnMerchantProfile
+      security:
+        - BearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/MerchantUpdateRequest'
+      responses:
+        '200':
+          description: Merchant profile updated
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/SuccessResponse'
+                  - type: object
+                    properties:
+                      data:
+                        $ref: '#/components/schemas/Merchant'
+              examples:
+                merchantUpdated:
+                  value:
+                    status: success
+                    message: Merchant profile updated
+                    data:
+                      merchant_id: 101
+                      user_id: 55
+                      business_name: Sunrise Hotel & Spa
+                      description: Luxury boutique hotel with spa services.
+                      category: hotel
+                      contact_phone: '+250788123456'
+                      contact_email: hello@sunrisehotel.rw
+                      business_license: LIC-2025-001
+                      is_verified: true
+                      status: active
+                      onboarding_status: approved
+                      agent_id: 12
+                      created_at: 2025-01-15T08:00:00Z
+                      updated_at: 2025-11-07T12:30:00Z
+        '400':
+          $ref: '#/components/responses/BadRequestError'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+  /api/v1/merchants/{merchant_id}:
+    get:
+      tags:
+        - Merchant Profile
+      summary: Get merchant profile by identifier
+      operationId: getMerchantById
+      parameters:
+        - $ref: '#/components/parameters/MerchantIdParam'
+      responses:
+        '200':
+          description: Merchant profile retrieved
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/SuccessResponse'
+                  - type: object
+                    properties:
+                      data:
+                        $ref: '#/components/schemas/Merchant'
+        '404':
+          $ref: '#/components/responses/NotFoundError'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+  /api/v1/merchants/search:
+    get:
+      tags:
+        - Merchant Profile
+      summary: Search merchants with filters
+      operationId: searchMerchants
+      parameters:
+        - $ref: '#/components/parameters/PageParam'
+        - $ref: '#/components/parameters/LimitParam'
+        - $ref: '#/components/parameters/SortParam'
+        - $ref: '#/components/parameters/SearchParam'
+        - in: query
+          name: category
+          schema:
+            $ref: '#/components/schemas/MerchantCategory'
+          description: Filter by merchant category
+        - in: query
+          name: city
+          schema:
+            type: string
+          description: Filter by city
+        - in: query
+          name: status
+          schema:
+            $ref: '#/components/schemas/MerchantStatus'
+          description: Filter by merchant account status
+      responses:
+        '200':
+          description: Merchant search results retrieved
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/PaginatedSuccessResponse'
+                  - type: object
+                    properties:
+                      data:
+                        type: array
+                        items:
+                          $ref: '#/components/schemas/Merchant'
+        '400':
+          $ref: '#/components/responses/BadRequestError'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+  /api/v1/merchants/me/locations:
+    get:
+      tags:
+        - Merchant Locations
+      summary: List merchant locations
+      operationId: listMerchantLocations
+      security:
+        - BearerAuth: []
+      parameters:
+        - $ref: '#/components/parameters/PageParam'
+        - $ref: '#/components/parameters/LimitParam'
+        - $ref: '#/components/parameters/SortParam'
+        - in: query
+          name: city
+          schema:
+            type: string
+          description: Filter by city name
+        - in: query
+          name: district
+          schema:
+            type: string
+          description: Filter by district
+        - in: query
+          name: neighborhood
+          schema:
+            type: string
+          description: Filter by neighborhood
+      responses:
+        '200':
+          description: Merchant locations retrieved
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/PaginatedSuccessResponse'
+                  - type: object
+                    properties:
+                      data:
+                        type: array
+                        items:
+                          $ref: '#/components/schemas/MerchantLocation'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+    post:
+      tags:
+        - Merchant Locations
+      summary: Create a merchant location
+      operationId: createMerchantLocation
+      security:
+        - BearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/MerchantLocationRequest'
+      responses:
+        '201':
+          description: Merchant location created
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/SuccessResponse'
+                  - type: object
+                    properties:
+                      data:
+                        $ref: '#/components/schemas/MerchantLocation'
+        '400':
+          $ref: '#/components/responses/BadRequestError'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+  /api/v1/merchants/me/locations/{location_id}:
+    put:
+      tags:
+        - Merchant Locations
+      summary: Update a merchant location
+      operationId: updateMerchantLocation
+      security:
+        - BearerAuth: []
+      parameters:
+        - $ref: '#/components/parameters/LocationIdParam'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/MerchantLocationRequest'
+      responses:
+        '200':
+          description: Merchant location updated
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/SuccessResponse'
+                  - type: object
+                    properties:
+                      data:
+                        $ref: '#/components/schemas/MerchantLocation'
+        '400':
+          $ref: '#/components/responses/BadRequestError'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '404':
+          $ref: '#/components/responses/NotFoundError'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+    delete:
+      tags:
+        - Merchant Locations
+      summary: Archive a merchant location
+      operationId: deleteMerchantLocation
+      security:
+        - BearerAuth: []
+      parameters:
+        - $ref: '#/components/parameters/LocationIdParam'
+      responses:
+        '200':
+          description: Merchant location archived
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/SuccessResponse'
+                  - type: object
+                    properties:
+                      data:
+                        $ref: '#/components/schemas/MerchantLocation'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '404':
+          $ref: '#/components/responses/NotFoundError'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+  /api/v1/merchants/me/subscriptions:
+    get:
+      tags:
+        - Merchant Subscriptions
+      summary: List merchant subscriptions
+      operationId: listMerchantSubscriptions
+      security:
+        - BearerAuth: []
+      parameters:
+        - $ref: '#/components/parameters/PageParam'
+        - $ref: '#/components/parameters/LimitParam'
+        - $ref: '#/components/parameters/SortParam'
+        - in: query
+          name: status
+          schema:
+            $ref: '#/components/schemas/MerchantSubscriptionStatus'
+          description: Filter by subscription status
+      responses:
+        '200':
+          description: Merchant subscriptions retrieved
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/PaginatedSuccessResponse'
+                  - type: object
+                    properties:
+                      data:
+                        type: array
+                        items:
+                          $ref: '#/components/schemas/MerchantSubscription'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+    post:
+      tags:
+        - Merchant Subscriptions
+      summary: Create a merchant subscription
+      operationId: createMerchantSubscription
+      security:
+        - BearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/MerchantSubscriptionRequest'
+      responses:
+        '201':
+          description: Merchant subscription created
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/SuccessResponse'
+                  - type: object
+                    properties:
+                      data:
+                        $ref: '#/components/schemas/MerchantSubscription'
+        '400':
+          $ref: '#/components/responses/BadRequestError'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+  /api/v1/merchants/me/subscriptions/{subscription_id}:
+    put:
+      tags:
+        - Merchant Subscriptions
+      summary: Update a merchant subscription
+      operationId: updateMerchantSubscription
+      security:
+        - BearerAuth: []
+      parameters:
+        - $ref: '#/components/parameters/SubscriptionIdParam'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/MerchantSubscriptionRequest'
+      responses:
+        '200':
+          description: Merchant subscription updated
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/SuccessResponse'
+                  - type: object
+                    properties:
+                      data:
+                        $ref: '#/components/schemas/MerchantSubscription'
+        '400':
+          $ref: '#/components/responses/BadRequestError'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '404':
+          $ref: '#/components/responses/NotFoundError'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+    delete:
+      tags:
+        - Merchant Subscriptions
+      summary: Cancel a merchant subscription
+      operationId: deleteMerchantSubscription
+      security:
+        - BearerAuth: []
+      parameters:
+        - $ref: '#/components/parameters/SubscriptionIdParam'
+      responses:
+        '200':
+          description: Merchant subscription cancelled
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/SuccessResponse'
+                  - type: object
+                    properties:
+                      data:
+                        $ref: '#/components/schemas/MerchantSubscription'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '404':
+          $ref: '#/components/responses/NotFoundError'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+  /api/v1/merchants/me/promotions:
+    get:
+      tags:
+        - Merchant Promotions
+      summary: List merchant promotions
+      operationId: listMerchantPromotions
+      security:
+        - BearerAuth: []
+      parameters:
+        - $ref: '#/components/parameters/PageParam'
+        - $ref: '#/components/parameters/LimitParam'
+        - $ref: '#/components/parameters/SortParam'
+        - in: query
+          name: status
+          schema:
+            $ref: '#/components/schemas/MerchantPromotionStatus'
+          description: Filter by promotion status
+        - in: query
+          name: promotion_type
+          schema:
+            $ref: '#/components/schemas/MerchantPromotionType'
+          description: Filter by promotion type
+      responses:
+        '200':
+          description: Merchant promotions retrieved
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/PaginatedSuccessResponse'
+                  - type: object
+                    properties:
+                      data:
+                        type: array
+                        items:
+                          $ref: '#/components/schemas/MerchantPromotion'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+    post:
+      tags:
+        - Merchant Promotions
+      summary: Create a merchant promotion
+      operationId: createMerchantPromotion
+      security:
+        - BearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/MerchantPromotionRequest'
+      responses:
+        '201':
+          description: Merchant promotion created
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/SuccessResponse'
+                  - type: object
+                    properties:
+                      data:
+                        $ref: '#/components/schemas/MerchantPromotion'
+        '400':
+          $ref: '#/components/responses/BadRequestError'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+  /api/v1/merchants/me/promotions/{promotion_id}:
+    put:
+      tags:
+        - Merchant Promotions
+      summary: Update a merchant promotion
+      operationId: updateMerchantPromotion
+      security:
+        - BearerAuth: []
+      parameters:
+        - $ref: '#/components/parameters/PromotionIdParam'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/MerchantPromotionRequest'
+      responses:
+        '200':
+          description: Merchant promotion updated
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/SuccessResponse'
+                  - type: object
+                    properties:
+                      data:
+                        $ref: '#/components/schemas/MerchantPromotion'
+        '400':
+          $ref: '#/components/responses/BadRequestError'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '404':
+          $ref: '#/components/responses/NotFoundError'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+    delete:
+      tags:
+        - Merchant Promotions
+      summary: Archive a merchant promotion
+      operationId: deleteMerchantPromotion
+      security:
+        - BearerAuth: []
+      parameters:
+        - $ref: '#/components/parameters/PromotionIdParam'
+      responses:
+        '200':
+          description: Merchant promotion archived
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/SuccessResponse'
+                  - type: object
+                    properties:
+                      data:
+                        $ref: '#/components/schemas/MerchantPromotion'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '404':
+          $ref: '#/components/responses/NotFoundError'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+components:
+  securitySchemes:
+    BearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+  parameters:
+    PageParam:
+      in: query
+      name: page
+      schema:
+        type: integer
+        minimum: 1
+        default: 1
+      description: Page number for pagination
+    LimitParam:
+      in: query
+      name: limit
+      schema:
+        type: integer
+        minimum: 1
+        maximum: 100
+        default: 20
+      description: Number of items per page
+    SortParam:
+      in: query
+      name: sort
+      schema:
+        type: string
+      description: Sort expression (e.g., business_name:asc)
+    SearchParam:
+      in: query
+      name: search
+      schema:
+        type: string
+      description: Free text search query
+    MerchantIdParam:
+      in: path
+      name: merchant_id
+      required: true
+      schema:
+        type: integer
+        format: int64
+      description: Unique merchant identifier
+    LocationIdParam:
+      in: path
+      name: location_id
+      required: true
+      schema:
+        type: integer
+        format: int64
+      description: Unique location identifier
+    SubscriptionIdParam:
+      in: path
+      name: subscription_id
+      required: true
+      schema:
+        type: integer
+        format: int64
+      description: Unique subscription identifier
+    PromotionIdParam:
+      in: path
+      name: promotion_id
+      required: true
+      schema:
+        type: integer
+        format: int64
+      description: Unique promotion identifier
+  responses:
+    BadRequestError:
+      description: The request payload or parameters were invalid
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+          examples:
+            badRequest:
+              value:
+                status: error
+                message: Validation failed
+                error:
+                  code: MERCHANT_VALIDATION_ERROR
+                  details:
+                    - field: business_name
+                      issue: Business name is required
+    UnauthorizedError:
+      description: Authentication credentials are missing or invalid
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+          examples:
+            unauthorized:
+              value:
+                status: error
+                message: Authentication failed
+                error:
+                  code: AUTH_INVALID_TOKEN
+                  details: []
+    NotFoundError:
+      description: The requested resource was not found
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+          examples:
+            notFound:
+              value:
+                status: error
+                message: Merchant not found
+                error:
+                  code: MERCHANT_NOT_FOUND
+                  details: []
+    InternalServerError:
+      description: Unexpected server error occurred
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+          examples:
+            serverError:
+              value:
+                status: error
+                message: Unexpected error occurred
+                error:
+                  code: INTERNAL_SERVER_ERROR
+                  details: []
+  schemas:
+    SuccessResponse:
+      type: object
+      required:
+        - status
+        - message
+        - data
+      properties:
+        status:
+          type: string
+          enum: [success]
+        message:
+          type: string
+        data:
+          description: Response payload container
+    PaginatedSuccessResponse:
+      type: object
+      required:
+        - status
+        - message
+        - data
+        - pagination
+      properties:
+        status:
+          type: string
+          enum: [success]
+        message:
+          type: string
+        data:
+          type: array
+          items:
+            description: Placeholder for paginated data items
+        pagination:
+          type: object
+          required:
+            - page
+            - limit
+            - total
+            - totalPages
+          properties:
+            page:
+              type: integer
+            limit:
+              type: integer
+            total:
+              type: integer
+            totalPages:
+              type: integer
+    ErrorResponse:
+      type: object
+      required:
+        - status
+        - message
+        - error
+      properties:
+        status:
+          type: string
+          enum: [error]
+        message:
+          type: string
+        error:
+          type: object
+          required:
+            - code
+            - details
+          properties:
+            code:
+              type: string
+            details:
+              type: array
+              items:
+                type: object
+                properties:
+                  field:
+                    type: string
+                  issue:
+                    type: string
+                  pointer:
+                    type: string
+                    description: JSON pointer to the field in error
+    MerchantCategory:
+      type: string
+      enum:
+        - hotel
+        - restaurant
+        - bar
+        - coffee_shop
+        - event_venue
+        - tour_operator
+        - shop
+        - service
+    MerchantStatus:
+      type: string
+      enum:
+        - pending
+        - active
+        - suspended
+    MerchantOnboardingStatusValue:
+      type: string
+      enum:
+        - pending
+        - in_review
+        - approved
+        - rejected
+    Merchant:
+      type: object
+      required:
+        - merchant_id
+        - user_id
+        - business_name
+        - category
+        - status
+        - onboarding_status
+        - created_at
+        - updated_at
+      properties:
+        merchant_id:
+          type: integer
+          format: int64
+        user_id:
+          type: integer
+          format: int64
+        business_name:
+          type: string
+        description:
+          type: string
+        category:
+          $ref: '#/components/schemas/MerchantCategory'
+        contact_phone:
+          type: string
+        contact_email:
+          type: string
+          format: email
+        business_license:
+          type: string
+        is_verified:
+          type: boolean
+        status:
+          $ref: '#/components/schemas/MerchantStatus'
+        onboarding_status:
+          $ref: '#/components/schemas/MerchantOnboardingStatusValue'
+        agent_id:
+          type: integer
+          format: int64
+          nullable: true
+        created_at:
+          type: string
+          format: date-time
+        updated_at:
+          type: string
+          format: date-time
+    MerchantApplicationRequest:
+      type: object
+      required:
+        - business_name
+        - category
+        - contact_phone
+        - contact_email
+        - description
+      properties:
+        business_name:
+          type: string
+          maxLength: 255
+        description:
+          type: string
+        category:
+          $ref: '#/components/schemas/MerchantCategory'
+        contact_phone:
+          type: string
+        contact_email:
+          type: string
+          format: email
+        business_license:
+          type: string
+        agent_code:
+          type: string
+          description: Optional referral agent code
+        location:
+          $ref: '#/components/schemas/MerchantLocationRequest'
+    MerchantOnboardingStatus:
+      type: object
+      required:
+        - merchant_id
+        - onboarding_status
+        - status
+        - required_documents
+        - submitted_documents
+        - missing_documents
+      properties:
+        merchant_id:
+          type: integer
+          format: int64
+        onboarding_status:
+          $ref: '#/components/schemas/MerchantOnboardingStatusValue'
+        status:
+          $ref: '#/components/schemas/MerchantStatus'
+        required_documents:
+          type: array
+          items:
+            type: string
+        submitted_documents:
+          type: array
+          items:
+            type: string
+        missing_documents:
+          type: array
+          items:
+            type: string
+        last_reviewed_at:
+          type: string
+          format: date-time
+          nullable: true
+    MerchantOnboardingUpdateRequest:
+      type: object
+      required:
+        - onboarding_status
+        - status
+      properties:
+        onboarding_status:
+          $ref: '#/components/schemas/MerchantOnboardingStatusValue'
+        status:
+          $ref: '#/components/schemas/MerchantStatus'
+        review_notes:
+          type: string
+        missing_documents:
+          type: array
+          items:
+            type: string
+    MerchantDocumentUploadRequest:
+      type: object
+      required:
+        - document_type
+        - file
+      properties:
+        document_type:
+          type: string
+          description: Document type identifier (e.g., business_license)
+        file:
+          type: string
+          format: binary
+    MerchantDocument:
+      type: object
+      required:
+        - document_id
+        - merchant_id
+        - document_type
+        - file_name
+        - uploaded_at
+      properties:
+        document_id:
+          type: integer
+          format: int64
+        merchant_id:
+          type: integer
+          format: int64
+        document_type:
+          type: string
+        file_name:
+          type: string
+        uploaded_at:
+          type: string
+          format: date-time
+    MerchantUpdateRequest:
+      type: object
+      properties:
+        business_name:
+          type: string
+        description:
+          type: string
+        contact_phone:
+          type: string
+        contact_email:
+          type: string
+          format: email
+        business_license:
+          type: string
+        default_city:
+          type: string
+        social_links:
+          type: array
+          items:
+            type: string
+    MerchantLocationRequest:
+      type: object
+      required:
+        - address_line_1
+        - city
+        - district
+      properties:
+        address_line_1:
+          type: string
+        address_line_2:
+          type: string
+        city:
+          type: string
+        district:
+          type: string
+        neighborhood:
+          type: string
+        latitude:
+          type: number
+          format: float
+        longitude:
+          type: number
+          format: float
+        timezone:
+          type: string
+    MerchantLocation:
+      type: object
+      required:
+        - location_id
+        - merchant_id
+        - address_line_1
+        - city
+        - district
+      properties:
+        location_id:
+          type: integer
+          format: int64
+        merchant_id:
+          type: integer
+          format: int64
+        address_line_1:
+          type: string
+        address_line_2:
+          type: string
+        city:
+          type: string
+        district:
+          type: string
+        neighborhood:
+          type: string
+        latitude:
+          type: number
+          format: float
+        longitude:
+          type: number
+          format: float
+        timezone:
+          type: string
+    MerchantSubscriptionPlan:
+      type: string
+      enum:
+        - basic
+        - premium
+        - enterprise
+    MerchantSubscriptionStatus:
+      type: string
+      enum:
+        - active
+        - expired
+        - cancelled
+    MerchantSubscriptionRequest:
+      type: object
+      required:
+        - plan
+        - start_date
+      properties:
+        plan:
+          $ref: '#/components/schemas/MerchantSubscriptionPlan'
+        start_date:
+          type: string
+          format: date
+        end_date:
+          type: string
+          format: date
+        payment_id:
+          type: integer
+          format: int64
+        status:
+          $ref: '#/components/schemas/MerchantSubscriptionStatus'
+    MerchantSubscription:
+      type: object
+      required:
+        - subscription_id
+        - merchant_id
+        - plan
+        - start_date
+        - status
+      properties:
+        subscription_id:
+          type: integer
+          format: int64
+        merchant_id:
+          type: integer
+          format: int64
+        plan:
+          $ref: '#/components/schemas/MerchantSubscriptionPlan'
+        start_date:
+          type: string
+          format: date
+        end_date:
+          type: string
+          format: date
+          nullable: true
+        status:
+          $ref: '#/components/schemas/MerchantSubscriptionStatus'
+        payment_id:
+          type: integer
+          format: int64
+          nullable: true
+        created_at:
+          type: string
+          format: date-time
+        updated_at:
+          type: string
+          format: date-time
+    MerchantPromotionType:
+      type: string
+      enum:
+        - flash_sale
+        - discount
+        - campaign
+    MerchantPromotionStatus:
+      type: string
+      enum:
+        - active
+        - scheduled
+        - expired
+    MerchantPromotionRequest:
+      type: object
+      required:
+        - title
+        - promotion_type
+        - start_date
+        - end_date
+      properties:
+        title:
+          type: string
+        description:
+          type: string
+        promotion_type:
+          $ref: '#/components/schemas/MerchantPromotionType'
+        start_date:
+          type: string
+          format: date
+        end_date:
+          type: string
+          format: date
+        discount_percent:
+          type: number
+          format: float
+        discount_amount:
+          type: number
+          format: float
+        status:
+          $ref: '#/components/schemas/MerchantPromotionStatus'
+    MerchantPromotion:
+      type: object
+      required:
+        - promotion_id
+        - merchant_id
+        - title
+        - promotion_type
+        - start_date
+        - end_date
+        - status
+      properties:
+        promotion_id:
+          type: integer
+          format: int64
+        merchant_id:
+          type: integer
+          format: int64
+        title:
+          type: string
+        description:
+          type: string
+        promotion_type:
+          $ref: '#/components/schemas/MerchantPromotionType'
+        start_date:
+          type: string
+          format: date
+        end_date:
+          type: string
+          format: date
+        discount_percent:
+          type: number
+          format: float
+        discount_amount:
+          type: number
+          format: float
+        status:
+          $ref: '#/components/schemas/MerchantPromotionStatus'
+        created_at:
+          type: string
+          format: date-time
+        updated_at:
+          type: string
+          format: date-time
+
