@@ -81,6 +81,36 @@ tags:
     description: Manage curated listing collections.
   - name: Community
     description: Community feed, posts, stories, and guides.
+  - name: Merchant Analytics
+    description: Analytics and insights for merchants.
+  - name: Platform Analytics
+    description: Platform-wide analytics and metrics.
+  - name: Channel Manager Analytics
+    description: Channel manager performance analytics.
+  - name: Admin Users
+    description: Admin user management operations.
+  - name: Admin Merchants
+    description: Admin merchant management operations.
+  - name: Admin Agents
+    description: Admin agent management operations.
+  - name: Admin Merchant Types
+    description: Admin merchant type configuration.
+  - name: Admin Merchant Type Features
+    description: Admin merchant type features management.
+  - name: Admin Merchant Type Requirements
+    description: Admin merchant type onboarding requirements.
+  - name: Admin Merchant Type Commission
+    description: Admin commission settings per merchant type.
+  - name: Admin Merchant Type Subscription Plans
+    description: Admin subscription plans per merchant type.
+  - name: Admin Commissions
+    description: Admin commission management.
+  - name: Admin Content Moderation
+    description: Admin content moderation and review management.
+  - name: Admin System
+    description: Admin system management and monitoring.
+  - name: Admin Financial
+    description: Admin financial reports and transactions.
   - name: Merchant Onboarding
     description: Onboarding workflows for new merchants.
   - name: Merchant Profile
@@ -6022,6 +6052,2374 @@ paths:
           $ref: '#/components/responses/NotFoundError'
         '500':
           $ref: '#/components/responses/InternalServerError'
+  /api/v1/analytics/merchant/overview:
+    get:
+      tags:
+        - Merchant Analytics
+      summary: Get merchant analytics overview
+      operationId: getMerchantAnalyticsOverview
+      security:
+        - BearerAuth: []
+      parameters:
+        - in: query
+          name: start_date
+          schema:
+            type: string
+            format: date
+          description: Start date for analytics period
+        - in: query
+          name: end_date
+          schema:
+            type: string
+            format: date
+          description: End date for analytics period
+      responses:
+        '200':
+          description: Merchant analytics overview retrieved successfully
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/SuccessResponse'
+                  - type: object
+                    properties:
+                      data:
+                        $ref: '#/components/schemas/MerchantAnalyticsOverview'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+  /api/v1/analytics/merchant/visits:
+    get:
+      tags:
+        - Merchant Analytics
+      summary: Get merchant visit analytics
+      operationId: getMerchantVisitAnalytics
+      security:
+        - BearerAuth: []
+      parameters:
+        - in: query
+          name: start_date
+          schema:
+            type: string
+            format: date
+          description: Start date for analytics period
+        - in: query
+          name: end_date
+          schema:
+            type: string
+            format: date
+          description: End date for analytics period
+        - in: query
+          name: listing_id
+          schema:
+            type: integer
+            format: int64
+          description: Filter by listing identifier
+      responses:
+        '200':
+          description: Merchant visit analytics retrieved successfully
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/SuccessResponse'
+                  - type: object
+                    properties:
+                      data:
+                        $ref: '#/components/schemas/MerchantVisitAnalytics'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+  /api/v1/analytics/merchant/orders:
+    get:
+      tags:
+        - Merchant Analytics
+      summary: Get merchant order analytics
+      operationId: getMerchantOrderAnalytics
+      security:
+        - BearerAuth: []
+      parameters:
+        - in: query
+          name: start_date
+          schema:
+            type: string
+            format: date
+          description: Start date for analytics period
+        - in: query
+          name: end_date
+          schema:
+            type: string
+            format: date
+          description: End date for analytics period
+      responses:
+        '200':
+          description: Merchant order analytics retrieved successfully
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/SuccessResponse'
+                  - type: object
+                    properties:
+                      data:
+                        $ref: '#/components/schemas/MerchantOrderAnalytics'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+  /api/v1/analytics/merchant/bookings:
+    get:
+      tags:
+        - Merchant Analytics
+      summary: Get merchant booking analytics
+      operationId: getMerchantBookingAnalytics
+      security:
+        - BearerAuth: []
+      parameters:
+        - in: query
+          name: start_date
+          schema:
+            type: string
+            format: date
+          description: Start date for analytics period
+        - in: query
+          name: end_date
+          schema:
+            type: string
+            format: date
+          description: End date for analytics period
+      responses:
+        '200':
+          description: Merchant booking analytics retrieved successfully
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/SuccessResponse'
+                  - type: object
+                    properties:
+                      data:
+                        $ref: '#/components/schemas/MerchantBookingAnalytics'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+  /api/v1/analytics/merchant/revenue:
+    get:
+      tags:
+        - Merchant Analytics
+      summary: Get merchant revenue analytics
+      operationId: getMerchantRevenueAnalytics
+      security:
+        - BearerAuth: []
+      parameters:
+        - in: query
+          name: start_date
+          schema:
+            type: string
+            format: date
+          description: Start date for analytics period
+        - in: query
+          name: end_date
+          schema:
+            type: string
+            format: date
+          description: End date for analytics period
+        - in: query
+          name: group_by
+          schema:
+            type: string
+            enum: [day, week, month]
+          description: Group results by period
+      responses:
+        '200':
+          description: Merchant revenue analytics retrieved successfully
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/SuccessResponse'
+                  - type: object
+                    properties:
+                      data:
+                        $ref: '#/components/schemas/MerchantRevenueAnalytics'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+  /api/v1/analytics/merchant/customer-insights:
+    get:
+      tags:
+        - Merchant Analytics
+      summary: Get merchant customer insights
+      operationId: getMerchantCustomerInsights
+      security:
+        - BearerAuth: []
+      parameters:
+        - in: query
+          name: start_date
+          schema:
+            type: string
+            format: date
+          description: Start date for analytics period
+        - in: query
+          name: end_date
+          schema:
+            type: string
+            format: date
+          description: End date for analytics period
+      responses:
+        '200':
+          description: Merchant customer insights retrieved successfully
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/SuccessResponse'
+                  - type: object
+                    properties:
+                      data:
+                        $ref: '#/components/schemas/MerchantCustomerInsights'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+  /api/v1/analytics/platform/overview:
+    get:
+      tags:
+        - Platform Analytics
+      summary: Get platform analytics overview
+      operationId: getPlatformAnalyticsOverview
+      security:
+        - BearerAuth: []
+      parameters:
+        - in: query
+          name: start_date
+          schema:
+            type: string
+            format: date
+          description: Start date for analytics period
+        - in: query
+          name: end_date
+          schema:
+            type: string
+            format: date
+          description: End date for analytics period
+      responses:
+        '200':
+          description: Platform analytics overview retrieved successfully
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/SuccessResponse'
+                  - type: object
+                    properties:
+                      data:
+                        $ref: '#/components/schemas/PlatformAnalyticsOverview'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+  /api/v1/analytics/platform/user-growth:
+    get:
+      tags:
+        - Platform Analytics
+      summary: Get platform user growth analytics
+      operationId: getPlatformUserGrowth
+      security:
+        - BearerAuth: []
+      parameters:
+        - in: query
+          name: start_date
+          schema:
+            type: string
+            format: date
+          description: Start date for analytics period
+        - in: query
+          name: end_date
+          schema:
+            type: string
+            format: date
+          description: End date for analytics period
+        - in: query
+          name: group_by
+          schema:
+            type: string
+            enum: [day, week, month]
+          description: Group results by period
+      responses:
+        '200':
+          description: Platform user growth analytics retrieved successfully
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/SuccessResponse'
+                  - type: object
+                    properties:
+                      data:
+                        $ref: '#/components/schemas/PlatformUserGrowth'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+  /api/v1/analytics/platform/merchant-growth:
+    get:
+      tags:
+        - Platform Analytics
+      summary: Get platform merchant growth analytics
+      operationId: getPlatformMerchantGrowth
+      security:
+        - BearerAuth: []
+      parameters:
+        - in: query
+          name: start_date
+          schema:
+            type: string
+            format: date
+          description: Start date for analytics period
+        - in: query
+          name: end_date
+          schema:
+            type: string
+            format: date
+          description: End date for analytics period
+        - in: query
+          name: group_by
+          schema:
+            type: string
+            enum: [day, week, month]
+          description: Group results by period
+      responses:
+        '200':
+          description: Platform merchant growth analytics retrieved successfully
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/SuccessResponse'
+                  - type: object
+                    properties:
+                      data:
+                        $ref: '#/components/schemas/PlatformMerchantGrowth'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+  /api/v1/analytics/platform/revenue:
+    get:
+      tags:
+        - Platform Analytics
+      summary: Get platform revenue analytics
+      operationId: getPlatformRevenue
+      security:
+        - BearerAuth: []
+      parameters:
+        - in: query
+          name: start_date
+          schema:
+            type: string
+            format: date
+          description: Start date for analytics period
+        - in: query
+          name: end_date
+          schema:
+            type: string
+            format: date
+          description: End date for analytics period
+        - in: query
+          name: group_by
+          schema:
+            type: string
+            enum: [day, week, month]
+          description: Group results by period
+      responses:
+        '200':
+          description: Platform revenue analytics retrieved successfully
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/SuccessResponse'
+                  - type: object
+                    properties:
+                      data:
+                        $ref: '#/components/schemas/PlatformRevenue'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+  /api/v1/analytics/platform/geographic:
+    get:
+      tags:
+        - Platform Analytics
+      summary: Get platform geographic analytics
+      operationId: getPlatformGeographic
+      security:
+        - BearerAuth: []
+      parameters:
+        - in: query
+          name: start_date
+          schema:
+            type: string
+            format: date
+          description: Start date for analytics period
+        - in: query
+          name: end_date
+          schema:
+            type: string
+            format: date
+          description: End date for analytics period
+      responses:
+        '200':
+          description: Platform geographic analytics retrieved successfully
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/SuccessResponse'
+                  - type: object
+                    properties:
+                      data:
+                        $ref: '#/components/schemas/PlatformGeographic'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+  /api/v1/analytics/channel-manager/performance:
+    get:
+      tags:
+        - Channel Manager Analytics
+      summary: Get channel manager performance analytics
+      operationId: getChannelManagerPerformance
+      security:
+        - BearerAuth: []
+      parameters:
+        - in: query
+          name: start_date
+          schema:
+            type: string
+            format: date
+          description: Start date for analytics period
+        - in: query
+          name: end_date
+          schema:
+            type: string
+            format: date
+          description: End date for analytics period
+        - in: query
+          name: property_id
+          schema:
+            type: integer
+            format: int64
+          description: Filter by property identifier
+      responses:
+        '200':
+          description: Channel manager performance analytics retrieved successfully
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/SuccessResponse'
+                  - type: object
+                    properties:
+                      data:
+                        $ref: '#/components/schemas/ChannelManagerPerformance'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+  /api/v1/analytics/channel-manager/ota-performance:
+    get:
+      tags:
+        - Channel Manager Analytics
+      summary: Get OTA performance analytics
+      operationId: getOTAPerformance
+      security:
+        - BearerAuth: []
+      parameters:
+        - in: query
+          name: start_date
+          schema:
+            type: string
+            format: date
+          description: Start date for analytics period
+        - in: query
+          name: end_date
+          schema:
+            type: string
+            format: date
+          description: End date for analytics period
+        - in: query
+          name: ota_name
+          schema:
+            type: string
+          description: Filter by OTA name
+      responses:
+        '200':
+          description: OTA performance analytics retrieved successfully
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/SuccessResponse'
+                  - type: object
+                    properties:
+                      data:
+                        $ref: '#/components/schemas/OTAPerformance'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+  /api/v1/analytics/channel-manager/revpar:
+    get:
+      tags:
+        - Channel Manager Analytics
+      summary: Get RevPAR (Revenue per Available Room) analytics
+      operationId: getRevPAR
+      security:
+        - BearerAuth: []
+      parameters:
+        - in: query
+          name: start_date
+          schema:
+            type: string
+            format: date
+          description: Start date for analytics period
+        - in: query
+          name: end_date
+          schema:
+            type: string
+            format: date
+          description: End date for analytics period
+        - in: query
+          name: property_id
+          schema:
+            type: integer
+            format: int64
+          description: Filter by property identifier
+      responses:
+        '200':
+          description: RevPAR analytics retrieved successfully
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/SuccessResponse'
+                  - type: object
+                    properties:
+                      data:
+                        $ref: '#/components/schemas/RevPARAnalytics'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+  /api/v1/analytics/channel-manager/occupancy:
+    get:
+      tags:
+        - Channel Manager Analytics
+      summary: Get occupancy analytics
+      operationId: getOccupancyAnalytics
+      security:
+        - BearerAuth: []
+      parameters:
+        - in: query
+          name: start_date
+          schema:
+            type: string
+            format: date
+          description: Start date for analytics period
+        - in: query
+          name: end_date
+          schema:
+            type: string
+            format: date
+          description: End date for analytics period
+        - in: query
+          name: property_id
+          schema:
+            type: integer
+            format: int64
+          description: Filter by property identifier
+      responses:
+        '200':
+          description: Occupancy analytics retrieved successfully
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/SuccessResponse'
+                  - type: object
+                    properties:
+                      data:
+                        $ref: '#/components/schemas/OccupancyAnalytics'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+  /api/v1/admin/users:
+    get:
+      tags:
+        - Admin Users
+      summary: List all users (admin)
+      operationId: adminListUsers
+      security:
+        - BearerAuth: []
+      parameters:
+        - $ref: '#/components/parameters/PageParam'
+        - $ref: '#/components/parameters/LimitParam'
+        - $ref: '#/components/parameters/SortParam'
+        - $ref: '#/components/parameters/SearchParam'
+        - in: query
+          name: status
+          schema:
+            type: string
+          description: Filter by user status
+      responses:
+        '200':
+          description: Users retrieved successfully
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/PaginatedSuccessResponse'
+                  - type: object
+                    properties:
+                      data:
+                        type: array
+                        items:
+                          $ref: '#/components/schemas/User'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+  /api/v1/admin/users/{user_id}:
+    get:
+      tags:
+        - Admin Users
+      summary: Get user by identifier (admin)
+      operationId: adminGetUserById
+      security:
+        - BearerAuth: []
+      parameters:
+        - $ref: '#/components/parameters/UserIdParam'
+      responses:
+        '200':
+          description: User retrieved successfully
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/SuccessResponse'
+                  - type: object
+                    properties:
+                      data:
+                        $ref: '#/components/schemas/User'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '404':
+          $ref: '#/components/responses/NotFoundError'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+    put:
+      tags:
+        - Admin Users
+      summary: Update user (admin)
+      operationId: adminUpdateUser
+      security:
+        - BearerAuth: []
+      parameters:
+        - $ref: '#/components/parameters/UserIdParam'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UserProfileUpdateRequest'
+      responses:
+        '200':
+          description: User updated successfully
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/SuccessResponse'
+                  - type: object
+                    properties:
+                      data:
+                        $ref: '#/components/schemas/User'
+        '400':
+          $ref: '#/components/responses/BadRequestError'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '404':
+          $ref: '#/components/responses/NotFoundError'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+    delete:
+      tags:
+        - Admin Users
+      summary: Delete user (admin)
+      operationId: adminDeleteUser
+      security:
+        - BearerAuth: []
+      parameters:
+        - $ref: '#/components/parameters/UserIdParam'
+      responses:
+        '200':
+          description: User deleted successfully
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/SuccessResponse'
+                  - type: object
+                    properties:
+                      data:
+                        $ref: '#/components/schemas/Acknowledgement'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '404':
+          $ref: '#/components/responses/NotFoundError'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+  /api/v1/admin/users/{user_id}/status:
+    patch:
+      tags:
+        - Admin Users
+      summary: Update user status (admin)
+      operationId: adminUpdateUserStatus
+      security:
+        - BearerAuth: []
+      parameters:
+        - $ref: '#/components/parameters/UserIdParam'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - status
+              properties:
+                status:
+                  type: string
+                  enum: [active, inactive, suspended, banned]
+      responses:
+        '200':
+          description: User status updated successfully
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/SuccessResponse'
+                  - type: object
+                    properties:
+                      data:
+                        $ref: '#/components/schemas/User'
+        '400':
+          $ref: '#/components/responses/BadRequestError'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '404':
+          $ref: '#/components/responses/NotFoundError'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+  /api/v1/admin/merchants:
+    get:
+      tags:
+        - Admin Merchants
+      summary: List all merchants (admin)
+      operationId: adminListMerchants
+      security:
+        - BearerAuth: []
+      parameters:
+        - $ref: '#/components/parameters/PageParam'
+        - $ref: '#/components/parameters/LimitParam'
+        - $ref: '#/components/parameters/SortParam'
+        - $ref: '#/components/parameters/SearchParam'
+        - in: query
+          name: status
+          schema:
+            $ref: '#/components/schemas/MerchantStatus'
+          description: Filter by merchant status
+        - in: query
+          name: category
+          schema:
+            $ref: '#/components/schemas/MerchantCategory'
+          description: Filter by merchant category
+      responses:
+        '200':
+          description: Merchants retrieved successfully
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/PaginatedSuccessResponse'
+                  - type: object
+                    properties:
+                      data:
+                        type: array
+                        items:
+                          $ref: '#/components/schemas/Merchant'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+  /api/v1/admin/merchants/{merchant_id}:
+    get:
+      tags:
+        - Admin Merchants
+      summary: Get merchant by identifier (admin)
+      operationId: adminGetMerchantById
+      security:
+        - BearerAuth: []
+      parameters:
+        - $ref: '#/components/parameters/MerchantIdParam'
+      responses:
+        '200':
+          description: Merchant retrieved successfully
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/SuccessResponse'
+                  - type: object
+                    properties:
+                      data:
+                        $ref: '#/components/schemas/Merchant'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '404':
+          $ref: '#/components/responses/NotFoundError'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+    put:
+      tags:
+        - Admin Merchants
+      summary: Update merchant (admin)
+      operationId: adminUpdateMerchant
+      security:
+        - BearerAuth: []
+      parameters:
+        - $ref: '#/components/parameters/MerchantIdParam'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/MerchantUpdateRequest'
+      responses:
+        '200':
+          description: Merchant updated successfully
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/SuccessResponse'
+                  - type: object
+                    properties:
+                      data:
+                        $ref: '#/components/schemas/Merchant'
+        '400':
+          $ref: '#/components/responses/BadRequestError'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '404':
+          $ref: '#/components/responses/NotFoundError'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+  /api/v1/admin/merchants/{merchant_id}/verification:
+    patch:
+      tags:
+        - Admin Merchants
+      summary: Update merchant verification status (admin)
+      operationId: adminUpdateMerchantVerification
+      security:
+        - BearerAuth: []
+      parameters:
+        - $ref: '#/components/parameters/MerchantIdParam'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - is_verified
+              properties:
+                is_verified:
+                  type: boolean
+      responses:
+        '200':
+          description: Merchant verification status updated successfully
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/SuccessResponse'
+                  - type: object
+                    properties:
+                      data:
+                        $ref: '#/components/schemas/Merchant'
+        '400':
+          $ref: '#/components/responses/BadRequestError'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '404':
+          $ref: '#/components/responses/NotFoundError'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+  /api/v1/admin/merchants/{merchant_id}/status:
+    patch:
+      tags:
+        - Admin Merchants
+      summary: Update merchant status (admin)
+      operationId: adminUpdateMerchantStatus
+      security:
+        - BearerAuth: []
+      parameters:
+        - $ref: '#/components/parameters/MerchantIdParam'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - status
+              properties:
+                status:
+                  $ref: '#/components/schemas/MerchantStatus'
+      responses:
+        '200':
+          description: Merchant status updated successfully
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/SuccessResponse'
+                  - type: object
+                    properties:
+                      data:
+                        $ref: '#/components/schemas/Merchant'
+        '400':
+          $ref: '#/components/responses/BadRequestError'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '404':
+          $ref: '#/components/responses/NotFoundError'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+  /api/v1/admin/agents:
+    get:
+      tags:
+        - Admin Agents
+      summary: List all agents (admin)
+      operationId: adminListAgents
+      security:
+        - BearerAuth: []
+      parameters:
+        - $ref: '#/components/parameters/PageParam'
+        - $ref: '#/components/parameters/LimitParam'
+        - $ref: '#/components/parameters/SortParam'
+        - $ref: '#/components/parameters/SearchParam'
+        - in: query
+          name: tier
+          schema:
+            $ref: '#/components/schemas/AgentTier'
+          description: Filter by agent tier
+      responses:
+        '200':
+          description: Agents retrieved successfully
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/PaginatedSuccessResponse'
+                  - type: object
+                    properties:
+                      data:
+                        type: array
+                        items:
+                          $ref: '#/components/schemas/Agent'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+  /api/v1/admin/agents/{agent_id}:
+    get:
+      tags:
+        - Admin Agents
+      summary: Get agent by identifier (admin)
+      operationId: adminGetAgentById
+      security:
+        - BearerAuth: []
+      parameters:
+        - $ref: '#/components/parameters/AgentIdParam'
+      responses:
+        '200':
+          description: Agent retrieved successfully
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/SuccessResponse'
+                  - type: object
+                    properties:
+                      data:
+                        $ref: '#/components/schemas/Agent'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '404':
+          $ref: '#/components/responses/NotFoundError'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+    put:
+      tags:
+        - Admin Agents
+      summary: Update agent (admin)
+      operationId: adminUpdateAgent
+      security:
+        - BearerAuth: []
+      parameters:
+        - $ref: '#/components/parameters/AgentIdParam'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AgentProfileUpdateRequest'
+      responses:
+        '200':
+          description: Agent updated successfully
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/SuccessResponse'
+                  - type: object
+                    properties:
+                      data:
+                        $ref: '#/components/schemas/Agent'
+        '400':
+          $ref: '#/components/responses/BadRequestError'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '404':
+          $ref: '#/components/responses/NotFoundError'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+  /api/v1/admin/agents/{agent_id}/certification:
+    patch:
+      tags:
+        - Admin Agents
+      summary: Update agent certification (admin)
+      operationId: adminUpdateAgentCertification
+      security:
+        - BearerAuth: []
+      parameters:
+        - $ref: '#/components/parameters/AgentIdParam'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - is_certified
+              properties:
+                is_certified:
+                  type: boolean
+      responses:
+        '200':
+          description: Agent certification updated successfully
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/SuccessResponse'
+                  - type: object
+                    properties:
+                      data:
+                        $ref: '#/components/schemas/Agent'
+        '400':
+          $ref: '#/components/responses/BadRequestError'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '404':
+          $ref: '#/components/responses/NotFoundError'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+  /api/v1/admin/agents/{agent_id}/tier:
+    patch:
+      tags:
+        - Admin Agents
+      summary: Update agent tier (admin)
+      operationId: adminUpdateAgentTier
+      security:
+        - BearerAuth: []
+      parameters:
+        - $ref: '#/components/parameters/AgentIdParam'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - tier
+              properties:
+                tier:
+                  $ref: '#/components/schemas/AgentTier'
+      responses:
+        '200':
+          description: Agent tier updated successfully
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/SuccessResponse'
+                  - type: object
+                    properties:
+                      data:
+                        $ref: '#/components/schemas/Agent'
+        '400':
+          $ref: '#/components/responses/BadRequestError'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '404':
+          $ref: '#/components/responses/NotFoundError'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+  /api/v1/admin/merchant-types:
+    get:
+      tags:
+        - Admin Merchant Types
+      summary: List all merchant types (admin)
+      operationId: adminListMerchantTypes
+      security:
+        - BearerAuth: []
+      parameters:
+        - $ref: '#/components/parameters/PageParam'
+        - $ref: '#/components/parameters/LimitParam'
+        - $ref: '#/components/parameters/SortParam'
+      responses:
+        '200':
+          description: Merchant types retrieved successfully
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/PaginatedSuccessResponse'
+                  - type: object
+                    properties:
+                      data:
+                        type: array
+                        items:
+                          $ref: '#/components/schemas/MerchantType'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+    post:
+      tags:
+        - Admin Merchant Types
+      summary: Create merchant type (admin)
+      operationId: adminCreateMerchantType
+      security:
+        - BearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/MerchantTypeRequest'
+      responses:
+        '201':
+          description: Merchant type created successfully
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/SuccessResponse'
+                  - type: object
+                    properties:
+                      data:
+                        $ref: '#/components/schemas/MerchantType'
+        '400':
+          $ref: '#/components/responses/BadRequestError'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+  /api/v1/admin/merchant-types/{type_id}:
+    get:
+      tags:
+        - Admin Merchant Types
+      summary: Get merchant type by identifier (admin)
+      operationId: adminGetMerchantTypeById
+      security:
+        - BearerAuth: []
+      parameters:
+        - $ref: '#/components/parameters/MerchantTypeIdParam'
+      responses:
+        '200':
+          description: Merchant type retrieved successfully
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/SuccessResponse'
+                  - type: object
+                    properties:
+                      data:
+                        $ref: '#/components/schemas/MerchantType'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '404':
+          $ref: '#/components/responses/NotFoundError'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+    put:
+      tags:
+        - Admin Merchant Types
+      summary: Update merchant type (admin)
+      operationId: adminUpdateMerchantType
+      security:
+        - BearerAuth: []
+      parameters:
+        - $ref: '#/components/parameters/MerchantTypeIdParam'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/MerchantTypeRequest'
+      responses:
+        '200':
+          description: Merchant type updated successfully
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/SuccessResponse'
+                  - type: object
+                    properties:
+                      data:
+                        $ref: '#/components/schemas/MerchantType'
+        '400':
+          $ref: '#/components/responses/BadRequestError'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '404':
+          $ref: '#/components/responses/NotFoundError'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+    delete:
+      tags:
+        - Admin Merchant Types
+      summary: Delete merchant type (admin)
+      operationId: adminDeleteMerchantType
+      security:
+        - BearerAuth: []
+      parameters:
+        - $ref: '#/components/parameters/MerchantTypeIdParam'
+      responses:
+        '200':
+          description: Merchant type deleted successfully
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/SuccessResponse'
+                  - type: object
+                    properties:
+                      data:
+                        $ref: '#/components/schemas/Acknowledgement'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '404':
+          $ref: '#/components/responses/NotFoundError'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+  /api/v1/admin/merchant-types/{type_id}/status:
+    patch:
+      tags:
+        - Admin Merchant Types
+      summary: Update merchant type status (admin)
+      operationId: adminUpdateMerchantTypeStatus
+      security:
+        - BearerAuth: []
+      parameters:
+        - $ref: '#/components/parameters/MerchantTypeIdParam'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - is_active
+              properties:
+                is_active:
+                  type: boolean
+      responses:
+        '200':
+          description: Merchant type status updated successfully
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/SuccessResponse'
+                  - type: object
+                    properties:
+                      data:
+                        $ref: '#/components/schemas/MerchantType'
+        '400':
+          $ref: '#/components/responses/BadRequestError'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '404':
+          $ref: '#/components/responses/NotFoundError'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+  /api/v1/admin/merchant-types/{type_id}/features:
+    get:
+      tags:
+        - Admin Merchant Type Features
+      summary: List features for a merchant type (admin)
+      operationId: adminListMerchantTypeFeatures
+      security:
+        - BearerAuth: []
+      parameters:
+        - $ref: '#/components/parameters/MerchantTypeIdParam'
+      responses:
+        '200':
+          description: Merchant type features retrieved successfully
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/SuccessResponse'
+                  - type: object
+                    properties:
+                      data:
+                        type: array
+                        items:
+                          $ref: '#/components/schemas/MerchantTypeFeature'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '404':
+          $ref: '#/components/responses/NotFoundError'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+    post:
+      tags:
+        - Admin Merchant Type Features
+      summary: Add feature to merchant type (admin)
+      operationId: adminCreateMerchantTypeFeature
+      security:
+        - BearerAuth: []
+      parameters:
+        - $ref: '#/components/parameters/MerchantTypeIdParam'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/MerchantTypeFeatureRequest'
+      responses:
+        '201':
+          description: Merchant type feature created successfully
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/SuccessResponse'
+                  - type: object
+                    properties:
+                      data:
+                        $ref: '#/components/schemas/MerchantTypeFeature'
+        '400':
+          $ref: '#/components/responses/BadRequestError'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '404':
+          $ref: '#/components/responses/NotFoundError'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+  /api/v1/admin/merchant-types/{type_id}/features/{feature_id}:
+    put:
+      tags:
+        - Admin Merchant Type Features
+      summary: Update merchant type feature (admin)
+      operationId: adminUpdateMerchantTypeFeature
+      security:
+        - BearerAuth: []
+      parameters:
+        - $ref: '#/components/parameters/MerchantTypeIdParam'
+        - $ref: '#/components/parameters/FeatureIdParam'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/MerchantTypeFeatureRequest'
+      responses:
+        '200':
+          description: Merchant type feature updated successfully
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/SuccessResponse'
+                  - type: object
+                    properties:
+                      data:
+                        $ref: '#/components/schemas/MerchantTypeFeature'
+        '400':
+          $ref: '#/components/responses/BadRequestError'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '404':
+          $ref: '#/components/responses/NotFoundError'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+    delete:
+      tags:
+        - Admin Merchant Type Features
+      summary: Delete merchant type feature (admin)
+      operationId: adminDeleteMerchantTypeFeature
+      security:
+        - BearerAuth: []
+      parameters:
+        - $ref: '#/components/parameters/MerchantTypeIdParam'
+        - $ref: '#/components/parameters/FeatureIdParam'
+      responses:
+        '200':
+          description: Merchant type feature deleted successfully
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/SuccessResponse'
+                  - type: object
+                    properties:
+                      data:
+                        $ref: '#/components/schemas/Acknowledgement'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '404':
+          $ref: '#/components/responses/NotFoundError'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+  /api/v1/admin/merchant-types/{type_id}/requirements:
+    get:
+      tags:
+        - Admin Merchant Type Requirements
+      summary: List requirements for a merchant type (admin)
+      operationId: adminListMerchantTypeRequirements
+      security:
+        - BearerAuth: []
+      parameters:
+        - $ref: '#/components/parameters/MerchantTypeIdParam'
+      responses:
+        '200':
+          description: Merchant type requirements retrieved successfully
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/SuccessResponse'
+                  - type: object
+                    properties:
+                      data:
+                        type: array
+                        items:
+                          $ref: '#/components/schemas/MerchantTypeRequirement'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '404':
+          $ref: '#/components/responses/NotFoundError'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+    post:
+      tags:
+        - Admin Merchant Type Requirements
+      summary: Add requirement to merchant type (admin)
+      operationId: adminCreateMerchantTypeRequirement
+      security:
+        - BearerAuth: []
+      parameters:
+        - $ref: '#/components/parameters/MerchantTypeIdParam'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/MerchantTypeRequirementRequest'
+      responses:
+        '201':
+          description: Merchant type requirement created successfully
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/SuccessResponse'
+                  - type: object
+                    properties:
+                      data:
+                        $ref: '#/components/schemas/MerchantTypeRequirement'
+        '400':
+          $ref: '#/components/responses/BadRequestError'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '404':
+          $ref: '#/components/responses/NotFoundError'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+  /api/v1/admin/merchant-types/{type_id}/requirements/{requirement_id}:
+    put:
+      tags:
+        - Admin Merchant Type Requirements
+      summary: Update merchant type requirement (admin)
+      operationId: adminUpdateMerchantTypeRequirement
+      security:
+        - BearerAuth: []
+      parameters:
+        - $ref: '#/components/parameters/MerchantTypeIdParam'
+        - $ref: '#/components/parameters/RequirementIdParam'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/MerchantTypeRequirementRequest'
+      responses:
+        '200':
+          description: Merchant type requirement updated successfully
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/SuccessResponse'
+                  - type: object
+                    properties:
+                      data:
+                        $ref: '#/components/schemas/MerchantTypeRequirement'
+        '400':
+          $ref: '#/components/responses/BadRequestError'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '404':
+          $ref: '#/components/responses/NotFoundError'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+    delete:
+      tags:
+        - Admin Merchant Type Requirements
+      summary: Delete merchant type requirement (admin)
+      operationId: adminDeleteMerchantTypeRequirement
+      security:
+        - BearerAuth: []
+      parameters:
+        - $ref: '#/components/parameters/MerchantTypeIdParam'
+        - $ref: '#/components/parameters/RequirementIdParam'
+      responses:
+        '200':
+          description: Merchant type requirement deleted successfully
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/SuccessResponse'
+                  - type: object
+                    properties:
+                      data:
+                        $ref: '#/components/schemas/Acknowledgement'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '404':
+          $ref: '#/components/responses/NotFoundError'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+  /api/v1/admin/merchant-types/{type_id}/commission:
+    get:
+      tags:
+        - Admin Merchant Type Commission
+      summary: Get commission settings for merchant type (admin)
+      operationId: adminGetMerchantTypeCommission
+      security:
+        - BearerAuth: []
+      parameters:
+        - $ref: '#/components/parameters/MerchantTypeIdParam'
+      responses:
+        '200':
+          description: Commission settings retrieved successfully
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/SuccessResponse'
+                  - type: object
+                    properties:
+                      data:
+                        $ref: '#/components/schemas/MerchantTypeCommission'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '404':
+          $ref: '#/components/responses/NotFoundError'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+    put:
+      tags:
+        - Admin Merchant Type Commission
+      summary: Update commission settings for merchant type (admin)
+      operationId: adminUpdateMerchantTypeCommission
+      security:
+        - BearerAuth: []
+      parameters:
+        - $ref: '#/components/parameters/MerchantTypeIdParam'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/MerchantTypeCommissionRequest'
+      responses:
+        '200':
+          description: Commission settings updated successfully
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/SuccessResponse'
+                  - type: object
+                    properties:
+                      data:
+                        $ref: '#/components/schemas/MerchantTypeCommission'
+        '400':
+          $ref: '#/components/responses/BadRequestError'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '404':
+          $ref: '#/components/responses/NotFoundError'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+  /api/v1/admin/merchant-types/{type_id}/subscription-plans:
+    get:
+      tags:
+        - Admin Merchant Type Subscription Plans
+      summary: List subscription plans for merchant type (admin)
+      operationId: adminListMerchantTypeSubscriptionPlans
+      security:
+        - BearerAuth: []
+      parameters:
+        - $ref: '#/components/parameters/MerchantTypeIdParam'
+      responses:
+        '200':
+          description: Subscription plans retrieved successfully
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/SuccessResponse'
+                  - type: object
+                    properties:
+                      data:
+                        type: array
+                        items:
+                          $ref: '#/components/schemas/MerchantTypeSubscriptionPlan'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '404':
+          $ref: '#/components/responses/NotFoundError'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+    post:
+      tags:
+        - Admin Merchant Type Subscription Plans
+      summary: Create subscription plan for merchant type (admin)
+      operationId: adminCreateMerchantTypeSubscriptionPlan
+      security:
+        - BearerAuth: []
+      parameters:
+        - $ref: '#/components/parameters/MerchantTypeIdParam'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/MerchantTypeSubscriptionPlanRequest'
+      responses:
+        '201':
+          description: Subscription plan created successfully
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/SuccessResponse'
+                  - type: object
+                    properties:
+                      data:
+                        $ref: '#/components/schemas/MerchantTypeSubscriptionPlan'
+        '400':
+          $ref: '#/components/responses/BadRequestError'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '404':
+          $ref: '#/components/responses/NotFoundError'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+  /api/v1/admin/merchant-types/{type_id}/subscription-plans/{plan_id}:
+    put:
+      tags:
+        - Admin Merchant Type Subscription Plans
+      summary: Update subscription plan for merchant type (admin)
+      operationId: adminUpdateMerchantTypeSubscriptionPlan
+      security:
+        - BearerAuth: []
+      parameters:
+        - $ref: '#/components/parameters/MerchantTypeIdParam'
+        - $ref: '#/components/parameters/SubscriptionPlanIdParam'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/MerchantTypeSubscriptionPlanRequest'
+      responses:
+        '200':
+          description: Subscription plan updated successfully
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/SuccessResponse'
+                  - type: object
+                    properties:
+                      data:
+                        $ref: '#/components/schemas/MerchantTypeSubscriptionPlan'
+        '400':
+          $ref: '#/components/responses/BadRequestError'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '404':
+          $ref: '#/components/responses/NotFoundError'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+    delete:
+      tags:
+        - Admin Merchant Type Subscription Plans
+      summary: Delete subscription plan for merchant type (admin)
+      operationId: adminDeleteMerchantTypeSubscriptionPlan
+      security:
+        - BearerAuth: []
+      parameters:
+        - $ref: '#/components/parameters/MerchantTypeIdParam'
+        - $ref: '#/components/parameters/SubscriptionPlanIdParam'
+      responses:
+        '200':
+          description: Subscription plan deleted successfully
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/SuccessResponse'
+                  - type: object
+                    properties:
+                      data:
+                        $ref: '#/components/schemas/Acknowledgement'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '404':
+          $ref: '#/components/responses/NotFoundError'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+  /api/v1/admin/commissions:
+    get:
+      tags:
+        - Admin Commissions
+      summary: List all commissions (admin)
+      operationId: adminListCommissions
+      security:
+        - BearerAuth: []
+      parameters:
+        - $ref: '#/components/parameters/PageParam'
+        - $ref: '#/components/parameters/LimitParam'
+        - $ref: '#/components/parameters/SortParam'
+        - in: query
+          name: status
+          schema:
+            $ref: '#/components/schemas/CommissionStatus'
+          description: Filter by commission status
+        - in: query
+          name: agent_id
+          schema:
+            type: integer
+            format: int64
+          description: Filter by agent identifier
+      responses:
+        '200':
+          description: Commissions retrieved successfully
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/PaginatedSuccessResponse'
+                  - type: object
+                    properties:
+                      data:
+                        type: array
+                        items:
+                          $ref: '#/components/schemas/Commission'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+  /api/v1/admin/commissions/{commission_id}:
+    put:
+      tags:
+        - Admin Commissions
+      summary: Update commission (admin)
+      operationId: adminUpdateCommission
+      security:
+        - BearerAuth: []
+      parameters:
+        - $ref: '#/components/parameters/CommissionIdParam'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                status:
+                  $ref: '#/components/schemas/CommissionStatus'
+                amount:
+                  type: number
+                  format: float
+      responses:
+        '200':
+          description: Commission updated successfully
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/SuccessResponse'
+                  - type: object
+                    properties:
+                      data:
+                        $ref: '#/components/schemas/Commission'
+        '400':
+          $ref: '#/components/responses/BadRequestError'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '404':
+          $ref: '#/components/responses/NotFoundError'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+  /api/v1/admin/commissions/bulk-payout:
+    post:
+      tags:
+        - Admin Commissions
+      summary: Process bulk commission payout (admin)
+      operationId: adminBulkCommissionPayout
+      security:
+        - BearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - commission_ids
+              properties:
+                commission_ids:
+                  type: array
+                  items:
+                    type: integer
+                    format: int64
+      responses:
+        '200':
+          description: Bulk commission payout processed successfully
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/SuccessResponse'
+                  - type: object
+                    properties:
+                      data:
+                        type: object
+                        properties:
+                          processed:
+                            type: integer
+                          failed:
+                            type: integer
+        '400':
+          $ref: '#/components/responses/BadRequestError'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+  /api/v1/admin/reviews/pending:
+    get:
+      tags:
+        - Admin Content Moderation
+      summary: List pending reviews for moderation (admin)
+      operationId: adminListPendingReviews
+      security:
+        - BearerAuth: []
+      parameters:
+        - $ref: '#/components/parameters/PageParam'
+        - $ref: '#/components/parameters/LimitParam'
+        - $ref: '#/components/parameters/SortParam'
+      responses:
+        '200':
+          description: Pending reviews retrieved successfully
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/PaginatedSuccessResponse'
+                  - type: object
+                    properties:
+                      data:
+                        type: array
+                        items:
+                          $ref: '#/components/schemas/Review'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+  /api/v1/admin/reviews/{review_id}/moderation:
+    patch:
+      tags:
+        - Admin Content Moderation
+      summary: Moderate review (admin)
+      operationId: adminModerateReview
+      security:
+        - BearerAuth: []
+      parameters:
+        - $ref: '#/components/parameters/ReviewIdParam'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - action
+              properties:
+                action:
+                  type: string
+                  enum: [approve, reject, flag]
+                reason:
+                  type: string
+                  nullable: true
+      responses:
+        '200':
+          description: Review moderated successfully
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/SuccessResponse'
+                  - type: object
+                    properties:
+                      data:
+                        $ref: '#/components/schemas/Review'
+        '400':
+          $ref: '#/components/responses/BadRequestError'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '404':
+          $ref: '#/components/responses/NotFoundError'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+  /api/v1/admin/review-flags:
+    get:
+      tags:
+        - Admin Content Moderation
+      summary: List review flags (admin)
+      operationId: adminListReviewFlags
+      security:
+        - BearerAuth: []
+      parameters:
+        - $ref: '#/components/parameters/PageParam'
+        - $ref: '#/components/parameters/LimitParam'
+        - $ref: '#/components/parameters/SortParam'
+        - in: query
+          name: status
+          schema:
+            $ref: '#/components/schemas/ReviewFlagStatus'
+          description: Filter by flag status
+      responses:
+        '200':
+          description: Review flags retrieved successfully
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/PaginatedSuccessResponse'
+                  - type: object
+                    properties:
+                      data:
+                        type: array
+                        items:
+                          $ref: '#/components/schemas/ReviewFlag'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+  /api/v1/admin/review-flags/{flag_id}:
+    put:
+      tags:
+        - Admin Content Moderation
+      summary: Update review flag (admin)
+      operationId: adminUpdateReviewFlag
+      security:
+        - BearerAuth: []
+      parameters:
+        - $ref: '#/components/parameters/FlagIdParam'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ReviewFlagUpdateRequest'
+      responses:
+        '200':
+          description: Review flag updated successfully
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/SuccessResponse'
+                  - type: object
+                    properties:
+                      data:
+                        $ref: '#/components/schemas/ReviewFlag'
+        '400':
+          $ref: '#/components/responses/BadRequestError'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '404':
+          $ref: '#/components/responses/NotFoundError'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+  /api/v1/admin/system/health:
+    get:
+      tags:
+        - Admin System
+      summary: Get system health status (admin)
+      operationId: adminGetSystemHealth
+      security:
+        - BearerAuth: []
+      responses:
+        '200':
+          description: System health status retrieved successfully
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/SuccessResponse'
+                  - type: object
+                    properties:
+                      data:
+                        $ref: '#/components/schemas/SystemHealth'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+  /api/v1/admin/system/metrics:
+    get:
+      tags:
+        - Admin System
+      summary: Get system metrics (admin)
+      operationId: adminGetSystemMetrics
+      security:
+        - BearerAuth: []
+      responses:
+        '200':
+          description: System metrics retrieved successfully
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/SuccessResponse'
+                  - type: object
+                    properties:
+                      data:
+                        $ref: '#/components/schemas/SystemMetrics'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+  /api/v1/admin/system/logs:
+    get:
+      tags:
+        - Admin System
+      summary: Get system logs (admin)
+      operationId: adminGetSystemLogs
+      security:
+        - BearerAuth: []
+      parameters:
+        - $ref: '#/components/parameters/PageParam'
+        - $ref: '#/components/parameters/LimitParam'
+        - in: query
+          name: level
+          schema:
+            type: string
+            enum: [debug, info, warn, error]
+          description: Filter by log level
+        - in: query
+          name: start_date
+          schema:
+            type: string
+            format: date-time
+          description: Filter logs from this date
+        - in: query
+          name: end_date
+          schema:
+            type: string
+            format: date-time
+          description: Filter logs until this date
+      responses:
+        '200':
+          description: System logs retrieved successfully
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/PaginatedSuccessResponse'
+                  - type: object
+                    properties:
+                      data:
+                        type: array
+                        items:
+                          $ref: '#/components/schemas/SystemLog'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+  /api/v1/admin/system/maintenance:
+    post:
+      tags:
+        - Admin System
+      summary: Enable or disable maintenance mode (admin)
+      operationId: adminSystemMaintenance
+      security:
+        - BearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - enabled
+              properties:
+                enabled:
+                  type: boolean
+                message:
+                  type: string
+                  nullable: true
+      responses:
+        '200':
+          description: Maintenance mode updated successfully
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/SuccessResponse'
+                  - type: object
+                    properties:
+                      data:
+                        type: object
+                        properties:
+                          maintenance_enabled:
+                            type: boolean
+                          message:
+                            type: string
+                            nullable: true
+        '400':
+          $ref: '#/components/responses/BadRequestError'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+  /api/v1/admin/financial/transactions:
+    get:
+      tags:
+        - Admin Financial
+      summary: List financial transactions (admin)
+      operationId: adminListFinancialTransactions
+      security:
+        - BearerAuth: []
+      parameters:
+        - $ref: '#/components/parameters/PageParam'
+        - $ref: '#/components/parameters/LimitParam'
+        - $ref: '#/components/parameters/SortParam'
+        - in: query
+          name: start_date
+          schema:
+            type: string
+            format: date
+          description: Filter transactions from this date
+        - in: query
+          name: end_date
+          schema:
+            type: string
+            format: date
+          description: Filter transactions until this date
+        - in: query
+          name: type
+          schema:
+            type: string
+            enum: [payment, refund, commission]
+          description: Filter by transaction type
+      responses:
+        '200':
+          description: Financial transactions retrieved successfully
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/PaginatedSuccessResponse'
+                  - type: object
+                    properties:
+                      data:
+                        type: array
+                        items:
+                          $ref: '#/components/schemas/FinancialTransaction'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+  /api/v1/admin/financial/revenue:
+    get:
+      tags:
+        - Admin Financial
+      summary: Get revenue report (admin)
+      operationId: adminGetRevenueReport
+      security:
+        - BearerAuth: []
+      parameters:
+        - in: query
+          name: start_date
+          schema:
+            type: string
+            format: date
+          description: Start date for revenue report
+        - in: query
+          name: end_date
+          schema:
+            type: string
+            format: date
+          description: End date for revenue report
+        - in: query
+          name: group_by
+          schema:
+            type: string
+            enum: [day, week, month]
+          description: Group results by period
+      responses:
+        '200':
+          description: Revenue report retrieved successfully
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/SuccessResponse'
+                  - type: object
+                    properties:
+                      data:
+                        $ref: '#/components/schemas/RevenueReport'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+  /api/v1/admin/financial/commissions:
+    get:
+      tags:
+        - Admin Financial
+      summary: Get commission report (admin)
+      operationId: adminGetCommissionReport
+      security:
+        - BearerAuth: []
+      parameters:
+        - in: query
+          name: start_date
+          schema:
+            type: string
+            format: date
+          description: Start date for commission report
+        - in: query
+          name: end_date
+          schema:
+            type: string
+            format: date
+          description: End date for commission report
+      responses:
+        '200':
+          description: Commission report retrieved successfully
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/SuccessResponse'
+                  - type: object
+                    properties:
+                      data:
+                        $ref: '#/components/schemas/CommissionReport'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+  /api/v1/admin/financial/refunds:
+    get:
+      tags:
+        - Admin Financial
+      summary: Get refund report (admin)
+      operationId: adminGetRefundReport
+      security:
+        - BearerAuth: []
+      parameters:
+        - in: query
+          name: start_date
+          schema:
+            type: string
+            format: date
+          description: Start date for refund report
+        - in: query
+          name: end_date
+          schema:
+            type: string
+            format: date
+          description: End date for refund report
+      responses:
+        '200':
+          description: Refund report retrieved successfully
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/SuccessResponse'
+                  - type: object
+                    properties:
+                      data:
+                        $ref: '#/components/schemas/RefundReport'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
   /api/v1/merchants/apply:
     post:
       tags:
@@ -7097,6 +9495,38 @@ components:
         type: integer
         format: int64
       description: Unique community guide identifier
+    MerchantTypeIdParam:
+      in: path
+      name: type_id
+      required: true
+      schema:
+        type: integer
+        format: int64
+      description: Unique merchant type identifier
+    FeatureIdParam:
+      in: path
+      name: feature_id
+      required: true
+      schema:
+        type: integer
+        format: int64
+      description: Unique merchant type feature identifier
+    RequirementIdParam:
+      in: path
+      name: requirement_id
+      required: true
+      schema:
+        type: integer
+        format: int64
+      description: Unique merchant type requirement identifier
+    SubscriptionPlanIdParam:
+      in: path
+      name: plan_id
+      required: true
+      schema:
+        type: integer
+        format: int64
+      description: Unique subscription plan identifier
   responses:
     BadRequestError:
       description: The request payload or parameters were invalid
@@ -10326,6 +12756,860 @@ components:
         updated_at:
           type: string
           format: date-time
+    MerchantAnalyticsOverview:
+      type: object
+      required:
+        - total_revenue
+        - total_bookings
+        - total_orders
+        - total_visits
+      properties:
+        total_revenue:
+          type: number
+          format: float
+        total_bookings:
+          type: integer
+        total_orders:
+          type: integer
+        total_visits:
+          type: integer
+        average_rating:
+          type: number
+          format: float
+          nullable: true
+        period:
+          type: object
+          properties:
+            start_date:
+              type: string
+              format: date
+            end_date:
+              type: string
+              format: date
+    MerchantVisitAnalytics:
+      type: object
+      required:
+        - total_visits
+        - unique_visitors
+      properties:
+        total_visits:
+          type: integer
+        unique_visitors:
+          type: integer
+        visits_by_listing:
+          type: array
+          items:
+            type: object
+            properties:
+              listing_id:
+                type: integer
+                format: int64
+              visits:
+                type: integer
+        period:
+          type: object
+          properties:
+            start_date:
+              type: string
+              format: date
+            end_date:
+              type: string
+              format: date
+    MerchantOrderAnalytics:
+      type: object
+      required:
+        - total_orders
+        - total_revenue
+      properties:
+        total_orders:
+          type: integer
+        total_revenue:
+          type: number
+          format: float
+        average_order_value:
+          type: number
+          format: float
+        orders_by_status:
+          type: object
+          additionalProperties:
+            type: integer
+        period:
+          type: object
+          properties:
+            start_date:
+              type: string
+              format: date
+            end_date:
+              type: string
+              format: date
+    MerchantBookingAnalytics:
+      type: object
+      required:
+        - total_bookings
+        - total_revenue
+      properties:
+        total_bookings:
+          type: integer
+        total_revenue:
+          type: number
+          format: float
+        average_booking_value:
+          type: number
+          format: float
+        bookings_by_status:
+          type: object
+          additionalProperties:
+            type: integer
+        bookings_by_type:
+          type: object
+          additionalProperties:
+            type: integer
+        period:
+          type: object
+          properties:
+            start_date:
+              type: string
+              format: date
+            end_date:
+              type: string
+              format: date
+    MerchantRevenueAnalytics:
+      type: object
+      required:
+        - total_revenue
+        - revenue_data
+      properties:
+        total_revenue:
+          type: number
+          format: float
+        revenue_data:
+          type: array
+          items:
+            type: object
+            properties:
+              period:
+                type: string
+              revenue:
+                type: number
+                format: float
+        currency:
+          type: string
+        period:
+          type: object
+          properties:
+            start_date:
+              type: string
+              format: date
+            end_date:
+              type: string
+              format: date
+    MerchantCustomerInsights:
+      type: object
+      required:
+        - total_customers
+        - repeat_customers
+      properties:
+        total_customers:
+          type: integer
+        repeat_customers:
+          type: integer
+        new_customers:
+          type: integer
+        customer_lifetime_value:
+          type: number
+          format: float
+        top_customers:
+          type: array
+          items:
+            type: object
+            properties:
+              user_id:
+                type: integer
+                format: int64
+              total_spent:
+                type: number
+                format: float
+              total_orders:
+                type: integer
+        period:
+          type: object
+          properties:
+            start_date:
+              type: string
+              format: date
+            end_date:
+              type: string
+              format: date
+    PlatformAnalyticsOverview:
+      type: object
+      required:
+        - total_users
+        - total_merchants
+        - total_revenue
+      properties:
+        total_users:
+          type: integer
+        total_merchants:
+          type: integer
+        total_revenue:
+          type: number
+          format: float
+        total_bookings:
+          type: integer
+        total_orders:
+          type: integer
+        period:
+          type: object
+          properties:
+            start_date:
+              type: string
+              format: date
+            end_date:
+              type: string
+              format: date
+    PlatformUserGrowth:
+      type: object
+      required:
+        - total_users
+        - growth_data
+      properties:
+        total_users:
+          type: integer
+        growth_data:
+          type: array
+          items:
+            type: object
+            properties:
+              period:
+                type: string
+              new_users:
+                type: integer
+              total_users:
+                type: integer
+        period:
+          type: object
+          properties:
+            start_date:
+              type: string
+              format: date
+            end_date:
+              type: string
+              format: date
+    PlatformMerchantGrowth:
+      type: object
+      required:
+        - total_merchants
+        - growth_data
+      properties:
+        total_merchants:
+          type: integer
+        growth_data:
+          type: array
+          items:
+            type: object
+            properties:
+              period:
+                type: string
+              new_merchants:
+                type: integer
+              total_merchants:
+                type: integer
+        period:
+          type: object
+          properties:
+            start_date:
+              type: string
+              format: date
+            end_date:
+              type: string
+              format: date
+    PlatformRevenue:
+      type: object
+      required:
+        - total_revenue
+        - revenue_data
+      properties:
+        total_revenue:
+          type: number
+          format: float
+        revenue_data:
+          type: array
+          items:
+            type: object
+            properties:
+              period:
+                type: string
+              revenue:
+                type: number
+                format: float
+        currency:
+          type: string
+        period:
+          type: object
+          properties:
+            start_date:
+              type: string
+              format: date
+            end_date:
+              type: string
+              format: date
+    PlatformGeographic:
+      type: object
+      required:
+        - geographic_data
+      properties:
+        geographic_data:
+          type: array
+          items:
+            type: object
+            properties:
+              location:
+                type: string
+              user_count:
+                type: integer
+              merchant_count:
+                type: integer
+              revenue:
+                type: number
+                format: float
+        period:
+          type: object
+          properties:
+            start_date:
+              type: string
+              format: date
+            end_date:
+              type: string
+              format: date
+    ChannelManagerPerformance:
+      type: object
+      required:
+        - total_reservations
+        - total_revenue
+      properties:
+        total_reservations:
+          type: integer
+        total_revenue:
+          type: number
+          format: float
+        reservations_by_ota:
+          type: object
+          additionalProperties:
+            type: integer
+        period:
+          type: object
+          properties:
+            start_date:
+              type: string
+              format: date
+            end_date:
+              type: string
+              format: date
+    OTAPerformance:
+      type: object
+      required:
+        - ota_name
+        - total_reservations
+        - total_revenue
+      properties:
+        ota_name:
+          type: string
+        total_reservations:
+          type: integer
+        total_revenue:
+          type: number
+          format: float
+        average_rate:
+          type: number
+          format: float
+        period:
+          type: object
+          properties:
+            start_date:
+              type: string
+              format: date
+            end_date:
+              type: string
+              format: date
+    RevPARAnalytics:
+      type: object
+      required:
+        - revpar
+        - revpar_data
+      properties:
+        revpar:
+          type: number
+          format: float
+        revpar_data:
+          type: array
+          items:
+            type: object
+            properties:
+              date:
+                type: string
+                format: date
+              revpar:
+                type: number
+                format: float
+        period:
+          type: object
+          properties:
+            start_date:
+              type: string
+              format: date
+            end_date:
+              type: string
+              format: date
+    OccupancyAnalytics:
+      type: object
+      required:
+        - average_occupancy
+        - occupancy_data
+      properties:
+        average_occupancy:
+          type: number
+          format: float
+        occupancy_data:
+          type: array
+          items:
+            type: object
+            properties:
+              date:
+                type: string
+                format: date
+              occupancy_rate:
+                type: number
+                format: float
+        period:
+          type: object
+          properties:
+            start_date:
+              type: string
+              format: date
+            end_date:
+              type: string
+              format: date
+    MerchantType:
+      type: object
+      required:
+        - type_id
+        - type_name
+        - is_active
+        - created_at
+        - updated_at
+      properties:
+        type_id:
+          type: integer
+          format: int64
+        type_name:
+          type: string
+        description:
+          type: string
+          nullable: true
+        is_active:
+          type: boolean
+        created_at:
+          type: string
+          format: date-time
+        updated_at:
+          type: string
+          format: date-time
+    MerchantTypeRequest:
+      type: object
+      required:
+        - type_name
+      properties:
+        type_name:
+          type: string
+        description:
+          type: string
+        is_active:
+          type: boolean
+    MerchantTypeFeature:
+      type: object
+      required:
+        - feature_id
+        - type_id
+        - feature_name
+        - created_at
+      properties:
+        feature_id:
+          type: integer
+          format: int64
+        type_id:
+          type: integer
+          format: int64
+        feature_name:
+          type: string
+        description:
+          type: string
+          nullable: true
+        is_enabled:
+          type: boolean
+        created_at:
+          type: string
+          format: date-time
+    MerchantTypeFeatureRequest:
+      type: object
+      required:
+        - feature_name
+      properties:
+        feature_name:
+          type: string
+        description:
+          type: string
+        is_enabled:
+          type: boolean
+    MerchantTypeRequirement:
+      type: object
+      required:
+        - requirement_id
+        - type_id
+        - requirement_name
+        - is_required
+        - created_at
+      properties:
+        requirement_id:
+          type: integer
+          format: int64
+        type_id:
+          type: integer
+          format: int64
+        requirement_name:
+          type: string
+        description:
+          type: string
+          nullable: true
+        is_required:
+          type: boolean
+        created_at:
+          type: string
+          format: date-time
+    MerchantTypeRequirementRequest:
+      type: object
+      required:
+        - requirement_name
+        - is_required
+      properties:
+        requirement_name:
+          type: string
+        description:
+          type: string
+        is_required:
+          type: boolean
+    MerchantTypeCommission:
+      type: object
+      required:
+        - type_id
+        - commission_rate
+        - commission_type
+      properties:
+        type_id:
+          type: integer
+          format: int64
+        commission_rate:
+          type: number
+          format: float
+        commission_type:
+          type: string
+          enum: [percentage, fixed]
+        minimum_commission:
+          type: number
+          format: float
+          nullable: true
+        maximum_commission:
+          type: number
+          format: float
+          nullable: true
+    MerchantTypeCommissionRequest:
+      type: object
+      required:
+        - commission_rate
+        - commission_type
+      properties:
+        commission_rate:
+          type: number
+          format: float
+        commission_type:
+          type: string
+          enum: [percentage, fixed]
+        minimum_commission:
+          type: number
+          format: float
+        maximum_commission:
+          type: number
+          format: float
+    MerchantTypeSubscriptionPlan:
+      type: object
+      required:
+        - plan_id
+        - type_id
+        - plan_name
+        - price
+        - currency
+        - created_at
+        - updated_at
+      properties:
+        plan_id:
+          type: integer
+          format: int64
+        type_id:
+          type: integer
+          format: int64
+        plan_name:
+          type: string
+        description:
+          type: string
+          nullable: true
+        price:
+          type: number
+          format: float
+        currency:
+          type: string
+        billing_period:
+          type: string
+          enum: [monthly, quarterly, yearly]
+        features:
+          type: array
+          items:
+            type: string
+        is_active:
+          type: boolean
+        created_at:
+          type: string
+          format: date-time
+        updated_at:
+          type: string
+          format: date-time
+    MerchantTypeSubscriptionPlanRequest:
+      type: object
+      required:
+        - plan_name
+        - price
+        - currency
+        - billing_period
+      properties:
+        plan_name:
+          type: string
+        description:
+          type: string
+        price:
+          type: number
+          format: float
+        currency:
+          type: string
+        billing_period:
+          type: string
+          enum: [monthly, quarterly, yearly]
+        features:
+          type: array
+          items:
+            type: string
+        is_active:
+          type: boolean
+    SystemHealth:
+      type: object
+      required:
+        - status
+        - timestamp
+      properties:
+        status:
+          type: string
+          enum: [healthy, degraded, down]
+        database:
+          type: object
+          properties:
+            status:
+              type: string
+            response_time_ms:
+              type: number
+              format: float
+        cache:
+          type: object
+          properties:
+            status:
+              type: string
+            response_time_ms:
+              type: number
+              format: float
+        timestamp:
+          type: string
+          format: date-time
+    SystemMetrics:
+      type: object
+      required:
+        - timestamp
+      properties:
+        cpu_usage:
+          type: number
+          format: float
+        memory_usage:
+          type: number
+          format: float
+        disk_usage:
+          type: number
+          format: float
+        active_connections:
+          type: integer
+        requests_per_minute:
+          type: number
+          format: float
+        timestamp:
+          type: string
+          format: date-time
+    SystemLog:
+      type: object
+      required:
+        - log_id
+        - level
+        - message
+        - timestamp
+      properties:
+        log_id:
+          type: integer
+          format: int64
+        level:
+          type: string
+          enum: [debug, info, warn, error]
+        message:
+          type: string
+        context:
+          type: object
+          additionalProperties: true
+          nullable: true
+        timestamp:
+          type: string
+          format: date-time
+    FinancialTransaction:
+      type: object
+      required:
+        - transaction_id
+        - type
+        - amount
+        - currency
+        - created_at
+      properties:
+        transaction_id:
+          type: integer
+          format: int64
+        type:
+          type: string
+          enum: [payment, refund, commission]
+        amount:
+          type: number
+          format: float
+        currency:
+          type: string
+        payment_id:
+          type: integer
+          format: int64
+          nullable: true
+        refund_id:
+          type: integer
+          format: int64
+          nullable: true
+        commission_id:
+          type: integer
+          format: int64
+          nullable: true
+        created_at:
+          type: string
+          format: date-time
+    RevenueReport:
+      type: object
+      required:
+        - total_revenue
+        - revenue_data
+      properties:
+        total_revenue:
+          type: number
+          format: float
+        revenue_data:
+          type: array
+          items:
+            type: object
+            properties:
+              period:
+                type: string
+              revenue:
+                type: number
+                format: float
+        currency:
+          type: string
+        period:
+          type: object
+          properties:
+            start_date:
+              type: string
+              format: date
+            end_date:
+              type: string
+              format: date
+    CommissionReport:
+      type: object
+      required:
+        - total_commissions
+        - commission_data
+      properties:
+        total_commissions:
+          type: number
+          format: float
+        commission_data:
+          type: array
+          items:
+            type: object
+            properties:
+              agent_id:
+                type: integer
+                format: int64
+              agent_name:
+                type: string
+              total_commissions:
+                type: number
+                format: float
+        period:
+          type: object
+          properties:
+            start_date:
+              type: string
+              format: date
+            end_date:
+              type: string
+              format: date
+    RefundReport:
+      type: object
+      required:
+        - total_refunds
+        - refund_data
+      properties:
+        total_refunds:
+          type: number
+          format: float
+        refund_count:
+          type: integer
+        refund_data:
+          type: array
+          items:
+            type: object
+            properties:
+              period:
+                type: string
+              refund_amount:
+                type: number
+                format: float
+              refund_count:
+                type: integer
+        currency:
+          type: string
+        period:
+          type: object
+          properties:
+            start_date:
+              type: string
+              format: date
+            end_date:
+              type: string
+              format: date
     MerchantCategory:
       type: string
       enum:
