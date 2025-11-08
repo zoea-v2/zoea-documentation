@@ -49,6 +49,18 @@ tags:
     description: Manage service offerings and availability.
   - name: Tours
     description: Manage tour packages, schedules, and add-ons.
+  - name: Booking Search
+    description: Search and check booking availability.
+  - name: Bookings
+    description: Manage bookings and reservations.
+  - name: Booking Participants
+    description: Manage booking participants and guests.
+  - name: Booking Add-ons
+    description: Manage booking add-ons and extras.
+  - name: Booking Check-in/Check-out
+    description: Handle check-in and check-out operations.
+  - name: Orders
+    description: Manage product orders and deliveries.
   - name: Merchant Onboarding
     description: Onboarding workflows for new merchants.
   - name: Merchant Profile
@@ -1257,6 +1269,3196 @@ paths:
           $ref: '#/components/responses/UnauthorizedError'
         '500':
           $ref: '#/components/responses/InternalServerError'
+  /api/v1/listings:
+    get:
+      tags:
+        - Listings
+      summary: List listings with filters and pagination
+      operationId: listListings
+      parameters:
+        - $ref: '#/components/parameters/PageParam'
+        - $ref: '#/components/parameters/LimitParam'
+        - $ref: '#/components/parameters/SortParam'
+        - $ref: '#/components/parameters/SearchParam'
+        - in: query
+          name: type
+          schema:
+            type: string
+            enum: [hotel, event, restaurant, tour, product, service]
+          description: Filter listings by type
+        - in: query
+          name: is_active
+          schema:
+            type: boolean
+          description: Filter listings by active status
+      responses:
+        '200':
+          description: Listings retrieved successfully
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/PaginatedSuccessResponse'
+                  - type: object
+                    properties:
+                      data:
+                        type: array
+                        items:
+                          $ref: '#/components/schemas/Listing'
+              examples:
+                listingsPage:
+                  value:
+                    status: success
+                    message: Listings retrieved
+                    data:
+                      - listing_id: 301
+                        merchant_id: 101
+                        title: Skyline Hotel Kigali
+                        description: Luxury hotel with rooftop lounge.
+                        type: hotel
+                        gallery_images:
+                          - https://cdn.zoea.rw/listings/301/cover.jpg
+                        base_price: 120.0
+                        currency: RWF
+                        is_active: true
+                        operating_hours:
+                          checkin: "14:00"
+                          checkout: "11:00"
+                        min_booking_notice_hours: 4
+                        max_advance_booking_days: 365
+                        service_config:
+                          property_rating: 5
+                        created_at: 2025-10-01T08:00:00Z
+                        updated_at: 2025-11-07T09:00:00Z
+                    pagination:
+                      page: 1
+                      limit: 20
+                      total: 145
+                      totalPages: 8
+        '400':
+          $ref: '#/components/responses/BadRequestError'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+    post:
+      tags:
+        - Listings
+      summary: Create a new listing
+      operationId: createListing
+      security:
+        - BearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ListingCreateRequest'
+      responses:
+        '201':
+          description: Listing created successfully
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/SuccessResponse'
+                  - type: object
+                    properties:
+                      data:
+                        $ref: '#/components/schemas/Listing'
+              examples:
+                listingCreated:
+                  value:
+                    status: success
+                    message: Listing created successfully
+                    data:
+                      listing_id: 322
+                      merchant_id: 101
+                      title: Green Hills Eco Lodge
+                      description: Sustainable lodge in Musanze.
+                      type: hotel
+                      gallery_images:
+                        - https://cdn.zoea.rw/listings/322/front.jpg
+                      base_price: 95.0
+                      currency: RWF
+                      is_active: true
+                      created_at: 2025-11-07T11:25:00Z
+                      updated_at: 2025-11-07T11:25:00Z
+        '400':
+          $ref: '#/components/responses/BadRequestError'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+  /api/v1/listings/{listing_id}:
+    get:
+      tags:
+        - Listings
+      summary: Retrieve a listing by identifier
+      operationId: getListingById
+      parameters:
+        - $ref: '#/components/parameters/ListingIdParam'
+      responses:
+        '200':
+          description: Listing retrieved successfully
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/SuccessResponse'
+                  - type: object
+                    properties:
+                      data:
+                        $ref: '#/components/schemas/Listing'
+        '404':
+          $ref: '#/components/responses/NotFoundError'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+    put:
+      tags:
+        - Listings
+      summary: Update a listing
+      operationId: updateListing
+      security:
+        - BearerAuth: []
+      parameters:
+        - $ref: '#/components/parameters/ListingIdParam'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ListingUpdateRequest'
+      responses:
+        '200':
+          description: Listing updated successfully
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/SuccessResponse'
+                  - type: object
+                    properties:
+                      data:
+                        $ref: '#/components/schemas/Listing'
+        '400':
+          $ref: '#/components/responses/BadRequestError'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '404':
+          $ref: '#/components/responses/NotFoundError'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+    delete:
+      tags:
+        - Listings
+      summary: Delete a listing
+      operationId: deleteListing
+      security:
+        - BearerAuth: []
+      parameters:
+        - $ref: '#/components/parameters/ListingIdParam'
+      responses:
+        '200':
+          description: Listing deleted successfully
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/SuccessResponse'
+                  - type: object
+                    properties:
+                      data:
+                        $ref: '#/components/schemas/Acknowledgement'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '404':
+          $ref: '#/components/responses/NotFoundError'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+  /api/v1/listings/{listing_id}/status:
+    patch:
+      tags:
+        - Listings
+      summary: Update listing active status
+      operationId: patchListingStatus
+      security:
+        - BearerAuth: []
+      parameters:
+        - $ref: '#/components/parameters/ListingIdParam'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ListingStatusUpdateRequest'
+      responses:
+        '200':
+          description: Listing status updated successfully
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/SuccessResponse'
+                  - type: object
+                    properties:
+                      data:
+                        $ref: '#/components/schemas/Listing'
+        '400':
+          $ref: '#/components/responses/BadRequestError'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '404':
+          $ref: '#/components/responses/NotFoundError'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+  /api/v1/listings/{listing_id}/locations:
+    get:
+      tags:
+        - Listing Locations
+      summary: List locations attached to a listing
+      operationId: listListingLocations
+      security:
+        - BearerAuth: []
+      parameters:
+        - $ref: '#/components/parameters/ListingIdParam'
+        - $ref: '#/components/parameters/PageParam'
+        - $ref: '#/components/parameters/LimitParam'
+        - $ref: '#/components/parameters/SortParam'
+      responses:
+        '200':
+          description: Listing locations retrieved successfully
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/PaginatedSuccessResponse'
+                  - type: object
+                    properties:
+                      data:
+                        type: array
+                        items:
+                          $ref: '#/components/schemas/ListingLocation'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '404':
+          $ref: '#/components/responses/NotFoundError'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+    post:
+      tags:
+        - Listing Locations
+      summary: Create a location for a listing
+      operationId: createListingLocation
+      security:
+        - BearerAuth: []
+      parameters:
+        - $ref: '#/components/parameters/ListingIdParam'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ListingLocationRequest'
+      responses:
+        '201':
+          description: Listing location created successfully
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/SuccessResponse'
+                  - type: object
+                    properties:
+                      data:
+                        $ref: '#/components/schemas/ListingLocation'
+        '400':
+          $ref: '#/components/responses/BadRequestError'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '404':
+          $ref: '#/components/responses/NotFoundError'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+  /api/v1/listings/{listing_id}/locations/{location_id}:
+    put:
+      tags:
+        - Listing Locations
+      summary: Update a listing location
+      operationId: updateListingLocation
+      security:
+        - BearerAuth: []
+      parameters:
+        - $ref: '#/components/parameters/ListingIdParam'
+        - $ref: '#/components/parameters/LocationIdParam'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ListingLocationRequest'
+      responses:
+        '200':
+          description: Listing location updated successfully
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/SuccessResponse'
+                  - type: object
+                    properties:
+                      data:
+                        $ref: '#/components/schemas/ListingLocation'
+        '400':
+          $ref: '#/components/responses/BadRequestError'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '404':
+          $ref: '#/components/responses/NotFoundError'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+    delete:
+      tags:
+        - Listing Locations
+      summary: Remove a listing location
+      operationId: deleteListingLocation
+      security:
+        - BearerAuth: []
+      parameters:
+        - $ref: '#/components/parameters/ListingIdParam'
+        - $ref: '#/components/parameters/LocationIdParam'
+      responses:
+        '200':
+          description: Listing location removed successfully
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/SuccessResponse'
+                  - type: object
+                    properties:
+                      data:
+                        $ref: '#/components/schemas/Acknowledgement'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '404':
+          $ref: '#/components/responses/NotFoundError'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+  /api/v1/listings/{listing_id}/room-types:
+    get:
+      tags:
+        - Hotel Room Types
+      summary: List room types for a hotel listing
+      operationId: listRoomTypes
+      security:
+        - BearerAuth: []
+      parameters:
+        - $ref: '#/components/parameters/ListingIdParam'
+        - $ref: '#/components/parameters/PageParam'
+        - $ref: '#/components/parameters/LimitParam'
+      responses:
+        '200':
+          description: Room types retrieved successfully
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/PaginatedSuccessResponse'
+                  - type: object
+                    properties:
+                      data:
+                        type: array
+                        items:
+                          $ref: '#/components/schemas/HotelRoomType'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '404':
+          $ref: '#/components/responses/NotFoundError'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+    post:
+      tags:
+        - Hotel Room Types
+      summary: Create a room type for a listing
+      operationId: createRoomType
+      security:
+        - BearerAuth: []
+      parameters:
+        - $ref: '#/components/parameters/ListingIdParam'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/HotelRoomTypeRequest'
+      responses:
+        '201':
+          description: Room type created successfully
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/SuccessResponse'
+                  - type: object
+                    properties:
+                      data:
+                        $ref: '#/components/schemas/HotelRoomType'
+        '400':
+          $ref: '#/components/responses/BadRequestError'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '404':
+          $ref: '#/components/responses/NotFoundError'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+  /api/v1/room-types/{room_type_id}:
+    get:
+      tags:
+        - Hotel Room Types
+      summary: Retrieve a room type by identifier
+      operationId: getRoomTypeById
+      security:
+        - BearerAuth: []
+      parameters:
+        - $ref: '#/components/parameters/RoomTypeIdParam'
+      responses:
+        '200':
+          description: Room type retrieved successfully
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/SuccessResponse'
+                  - type: object
+                    properties:
+                      data:
+                        $ref: '#/components/schemas/HotelRoomType'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '404':
+          $ref: '#/components/responses/NotFoundError'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+    put:
+      tags:
+        - Hotel Room Types
+      summary: Update a room type
+      operationId: updateRoomType
+      security:
+        - BearerAuth: []
+      parameters:
+        - $ref: '#/components/parameters/RoomTypeIdParam'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/HotelRoomTypeRequest'
+      responses:
+        '200':
+          description: Room type updated successfully
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/SuccessResponse'
+                  - type: object
+                    properties:
+                      data:
+                        $ref: '#/components/schemas/HotelRoomType'
+        '400':
+          $ref: '#/components/responses/BadRequestError'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '404':
+          $ref: '#/components/responses/NotFoundError'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+    delete:
+      tags:
+        - Hotel Room Types
+      summary: Delete a room type
+      operationId: deleteRoomType
+      security:
+        - BearerAuth: []
+      parameters:
+        - $ref: '#/components/parameters/RoomTypeIdParam'
+      responses:
+        '200':
+          description: Room type deleted successfully
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/SuccessResponse'
+                  - type: object
+                    properties:
+                      data:
+                        $ref: '#/components/schemas/Acknowledgement'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '404':
+          $ref: '#/components/responses/NotFoundError'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+
+  /api/v1/room-types/{room_type_id}/rate-plans:
+    get:
+      tags:
+        - Rate Plans
+      summary: List rate plans for a room type
+      operationId: listRatePlans
+      security:
+        - BearerAuth: []
+      parameters:
+        - $ref: '#/components/parameters/RoomTypeIdParam'
+      responses:
+        '200':
+          description: Rate plans retrieved successfully
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/SuccessResponse'
+                  - type: object
+                    properties:
+                      data:
+                        type: array
+                        items:
+                          $ref: '#/components/schemas/RatePlan'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '404':
+          $ref: '#/components/responses/NotFoundError'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+    post:
+      tags:
+        - Rate Plans
+      summary: Create a rate plan for a room type
+      operationId: createRatePlan
+      security:
+        - BearerAuth: []
+      parameters:
+        - $ref: '#/components/parameters/RoomTypeIdParam'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RatePlanRequest'
+      responses:
+        '201':
+          description: Rate plan created successfully
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/SuccessResponse'
+                  - type: object
+                    properties:
+                      data:
+                        $ref: '#/components/schemas/RatePlan'
+        '400':
+          $ref: '#/components/responses/BadRequestError'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '404':
+          $ref: '#/components/responses/NotFoundError'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+  /api/v1/rate-plans/{rate_plan_id}:
+    get:
+      tags:
+        - Rate Plans
+      summary: Retrieve a rate plan by identifier
+      operationId: getRatePlanById
+      security:
+        - BearerAuth: []
+      parameters:
+        - $ref: '#/components/parameters/RatePlanIdParam'
+      responses:
+        '200':
+          description: Rate plan retrieved successfully
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/SuccessResponse'
+                  - type: object
+                    properties:
+                      data:
+                        $ref: '#/components/schemas/RatePlan'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '404':
+          $ref: '#/components/responses/NotFoundError'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+    put:
+      tags:
+        - Rate Plans
+      summary: Update a rate plan
+      operationId: updateRatePlan
+      security:
+        - BearerAuth: []
+      parameters:
+        - $ref: '#/components/parameters/RatePlanIdParam'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RatePlanRequest'
+      responses:
+        '200':
+          description: Rate plan updated successfully
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/SuccessResponse'
+                  - type: object
+                    properties:
+                      data:
+                        $ref: '#/components/schemas/RatePlan'
+        '400':
+          $ref: '#/components/responses/BadRequestError'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '404':
+          $ref: '#/components/responses/NotFoundError'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+    delete:
+      tags:
+        - Rate Plans
+      summary: Delete a rate plan
+      operationId: deleteRatePlan
+      security:
+        - BearerAuth: []
+      parameters:
+        - $ref: '#/components/parameters/RatePlanIdParam'
+      responses:
+        '200':
+          description: Rate plan deleted successfully
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/SuccessResponse'
+                  - type: object
+                    properties:
+                      data:
+                        $ref: '#/components/schemas/Acknowledgement'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '404':
+          $ref: '#/components/responses/NotFoundError'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+ 
+  /api/v1/listings/{listing_id}/availability:
+    get:
+      tags:
+        - Listing Availability
+      summary: Retrieve availability calendar for a listing
+      operationId: getListingAvailability
+      security:
+        - BearerAuth: []
+      parameters:
+        - $ref: '#/components/parameters/ListingIdParam'
+        - in: query
+          name: from
+          schema:
+            type: string
+            format: date
+          description: Start date filter
+        - in: query
+          name: to
+          schema:
+            type: string
+            format: date
+          description: End date filter
+      responses:
+        '200':
+          description: Listing availability retrieved successfully
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/SuccessResponse'
+                  - type: object
+                    properties:
+                      data:
+                        type: array
+                        items:
+                          $ref: '#/components/schemas/ListingAvailabilityEntry'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '404':
+          $ref: '#/components/responses/NotFoundError'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+
+  /api/v1/listings/{listing_id}/events:
+    get:
+      tags:
+        - Events
+      summary: List events for a listing
+      operationId: listEvents
+      security:
+        - BearerAuth: []
+      parameters:
+        - $ref: '#/components/parameters/ListingIdParam'
+        - $ref: '#/components/parameters/PageParam'
+        - $ref: '#/components/parameters/LimitParam'
+      responses:
+        '200':
+          description: Events retrieved successfully
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/PaginatedSuccessResponse'
+                  - type: object
+                    properties:
+                      data:
+                        type: array
+                        items:
+                          $ref: '#/components/schemas/Event'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '404':
+          $ref: '#/components/responses/NotFoundError'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+    post:
+      tags:
+        - Events
+      summary: Create an event for a listing
+      operationId: createEvent
+      security:
+        - BearerAuth: []
+      parameters:
+        - $ref: '#/components/parameters/ListingIdParam'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/EventRequest'
+      responses:
+        '201':
+          description: Event created successfully
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/SuccessResponse'
+                  - type: object
+                    properties:
+                      data:
+                        $ref: '#/components/schemas/Event'
+        '400':
+          $ref: '#/components/responses/BadRequestError'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '404':
+          $ref: '#/components/responses/NotFoundError'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+  /api/v1/events/{event_id}:
+    get:
+      tags:
+        - Events
+      summary: Retrieve an event by identifier
+      operationId: getEventById
+      security:
+        - BearerAuth: []
+      parameters:
+        - $ref: '#/components/parameters/EventIdParam'
+      responses:
+        '200':
+          description: Event retrieved successfully
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/SuccessResponse'
+                  - type: object
+                    properties:
+                      data:
+                        $ref: '#/components/schemas/Event'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '404':
+          $ref: '#/components/responses/NotFoundError'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+    put:
+      tags:
+        - Events
+      summary: Update an event
+      operationId: updateEvent
+      security:
+        - BearerAuth: []
+      parameters:
+        - $ref: '#/components/parameters/EventIdParam'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/EventRequest'
+      responses:
+        '200':
+          description: Event updated successfully
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/SuccessResponse'
+                  - type: object
+                    properties:
+                      data:
+                        $ref: '#/components/schemas/Event'
+        '400':
+          $ref: '#/components/responses/BadRequestError'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '404':
+          $ref: '#/components/responses/NotFoundError'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+    delete:
+      tags:
+        - Events
+      summary: Delete an event
+      operationId: deleteEvent
+      security:
+        - BearerAuth: []
+      parameters:
+        - $ref: '#/components/parameters/EventIdParam'
+      responses:
+        '200':
+          description: Event deleted successfully
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/SuccessResponse'
+                  - type: object
+                    properties:
+                      data:
+                        $ref: '#/components/schemas/Acknowledgement'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '404':
+          $ref: '#/components/responses/NotFoundError'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+  /api/v1/events/{event_id}/ticket-tiers:
+    get:
+      tags:
+        - Events
+      summary: List ticket tiers for an event
+      operationId: listTicketTiers
+      security:
+        - BearerAuth: []
+      parameters:
+        - $ref: '#/components/parameters/EventIdParam'
+      responses:
+        '200':
+          description: Ticket tiers retrieved successfully
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/SuccessResponse'
+                  - type: object
+                    properties:
+                      data:
+                        type: array
+                        items:
+                          $ref: '#/components/schemas/TicketTier'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '404':
+          $ref: '#/components/responses/NotFoundError'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+    post:
+      tags:
+        - Events
+      summary: Create a ticket tier for an event
+      operationId: createTicketTier
+      security:
+        - BearerAuth: []
+      parameters:
+        - $ref: '#/components/parameters/EventIdParam'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/TicketTierRequest'
+      responses:
+        '201':
+          description: Ticket tier created successfully
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/SuccessResponse'
+                  - type: object
+                    properties:
+                      data:
+                        $ref: '#/components/schemas/TicketTier'
+        '400':
+          $ref: '#/components/responses/BadRequestError'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '404':
+          $ref: '#/components/responses/NotFoundError'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+  /api/v1/ticket-tiers/{tier_id}:
+    put:
+      tags:
+        - Events
+      summary: Update a ticket tier
+      operationId: updateTicketTier
+      security:
+        - BearerAuth: []
+      parameters:
+        - $ref: '#/components/parameters/TicketTierIdParam'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/TicketTierRequest'
+      responses:
+        '200':
+          description: Ticket tier updated successfully
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/SuccessResponse'
+                  - type: object
+                    properties:
+                      data:
+                        $ref: '#/components/schemas/TicketTier'
+        '400':
+          $ref: '#/components/responses/BadRequestError'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '404':
+          $ref: '#/components/responses/NotFoundError'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+  /api/v1/listings/{listing_id}/tables:
+    get:
+      tags:
+        - Restaurant Tables
+      summary: List table configurations for a listing
+      operationId: listRestaurantTables
+      security:
+        - BearerAuth: []
+      parameters:
+        - $ref: '#/components/parameters/ListingIdParam'
+      responses:
+        '200':
+          description: Restaurant tables retrieved successfully
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/SuccessResponse'
+                  - type: object
+                    properties:
+                      data:
+                        type: array
+                        items:
+                          $ref: '#/components/schemas/RestaurantTable'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '404':
+          $ref: '#/components/responses/NotFoundError'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+    post:
+      tags:
+        - Restaurant Tables
+      summary: Create a table configuration
+      operationId: createRestaurantTable
+      security:
+        - BearerAuth: []
+      parameters:
+        - $ref: '#/components/parameters/ListingIdParam'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RestaurantTableRequest'
+      responses:
+        '201':
+          description: Restaurant table created successfully
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/SuccessResponse'
+                  - type: object
+                    properties:
+                      data:
+                        $ref: '#/components/schemas/RestaurantTable'
+        '400':
+          $ref: '#/components/responses/BadRequestError'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '404':
+          $ref: '#/components/responses/NotFoundError'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+  /api/v1/tables/{table_id}:
+    get:
+      tags:
+        - Restaurant Tables
+      summary: Retrieve a restaurant table configuration
+      operationId: getRestaurantTable
+      security:
+        - BearerAuth: []
+      parameters:
+        - $ref: '#/components/parameters/TableIdParam'
+      responses:
+        '200':
+          description: Restaurant table retrieved successfully
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/SuccessResponse'
+                  - type: object
+                    properties:
+                      data:
+                        $ref: '#/components/schemas/RestaurantTable'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '404':
+          $ref: '#/components/responses/NotFoundError'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+    put:
+      tags:
+        - Restaurant Tables
+      summary: Update a restaurant table configuration
+      operationId: updateRestaurantTable
+      security:
+        - BearerAuth: []
+      parameters:
+        - $ref: '#/components/parameters/TableIdParam'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RestaurantTableRequest'
+      responses:
+        '200':
+          description: Restaurant table updated successfully
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/SuccessResponse'
+                  - type: object
+                    properties:
+                      data:
+                        $ref: '#/components/schemas/RestaurantTable'
+        '400':
+          $ref: '#/components/responses/BadRequestError'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '404':
+          $ref: '#/components/responses/NotFoundError'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+    delete:
+      tags:
+        - Restaurant Tables
+      summary: Delete a restaurant table configuration
+      operationId: deleteRestaurantTable
+      security:
+        - BearerAuth: []
+      parameters:
+        - $ref: '#/components/parameters/TableIdParam'
+      responses:
+        '200':
+          description: Restaurant table deleted successfully
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/SuccessResponse'
+                  - type: object
+                    properties:
+                      data:
+                        $ref: '#/components/schemas/Acknowledgement'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '404':
+          $ref: '#/components/responses/NotFoundError'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+  /api/v1/listings/{listing_id}/table-availability/check:
+    post:
+      tags:
+        - Restaurant Tables
+      summary: Check table availability for a specific time window
+      operationId: checkTableAvailability
+      security:
+        - BearerAuth: []
+      parameters:
+        - $ref: '#/components/parameters/ListingIdParam'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/TableAvailabilityCheckRequest'
+      responses:
+        '200':
+          description: Table availability evaluated successfully
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/SuccessResponse'
+                  - type: object
+                    properties:
+                      data:
+                        $ref: '#/components/schemas/TableAvailabilityCheckResult'
+              examples:
+                tableAvailability:
+                  value:
+                    status: success
+                    message: Availability calculated
+                    data:
+                      available: true
+                      suggested_tables:
+                        - table_id: 880
+                          listing_id: 305
+                          table_type: indoor
+                          capacity: 4
+                          table_count: 10
+                          min_booking_duration_minutes: 90
+                          created_at: 2025-05-01T08:00:00Z
+                          updated_at: 2025-11-06T14:00:00Z
+                      message: Reserved successfully
+        '400':
+          $ref: '#/components/responses/BadRequestError'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+  /api/v1/listings/{listing_id}/products:
+    get:
+      tags:
+        - Products
+      summary: List products for a listing
+      operationId: listProducts
+      security:
+        - BearerAuth: []
+      parameters:
+        - $ref: '#/components/parameters/ListingIdParam'
+        - $ref: '#/components/parameters/PageParam'
+        - $ref: '#/components/parameters/LimitParam'
+        - $ref: '#/components/parameters/SortParam'
+      responses:
+        '200':
+          description: Products retrieved successfully
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/PaginatedSuccessResponse'
+                  - type: object
+                    properties:
+                      data:
+                        type: array
+                        items:
+                          $ref: '#/components/schemas/Product'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '404':
+          $ref: '#/components/responses/NotFoundError'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+    post:
+      tags:
+        - Products
+      summary: Create a product for a listing
+      operationId: createProduct
+      security:
+        - BearerAuth: []
+      parameters:
+        - $ref: '#/components/parameters/ListingIdParam'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ProductRequest'
+      responses:
+        '201':
+          description: Product created successfully
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/SuccessResponse'
+                  - type: object
+                    properties:
+                      data:
+                        $ref: '#/components/schemas/Product'
+        '400':
+          $ref: '#/components/responses/BadRequestError'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '404':
+          $ref: '#/components/responses/NotFoundError'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+  /api/v1/products/{product_id}:
+    get:
+      tags:
+        - Products
+      summary: Retrieve a product by identifier
+      operationId: getProduct
+      security:
+        - BearerAuth: []
+      parameters:
+        - $ref: '#/components/parameters/ProductIdParam'
+      responses:
+        '200':
+          description: Product retrieved successfully
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/SuccessResponse'
+                  - type: object
+                    properties:
+                      data:
+                        $ref: '#/components/schemas/Product'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '404':
+          $ref: '#/components/responses/NotFoundError'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+    put:
+      tags:
+        - Products
+      summary: Update a product
+      operationId: updateProduct
+      security:
+        - BearerAuth: []
+      parameters:
+        - $ref: '#/components/parameters/ProductIdParam'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ProductRequest'
+      responses:
+        '200':
+          description: Product updated successfully
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/SuccessResponse'
+                  - type: object
+                    properties:
+                      data:
+                        $ref: '#/components/schemas/Product'
+        '400':
+          $ref: '#/components/responses/BadRequestError'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '404':
+          $ref: '#/components/responses/NotFoundError'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+    delete:
+      tags:
+        - Products
+      summary: Delete a product
+      operationId: deleteProduct
+      security:
+        - BearerAuth: []
+      parameters:
+        - $ref: '#/components/parameters/ProductIdParam'
+      responses:
+        '200':
+          description: Product deleted successfully
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/SuccessResponse'
+                  - type: object
+                    properties:
+                      data:
+                        $ref: '#/components/schemas/Acknowledgement'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '404':
+          $ref: '#/components/responses/NotFoundError'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+  /api/v1/products/{product_id}/inventory:
+    patch:
+      tags:
+        - Products
+      summary: Update product inventory details
+      operationId: updateProductInventory
+      security:
+        - BearerAuth: []
+      parameters:
+        - $ref: '#/components/parameters/ProductIdParam'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ProductInventoryPatchRequest'
+      responses:
+        '200':
+          description: Product inventory updated successfully
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/SuccessResponse'
+                  - type: object
+                    properties:
+                      data:
+                        $ref: '#/components/schemas/Product'
+              examples:
+                productInventory:
+                  value:
+                    status: success
+                    message: Inventory updated
+                    data:
+                      product_id: 5402
+                      listing_id: 305
+                      product_name: Lake Kivu Coffee Beans 1kg
+                      description: Single-origin beans from Gisenyi.
+                      stock_quantity: 32
+                      variants:
+                        - size: 1kg
+                          roast: medium
+                      track_inventory: true
+                      price: 18.5
+                      currency: USD
+                      status: active
+                      created_at: 2025-03-12T10:00:00Z
+                      updated_at: 2025-11-07T13:45:00Z
+        '400':
+          $ref: '#/components/responses/BadRequestError'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '404':
+          $ref: '#/components/responses/NotFoundError'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+  /api/v1/listings/{listing_id}/services:
+    get:
+      tags:
+        - Services
+      summary: List services for a listing
+      operationId: listServices
+      security:
+        - BearerAuth: []
+      parameters:
+        - $ref: '#/components/parameters/ListingIdParam'
+        - $ref: '#/components/parameters/PageParam'
+        - $ref: '#/components/parameters/LimitParam'
+      responses:
+        '200':
+          description: Services retrieved successfully
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/PaginatedSuccessResponse'
+                  - type: object
+                    properties:
+                      data:
+                        type: array
+                        items:
+                          $ref: '#/components/schemas/ServiceOffering'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '404':
+          $ref: '#/components/responses/NotFoundError'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+    post:
+      tags:
+        - Services
+      summary: Create a service offering
+      operationId: createServiceOffering
+      security:
+        - BearerAuth: []
+      parameters:
+        - $ref: '#/components/parameters/ListingIdParam'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ServiceOfferingRequest'
+      responses:
+        '201':
+          description: Service offering created successfully
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/SuccessResponse'
+                  - type: object
+                    properties:
+                      data:
+                        $ref: '#/components/schemas/ServiceOffering'
+        '400':
+          $ref: '#/components/responses/BadRequestError'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '404':
+          $ref: '#/components/responses/NotFoundError'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+  /api/v1/services/{service_id}:
+    get:
+      tags:
+        - Services
+      summary: Retrieve a service offering
+      operationId: getServiceOffering
+      security:
+        - BearerAuth: []
+      parameters:
+        - $ref: '#/components/parameters/ServiceIdParam'
+      responses:
+        '200':
+          description: Service offering retrieved successfully
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/SuccessResponse'
+                  - type: object
+                    properties:
+                      data:
+                        $ref: '#/components/schemas/ServiceOffering'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '404':
+          $ref: '#/components/responses/NotFoundError'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+    put:
+      tags:
+        - Services
+      summary: Update a service offering
+      operationId: updateServiceOffering
+      security:
+        - BearerAuth: []
+      parameters:
+        - $ref: '#/components/parameters/ServiceIdParam'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ServiceOfferingRequest'
+      responses:
+        '200':
+          description: Service offering updated successfully
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/SuccessResponse'
+                  - type: object
+                    properties:
+                      data:
+                        $ref: '#/components/schemas/ServiceOffering'
+        '400':
+          $ref: '#/components/responses/BadRequestError'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '404':
+          $ref: '#/components/responses/NotFoundError'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+    delete:
+      tags:
+        - Services
+      summary: Delete a service offering
+      operationId: deleteServiceOffering
+      security:
+        - BearerAuth: []
+      parameters:
+        - $ref: '#/components/parameters/ServiceIdParam'
+      responses:
+        '200':
+          description: Service offering deleted successfully
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/SuccessResponse'
+                  - type: object
+                    properties:
+                      data:
+                        $ref: '#/components/schemas/Acknowledgement'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '404':
+          $ref: '#/components/responses/NotFoundError'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+  /api/v1/services/{service_id}/availability:
+    post:
+      tags:
+        - Services
+      summary: Create availability slots for a service
+      operationId: createServiceAvailability
+      security:
+        - BearerAuth: []
+      parameters:
+        - $ref: '#/components/parameters/ServiceIdParam'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ServiceAvailabilityRequest'
+      responses:
+        '201':
+          description: Service availability created successfully
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/SuccessResponse'
+                  - type: object
+                    properties:
+                      data:
+                        $ref: '#/components/schemas/ServiceOffering'
+              examples:
+                serviceAvailabilityCreated:
+                  value:
+                    status: success
+                    message: Availability slots recorded
+                    data:
+                      service_id: 720
+                      listing_id: 310
+                      service_name: Deep Tissue Massage
+                      description: 60-minute massage session.
+                      duration_minutes: 60
+                      max_concurrent_customers: 2
+                      is_available: true
+                      price: 45.0
+                      currency: USD
+                      created_at: 2025-04-18T09:00:00Z
+                      updated_at: 2025-11-07T12:20:00Z
+        '400':
+          $ref: '#/components/responses/BadRequestError'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '404':
+          $ref: '#/components/responses/NotFoundError'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+  /api/v1/services/{service_id}/availability/{date}:
+    put:
+      tags:
+        - Services
+      summary: Update availability slots for a specific date
+      operationId: updateServiceAvailabilityDate
+      security:
+        - BearerAuth: []
+      parameters:
+        - $ref: '#/components/parameters/ServiceIdParam'
+        - $ref: '#/components/parameters/DatePathParam'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ServiceAvailabilityUpdateRequest'
+      responses:
+        '200':
+          description: Service availability updated successfully
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/SuccessResponse'
+                  - type: object
+                    properties:
+                      data:
+                        $ref: '#/components/schemas/ServiceOffering'
+        '400':
+          $ref: '#/components/responses/BadRequestError'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '404':
+          $ref: '#/components/responses/NotFoundError'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+  /api/v1/listings/{listing_id}/tours:
+    get:
+      tags:
+        - Tours
+      summary: List tour packages for a listing
+      operationId: listTours
+      security:
+        - BearerAuth: []
+      parameters:
+        - $ref: '#/components/parameters/ListingIdParam'
+        - $ref: '#/components/parameters/PageParam'
+        - $ref: '#/components/parameters/LimitParam'
+      responses:
+        '200':
+          description: Tours retrieved successfully
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/PaginatedSuccessResponse'
+                  - type: object
+                    properties:
+                      data:
+                        type: array
+                        items:
+                          $ref: '#/components/schemas/TourPackage'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '404':
+          $ref: '#/components/responses/NotFoundError'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+    post:
+      tags:
+        - Tours
+      summary: Create a tour package
+      operationId: createTourPackage
+      security:
+        - BearerAuth: []
+      parameters:
+        - $ref: '#/components/parameters/ListingIdParam'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/TourPackageRequest'
+      responses:
+        '201':
+          description: Tour package created successfully
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/SuccessResponse'
+                  - type: object
+                    properties:
+                      data:
+                        $ref: '#/components/schemas/TourPackage'
+        '400':
+          $ref: '#/components/responses/BadRequestError'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '404':
+          $ref: '#/components/responses/NotFoundError'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+  /api/v1/tours/{tour_id}:
+    get:
+      tags:
+        - Tours
+      summary: Retrieve a tour package
+      operationId: getTourPackage
+      security:
+        - BearerAuth: []
+      parameters:
+        - $ref: '#/components/parameters/TourIdParam'
+      responses:
+        '200':
+          description: Tour package retrieved successfully
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/SuccessResponse'
+                  - type: object
+                    properties:
+                      data:
+                        $ref: '#/components/schemas/TourPackage'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '404':
+          $ref: '#/components/responses/NotFoundError'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+    put:
+      tags:
+        - Tours
+      summary: Update a tour package
+      operationId: updateTourPackage
+      security:
+        - BearerAuth: []
+      parameters:
+        - $ref: '#/components/parameters/TourIdParam'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/TourPackageRequest'
+      responses:
+        '200':
+          description: Tour package updated successfully
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/SuccessResponse'
+                  - type: object
+                    properties:
+                      data:
+                        $ref: '#/components/schemas/TourPackage'
+        '400':
+          $ref: '#/components/responses/BadRequestError'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '404':
+          $ref: '#/components/responses/NotFoundError'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+    delete:
+      tags:
+        - Tours
+      summary: Delete a tour package
+      operationId: deleteTourPackage
+      security:
+        - BearerAuth: []
+      parameters:
+        - $ref: '#/components/parameters/TourIdParam'
+      responses:
+        '200':
+          description: Tour package deleted successfully
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/SuccessResponse'
+                  - type: object
+                    properties:
+                      data:
+                        $ref: '#/components/schemas/Acknowledgement'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '404':
+          $ref: '#/components/responses/NotFoundError'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+  /api/v1/tours/{tour_id}/schedule:
+    get:
+      tags:
+        - Tours
+      summary: List tour schedule entries
+      operationId: listTourSchedule
+      security:
+        - BearerAuth: []
+      parameters:
+        - $ref: '#/components/parameters/TourIdParam'
+      responses:
+        '200':
+          description: Tour schedule retrieved successfully
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/SuccessResponse'
+                  - type: object
+                    properties:
+                      data:
+                        type: array
+                        items:
+                          $ref: '#/components/schemas/TourScheduleEntry'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '404':
+          $ref: '#/components/responses/NotFoundError'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+    post:
+      tags:
+        - Tours
+      summary: Create schedule entries for a tour
+      operationId: createTourSchedule
+      security:
+        - BearerAuth: []
+      parameters:
+        - $ref: '#/components/parameters/TourIdParam'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: array
+              items:
+                $ref: '#/components/schemas/TourScheduleRequest'
+      responses:
+        '201':
+          description: Tour schedule created successfully
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/SuccessResponse'
+                  - type: object
+                    properties:
+                      data:
+                        type: array
+                        items:
+                          $ref: '#/components/schemas/TourScheduleEntry'
+              examples:
+                tourScheduleCreated:
+                  value:
+                    status: success
+                    message: Tour schedule created
+                    data:
+                      - schedule_id: 9101
+                        tour_id: 1200
+                        start_time: 2025-11-10T07:00:00Z
+                        end_time: 2025-11-10T16:00:00Z
+                        capacity: 12
+                        meeting_point: Kigali Convention Centre
+                      - schedule_id: 9102
+                        tour_id: 1200
+                        start_time: 2025-11-12T07:00:00Z
+                        end_time: 2025-11-12T16:00:00Z
+                        capacity: 12
+                        meeting_point: Kigali Convention Centre
+        '400':
+          $ref: '#/components/responses/BadRequestError'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '404':
+          $ref: '#/components/responses/NotFoundError'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+  /api/v1/tour-schedule/{schedule_id}:
+    put:
+      tags:
+        - Tours
+      summary: Update a tour schedule entry
+      operationId: updateTourScheduleEntry
+      security:
+        - BearerAuth: []
+      parameters:
+        - $ref: '#/components/parameters/ScheduleIdParam'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/TourScheduleRequest'
+      responses:
+        '200':
+          description: Tour schedule entry updated successfully
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/SuccessResponse'
+                  - type: object
+                    properties:
+                      data:
+                        $ref: '#/components/schemas/TourScheduleEntry'
+        '400':
+          $ref: '#/components/responses/BadRequestError'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '404':
+          $ref: '#/components/responses/NotFoundError'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+    delete:
+      tags:
+        - Tours
+      summary: Delete a tour schedule entry
+      operationId: deleteTourScheduleEntry
+      security:
+        - BearerAuth: []
+      parameters:
+        - $ref: '#/components/parameters/ScheduleIdParam'
+      responses:
+        '200':
+          description: Tour schedule entry deleted successfully
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/SuccessResponse'
+                  - type: object
+                    properties:
+                      data:
+                        $ref: '#/components/schemas/Acknowledgement'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '404':
+          $ref: '#/components/responses/NotFoundError'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+  /api/v1/tours/{tour_id}/addons:
+    get:
+      tags:
+        - Tours
+      summary: List tour add-ons
+      operationId: listTourAddons
+      security:
+        - BearerAuth: []
+      parameters:
+        - $ref: '#/components/parameters/TourIdParam'
+      responses:
+        '200':
+          description: Tour add-ons retrieved successfully
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/SuccessResponse'
+                  - type: object
+                    properties:
+                      data:
+                        type: array
+                        items:
+                          $ref: '#/components/schemas/TourAddon'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '404':
+          $ref: '#/components/responses/NotFoundError'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+    post:
+      tags:
+        - Tours
+      summary: Create a tour add-on
+      operationId: createTourAddon
+      security:
+        - BearerAuth: []
+      parameters:
+        - $ref: '#/components/parameters/TourIdParam'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/TourAddonRequest'
+      responses:
+        '201':
+          description: Tour add-on created successfully
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/SuccessResponse'
+                  - type: object
+                    properties:
+                      data:
+                        $ref: '#/components/schemas/TourAddon'
+              examples:
+                tourAddonCreated:
+                  value:
+                    status: success
+                    message: Tour add-on created
+                    data:
+                      addon_id: 5501
+                      tour_id: 1200
+                      name: Gorilla Trekking Permit
+                      description: Includes park entry and guide.
+                      price: 150.0
+                      currency: USD
+                      max_quantity: 6
+                      created_at: 2025-06-01T08:00:00Z
+                      updated_at: 2025-11-07T12:10:00Z
+        '400':
+          $ref: '#/components/responses/BadRequestError'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '404':
+          $ref: '#/components/responses/NotFoundError'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+  /api/v1/tour-addons/{addon_id}:
+    put:
+      tags:
+        - Tours
+      summary: Update a tour add-on
+      operationId: updateTourAddon
+      security:
+        - BearerAuth: []
+      parameters:
+        - $ref: '#/components/parameters/AddonIdParam'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/TourAddonRequest'
+      responses:
+        '200':
+          description: Tour add-on updated successfully
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/SuccessResponse'
+                  - type: object
+                    properties:
+                      data:
+                        $ref: '#/components/schemas/TourAddon'
+        '400':
+          $ref: '#/components/responses/BadRequestError'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '404':
+          $ref: '#/components/responses/NotFoundError'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+    delete:
+      tags:
+        - Tours
+      summary: Delete a tour add-on
+      operationId: deleteTourAddon
+      security:
+        - BearerAuth: []
+      parameters:
+        - $ref: '#/components/parameters/AddonIdParam'
+      responses:
+        '200':
+          description: Tour add-on deleted successfully
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/SuccessResponse'
+                  - type: object
+                    properties:
+                      data:
+                        $ref: '#/components/schemas/Acknowledgement'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '404':
+          $ref: '#/components/responses/NotFoundError'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+  /api/v1/bookings/availability:
+    get:
+      tags:
+        - Booking Search
+      summary: Search booking availability across listings
+      operationId: searchBookingAvailability
+      parameters:
+        - $ref: '#/components/parameters/PageParam'
+        - $ref: '#/components/parameters/LimitParam'
+        - in: query
+          name: listing_id
+          schema:
+            type: integer
+            format: int64
+          description: Filter by listing identifier
+        - in: query
+          name: booking_type
+          schema:
+            $ref: '#/components/schemas/BookingType'
+          description: Filter by booking type
+        - in: query
+          name: start_date
+          schema:
+            type: string
+            format: date
+          description: Filter by start date
+        - in: query
+          name: end_date
+          schema:
+            type: string
+            format: date
+          description: Filter by end date
+      responses:
+        '200':
+          description: Booking availability retrieved successfully
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/PaginatedSuccessResponse'
+                  - type: object
+                    properties:
+                      data:
+                        type: array
+                        items:
+                          $ref: '#/components/schemas/BookingAvailabilityResult'
+        '400':
+          $ref: '#/components/responses/BadRequestError'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+  /api/v1/bookings/check-availability:
+    post:
+      tags:
+        - Booking Search
+      summary: Check availability for a specific booking request
+      operationId: checkBookingAvailability
+      security:
+        - BearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/BookingAvailabilityCheckRequest'
+      responses:
+        '200':
+          description: Booking availability checked successfully
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/SuccessResponse'
+                  - type: object
+                    properties:
+                      data:
+                        $ref: '#/components/schemas/BookingAvailabilityCheckResult'
+              examples:
+                availabilityChecked:
+                  value:
+                    status: success
+                    message: Availability checked
+                    data:
+                      available: true
+                      listing_id: 301
+                      resource_id: 501
+                      booking_type: hotel_stay
+                      start_time: 2025-12-15T14:00:00Z
+                      end_time: 2025-12-18T11:00:00Z
+                      available_quantity: 3
+                      price_per_unit: 120.0
+                      currency: RWF
+                      total_price: 360.0
+                      message: Rooms available for selected dates
+        '400':
+          $ref: '#/components/responses/BadRequestError'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+  /api/v1/bookings/calendar/{listing_id}:
+    get:
+      tags:
+        - Booking Search
+      summary: Retrieve availability calendar for a listing
+      operationId: getBookingCalendar
+      parameters:
+        - $ref: '#/components/parameters/ListingIdParam'
+        - in: query
+          name: from
+          schema:
+            type: string
+            format: date
+          description: Start date for calendar view
+        - in: query
+          name: to
+          schema:
+            type: string
+            format: date
+          description: End date for calendar view
+        - in: query
+          name: booking_type
+          schema:
+            $ref: '#/components/schemas/BookingType'
+          description: Filter by booking type
+      responses:
+        '200':
+          description: Booking calendar retrieved successfully
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/SuccessResponse'
+                  - type: object
+                    properties:
+                      data:
+                        $ref: '#/components/schemas/BookingCalendar'
+        '404':
+          $ref: '#/components/responses/NotFoundError'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+  /api/v1/bookings:
+    get:
+      tags:
+        - Bookings
+      summary: List bookings with filters
+      operationId: listBookings
+      security:
+        - BearerAuth: []
+      parameters:
+        - $ref: '#/components/parameters/PageParam'
+        - $ref: '#/components/parameters/LimitParam'
+        - $ref: '#/components/parameters/SortParam'
+        - in: query
+          name: status
+          schema:
+            $ref: '#/components/schemas/BookingStatus'
+          description: Filter by booking status
+        - in: query
+          name: booking_type
+          schema:
+            $ref: '#/components/schemas/BookingType'
+          description: Filter by booking type
+        - in: query
+          name: listing_id
+          schema:
+            type: integer
+            format: int64
+          description: Filter by listing identifier
+      responses:
+        '200':
+          description: Bookings retrieved successfully
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/PaginatedSuccessResponse'
+                  - type: object
+                    properties:
+                      data:
+                        type: array
+                        items:
+                          $ref: '#/components/schemas/Booking'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+    post:
+      tags:
+        - Bookings
+      summary: Create a new booking
+      operationId: createBooking
+      security:
+        - BearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/BookingCreateRequest'
+      responses:
+        '201':
+          description: Booking created successfully
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/SuccessResponse'
+                  - type: object
+                    properties:
+                      data:
+                        $ref: '#/components/schemas/Booking'
+              examples:
+                bookingCreated:
+                  value:
+                    status: success
+                    message: Booking created successfully
+                    data:
+                      booking_id: 8001
+                      user_id: 2001
+                      listing_id: 301
+                      resource_id: 501
+                      booking_type: hotel_stay
+                      status: confirmed
+                      start_time: 2025-12-15T14:00:00Z
+                      end_time: 2025-12-18T11:00:00Z
+                      quantity: 1
+                      guest_count: 2
+                      base_amount: 360.0
+                      tax_amount: 54.0
+                      service_fee: 18.0
+                      total_amount: 432.0
+                      currency: RWF
+                      confirmation_code: BK-2025-8001
+                      special_requests: Late checkout preferred
+                      created_at: 2025-11-07T14:30:00Z
+                      confirmed_at: 2025-11-07T14:30:00Z
+                      updated_at: 2025-11-07T14:30:00Z
+        '400':
+          $ref: '#/components/responses/BadRequestError'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+  /api/v1/bookings/user:
+    get:
+      tags:
+        - Bookings
+      summary: Retrieve bookings for the authenticated user (my trips)
+      operationId: getUserBookings
+      security:
+        - BearerAuth: []
+      parameters:
+        - $ref: '#/components/parameters/PageParam'
+        - $ref: '#/components/parameters/LimitParam'
+        - $ref: '#/components/parameters/SortParam'
+        - in: query
+          name: status
+          schema:
+            $ref: '#/components/schemas/BookingStatus'
+          description: Filter by booking status
+      responses:
+        '200':
+          description: User bookings retrieved successfully
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/PaginatedSuccessResponse'
+                  - type: object
+                    properties:
+                      data:
+                        type: array
+                        items:
+                          $ref: '#/components/schemas/Booking'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+  /api/v1/bookings/merchant:
+    get:
+      tags:
+        - Bookings
+      summary: Retrieve bookings for the authenticated merchant (my guests)
+      operationId: getMerchantBookings
+      security:
+        - BearerAuth: []
+      parameters:
+        - $ref: '#/components/parameters/PageParam'
+        - $ref: '#/components/parameters/LimitParam'
+        - $ref: '#/components/parameters/SortParam'
+        - in: query
+          name: status
+          schema:
+            $ref: '#/components/schemas/BookingStatus'
+          description: Filter by booking status
+        - in: query
+          name: listing_id
+          schema:
+            type: integer
+            format: int64
+          description: Filter by listing identifier
+      responses:
+        '200':
+          description: Merchant bookings retrieved successfully
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/PaginatedSuccessResponse'
+                  - type: object
+                    properties:
+                      data:
+                        type: array
+                        items:
+                          $ref: '#/components/schemas/Booking'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+  /api/v1/bookings/{booking_id}:
+    get:
+      tags:
+        - Bookings
+      summary: Retrieve a booking by identifier
+      operationId: getBookingById
+      security:
+        - BearerAuth: []
+      parameters:
+        - $ref: '#/components/parameters/BookingIdParam'
+      responses:
+        '200':
+          description: Booking retrieved successfully
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/SuccessResponse'
+                  - type: object
+                    properties:
+                      data:
+                        $ref: '#/components/schemas/Booking'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '404':
+          $ref: '#/components/responses/NotFoundError'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+    put:
+      tags:
+        - Bookings
+      summary: Update a booking
+      operationId: updateBooking
+      security:
+        - BearerAuth: []
+      parameters:
+        - $ref: '#/components/parameters/BookingIdParam'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/BookingUpdateRequest'
+      responses:
+        '200':
+          description: Booking updated successfully
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/SuccessResponse'
+                  - type: object
+                    properties:
+                      data:
+                        $ref: '#/components/schemas/Booking'
+        '400':
+          $ref: '#/components/responses/BadRequestError'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '404':
+          $ref: '#/components/responses/NotFoundError'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+    delete:
+      tags:
+        - Bookings
+      summary: Cancel a booking
+      operationId: cancelBooking
+      security:
+        - BearerAuth: []
+      parameters:
+        - $ref: '#/components/parameters/BookingIdParam'
+      requestBody:
+        required: false
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                cancellation_reason:
+                  type: string
+      responses:
+        '200':
+          description: Booking cancelled successfully
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/SuccessResponse'
+                  - type: object
+                    properties:
+                      data:
+                        $ref: '#/components/schemas/Booking'
+        '400':
+          $ref: '#/components/responses/BadRequestError'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '404':
+          $ref: '#/components/responses/NotFoundError'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+  /api/v1/bookings/{booking_id}/status:
+    patch:
+      tags:
+        - Bookings
+      summary: Update booking status
+      operationId: updateBookingStatus
+      security:
+        - BearerAuth: []
+      parameters:
+        - $ref: '#/components/parameters/BookingIdParam'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/BookingStatusUpdateRequest'
+      responses:
+        '200':
+          description: Booking status updated successfully
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/SuccessResponse'
+                  - type: object
+                    properties:
+                      data:
+                        $ref: '#/components/schemas/Booking'
+        '400':
+          $ref: '#/components/responses/BadRequestError'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '404':
+          $ref: '#/components/responses/NotFoundError'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+  /api/v1/bookings/{booking_id}/participants:
+    get:
+      tags:
+        - Booking Participants
+      summary: List participants for a booking
+      operationId: listBookingParticipants
+      security:
+        - BearerAuth: []
+      parameters:
+        - $ref: '#/components/parameters/BookingIdParam'
+      responses:
+        '200':
+          description: Booking participants retrieved successfully
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/SuccessResponse'
+                  - type: object
+                    properties:
+                      data:
+                        type: array
+                        items:
+                          $ref: '#/components/schemas/BookingParticipant'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '404':
+          $ref: '#/components/responses/NotFoundError'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+    post:
+      tags:
+        - Booking Participants
+      summary: Add a participant to a booking
+      operationId: createBookingParticipant
+      security:
+        - BearerAuth: []
+      parameters:
+        - $ref: '#/components/parameters/BookingIdParam'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/BookingParticipantRequest'
+      responses:
+        '201':
+          description: Booking participant added successfully
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/SuccessResponse'
+                  - type: object
+                    properties:
+                      data:
+                        $ref: '#/components/schemas/BookingParticipant'
+        '400':
+          $ref: '#/components/responses/BadRequestError'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '404':
+          $ref: '#/components/responses/NotFoundError'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+  /api/v1/bookings/{booking_id}/participants/{participant_id}:
+    put:
+      tags:
+        - Booking Participants
+      summary: Update a booking participant
+      operationId: updateBookingParticipant
+      security:
+        - BearerAuth: []
+      parameters:
+        - $ref: '#/components/parameters/BookingIdParam'
+        - $ref: '#/components/parameters/ParticipantIdParam'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/BookingParticipantRequest'
+      responses:
+        '200':
+          description: Booking participant updated successfully
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/SuccessResponse'
+                  - type: object
+                    properties:
+                      data:
+                        $ref: '#/components/schemas/BookingParticipant'
+        '400':
+          $ref: '#/components/responses/BadRequestError'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '404':
+          $ref: '#/components/responses/NotFoundError'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+    delete:
+      tags:
+        - Booking Participants
+      summary: Remove a booking participant
+      operationId: deleteBookingParticipant
+      security:
+        - BearerAuth: []
+      parameters:
+        - $ref: '#/components/parameters/BookingIdParam'
+        - $ref: '#/components/parameters/ParticipantIdParam'
+      responses:
+        '200':
+          description: Booking participant removed successfully
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/SuccessResponse'
+                  - type: object
+                    properties:
+                      data:
+                        $ref: '#/components/schemas/Acknowledgement'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '404':
+          $ref: '#/components/responses/NotFoundError'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+  /api/v1/bookings/{booking_id}/addons:
+    get:
+      tags:
+        - Booking Add-ons
+      summary: List add-ons for a booking
+      operationId: listBookingAddons
+      security:
+        - BearerAuth: []
+      parameters:
+        - $ref: '#/components/parameters/BookingIdParam'
+      responses:
+        '200':
+          description: Booking add-ons retrieved successfully
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/SuccessResponse'
+                  - type: object
+                    properties:
+                      data:
+                        type: array
+                        items:
+                          $ref: '#/components/schemas/BookingAddon'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '404':
+          $ref: '#/components/responses/NotFoundError'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+    post:
+      tags:
+        - Booking Add-ons
+      summary: Add an add-on to a booking
+      operationId: createBookingAddon
+      security:
+        - BearerAuth: []
+      parameters:
+        - $ref: '#/components/parameters/BookingIdParam'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/BookingAddonRequest'
+      responses:
+        '201':
+          description: Booking add-on added successfully
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/SuccessResponse'
+                  - type: object
+                    properties:
+                      data:
+                        $ref: '#/components/schemas/BookingAddon'
+        '400':
+          $ref: '#/components/responses/BadRequestError'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '404':
+          $ref: '#/components/responses/NotFoundError'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+  /api/v1/bookings/{booking_id}/addons/{addon_id}:
+    put:
+      tags:
+        - Booking Add-ons
+      summary: Update a booking add-on
+      operationId: updateBookingAddon
+      security:
+        - BearerAuth: []
+      parameters:
+        - $ref: '#/components/parameters/BookingIdParam'
+        - $ref: '#/components/parameters/BookingAddonIdParam'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/BookingAddonRequest'
+      responses:
+        '200':
+          description: Booking add-on updated successfully
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/SuccessResponse'
+                  - type: object
+                    properties:
+                      data:
+                        $ref: '#/components/schemas/BookingAddon'
+        '400':
+          $ref: '#/components/responses/BadRequestError'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '404':
+          $ref: '#/components/responses/NotFoundError'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+    delete:
+      tags:
+        - Booking Add-ons
+      summary: Remove a booking add-on
+      operationId: deleteBookingAddon
+      security:
+        - BearerAuth: []
+      parameters:
+        - $ref: '#/components/parameters/BookingIdParam'
+        - $ref: '#/components/parameters/BookingAddonIdParam'
+      responses:
+        '200':
+          description: Booking add-on removed successfully
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/SuccessResponse'
+                  - type: object
+                    properties:
+                      data:
+                        $ref: '#/components/schemas/Acknowledgement'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '404':
+          $ref: '#/components/responses/NotFoundError'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+  /api/v1/bookings/{booking_id}/checkin:
+    post:
+      tags:
+        - Booking Check-in/Check-out
+      summary: Check in a booking
+      operationId: checkInBooking
+      security:
+        - BearerAuth: []
+      parameters:
+        - $ref: '#/components/parameters/BookingIdParam'
+      requestBody:
+        required: false
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                checkin_time:
+                  type: string
+                  format: date-time
+                notes:
+                  type: string
+      responses:
+        '200':
+          description: Booking checked in successfully
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/SuccessResponse'
+                  - type: object
+                    properties:
+                      data:
+                        $ref: '#/components/schemas/Booking'
+              examples:
+                bookingCheckedIn:
+                  value:
+                    status: success
+                    message: Booking checked in successfully
+                    data:
+                      booking_id: 8001
+                      user_id: 2001
+                      listing_id: 301
+                      resource_id: 501
+                      booking_type: hotel_stay
+                      status: checked_in
+                      start_time: 2025-12-15T14:00:00Z
+                      end_time: 2025-12-18T11:00:00Z
+                      confirmation_code: BK-2025-8001
+                      created_at: 2025-11-07T14:30:00Z
+                      confirmed_at: 2025-11-07T14:30:00Z
+                      updated_at: 2025-12-15T14:15:00Z
+        '400':
+          $ref: '#/components/responses/BadRequestError'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '404':
+          $ref: '#/components/responses/NotFoundError'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+  /api/v1/bookings/{booking_id}/checkout:
+    post:
+      tags:
+        - Booking Check-in/Check-out
+      summary: Check out a booking
+      operationId: checkOutBooking
+      security:
+        - BearerAuth: []
+      parameters:
+        - $ref: '#/components/parameters/BookingIdParam'
+      requestBody:
+        required: false
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                checkout_time:
+                  type: string
+                  format: date-time
+                notes:
+                  type: string
+      responses:
+        '200':
+          description: Booking checked out successfully
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/SuccessResponse'
+                  - type: object
+                    properties:
+                      data:
+                        $ref: '#/components/schemas/Booking'
+        '400':
+          $ref: '#/components/responses/BadRequestError'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '404':
+          $ref: '#/components/responses/NotFoundError'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+  /api/v1/bookings/{booking_id}/participants/{participant_id}/checkin:
+    post:
+      tags:
+        - Booking Check-in/Check-out
+      summary: Check in a specific participant
+      operationId: checkInParticipant
+      security:
+        - BearerAuth: []
+      parameters:
+        - $ref: '#/components/parameters/BookingIdParam'
+        - $ref: '#/components/parameters/ParticipantIdParam'
+      requestBody:
+        required: false
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                checkin_time:
+                  type: string
+                  format: date-time
+                notes:
+                  type: string
+      responses:
+        '200':
+          description: Participant checked in successfully
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/SuccessResponse'
+                  - type: object
+                    properties:
+                      data:
+                        $ref: '#/components/schemas/BookingParticipant'
+        '400':
+          $ref: '#/components/responses/BadRequestError'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '404':
+          $ref: '#/components/responses/NotFoundError'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+  /api/v1/orders:
+    get:
+      tags:
+        - Orders
+      summary: List orders with filters
+      operationId: listOrders
+      security:
+        - BearerAuth: []
+      parameters:
+        - $ref: '#/components/parameters/PageParam'
+        - $ref: '#/components/parameters/LimitParam'
+        - $ref: '#/components/parameters/SortParam'
+        - in: query
+          name: status
+          schema:
+            $ref: '#/components/schemas/OrderStatus'
+          description: Filter by order status
+        - in: query
+          name: listing_id
+          schema:
+            type: integer
+            format: int64
+          description: Filter by listing identifier
+      responses:
+        '200':
+          description: Orders retrieved successfully
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/PaginatedSuccessResponse'
+                  - type: object
+                    properties:
+                      data:
+                        type: array
+                        items:
+                          $ref: '#/components/schemas/Order'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+    post:
+      tags:
+        - Orders
+      summary: Create a new order
+      operationId: createOrder
+      security:
+        - BearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/OrderCreateRequest'
+      responses:
+        '201':
+          description: Order created successfully
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/SuccessResponse'
+                  - type: object
+                    properties:
+                      data:
+                        $ref: '#/components/schemas/Order'
+              examples:
+                orderCreated:
+                  value:
+                    status: success
+                    message: Order created successfully
+                    data:
+                      order_id: 9001
+                      user_id: 2001
+                      listing_id: 305
+                      product_id: 5402
+                      quantity: 2
+                      status: confirmed
+                      total_amount: 37.0
+                      currency: USD
+                      payment_id: 10001
+                      shipping_address:
+                        street: "KG 123 St"
+                        city: Kigali
+                        district: Nyarugenge
+                        country: Rwanda
+                      tracking_number: TRK-2025-9001
+                      created_at: 2025-11-07T15:00:00Z
+                      updated_at: 2025-11-07T15:00:00Z
+        '400':
+          $ref: '#/components/responses/BadRequestError'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+  /api/v1/orders/{order_id}:
+    get:
+      tags:
+        - Orders
+      summary: Retrieve an order by identifier
+      operationId: getOrderById
+      security:
+        - BearerAuth: []
+      parameters:
+        - $ref: '#/components/parameters/OrderIdParam'
+      responses:
+        '200':
+          description: Order retrieved successfully
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/SuccessResponse'
+                  - type: object
+                    properties:
+                      data:
+                        $ref: '#/components/schemas/Order'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '404':
+          $ref: '#/components/responses/NotFoundError'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+    put:
+      tags:
+        - Orders
+      summary: Update an order
+      operationId: updateOrder
+      security:
+        - BearerAuth: []
+      parameters:
+        - $ref: '#/components/parameters/OrderIdParam'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/OrderUpdateRequest'
+      responses:
+        '200':
+          description: Order updated successfully
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/SuccessResponse'
+                  - type: object
+                    properties:
+                      data:
+                        $ref: '#/components/schemas/Order'
+        '400':
+          $ref: '#/components/responses/BadRequestError'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '404':
+          $ref: '#/components/responses/NotFoundError'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+    delete:
+      tags:
+        - Orders
+      summary: Cancel an order
+      operationId: cancelOrder
+      security:
+        - BearerAuth: []
+      parameters:
+        - $ref: '#/components/parameters/OrderIdParam'
+      responses:
+        '200':
+          description: Order cancelled successfully
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/SuccessResponse'
+                  - type: object
+                    properties:
+                      data:
+                        $ref: '#/components/schemas/Order'
+        '400':
+          $ref: '#/components/responses/BadRequestError'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '404':
+          $ref: '#/components/responses/NotFoundError'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+  /api/v1/orders/{order_id}/status:
+    patch:
+      tags:
+        - Orders
+      summary: Update order status
+      operationId: updateOrderStatus
+      security:
+        - BearerAuth: []
+      parameters:
+        - $ref: '#/components/parameters/OrderIdParam'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/OrderStatusUpdateRequest'
+      responses:
+        '200':
+          description: Order status updated successfully
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/SuccessResponse'
+                  - type: object
+                    properties:
+                      data:
+                        $ref: '#/components/schemas/Order'
+        '400':
+          $ref: '#/components/responses/BadRequestError'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '404':
+          $ref: '#/components/responses/NotFoundError'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
   /api/v1/merchants/apply:
     post:
       tags:
@@ -2140,6 +5342,126 @@ components:
       schema:
         $ref: '#/components/schemas/LeaderboardPeriod'
       description: Leaderboard aggregation period
+    RoomTypeIdParam:
+      in: path
+      name: room_type_id
+      required: true
+      schema:
+        type: integer
+        format: int64
+      description: Unique hotel room type identifier
+    RatePlanIdParam:
+      in: path
+      name: rate_plan_id
+      required: true
+      schema:
+        type: integer
+        format: int64
+      description: Unique rate plan identifier
+    EventIdParam:
+      in: path
+      name: event_id
+      required: true
+      schema:
+        type: integer
+        format: int64
+      description: Unique event identifier
+    TicketTierIdParam:
+      in: path
+      name: tier_id
+      required: true
+      schema:
+        type: integer
+        format: int64
+      description: Unique ticket tier identifier
+    TableIdParam:
+      in: path
+      name: table_id
+      required: true
+      schema:
+        type: integer
+        format: int64
+      description: Unique restaurant table identifier
+    ProductIdParam:
+      in: path
+      name: product_id
+      required: true
+      schema:
+        type: integer
+        format: int64
+      description: Unique product identifier
+    ServiceIdParam:
+      in: path
+      name: service_id
+      required: true
+      schema:
+        type: integer
+        format: int64
+      description: Unique service identifier
+    TourIdParam:
+      in: path
+      name: tour_id
+      required: true
+      schema:
+        type: integer
+        format: int64
+      description: Unique tour identifier
+    ScheduleIdParam:
+      in: path
+      name: schedule_id
+      required: true
+      schema:
+        type: integer
+        format: int64
+      description: Unique tour schedule identifier
+    AddonIdParam:
+      in: path
+      name: addon_id
+      required: true
+      schema:
+        type: integer
+        format: int64
+      description: Unique tour add-on identifier
+    DatePathParam:
+      in: path
+      name: date
+      required: true
+      schema:
+        type: string
+        format: date
+      description: ISO-8601 calendar date
+    BookingIdParam:
+      in: path
+      name: booking_id
+      required: true
+      schema:
+        type: integer
+        format: int64
+      description: Unique booking identifier
+    OrderIdParam:
+      in: path
+      name: order_id
+      required: true
+      schema:
+        type: integer
+        format: int64
+      description: Unique order identifier
+    ParticipantIdParam:
+      in: path
+      name: participant_id
+      required: true
+      schema:
+        type: integer
+        format: int64
+      description: Unique booking participant identifier
+    BookingAddonIdParam:
+      in: path
+      name: addon_id
+      required: true
+      schema:
+        type: integer
+        format: int64
+      description: Unique booking add-on identifier
   responses:
     BadRequestError:
       description: The request payload or parameters were invalid
@@ -3093,6 +6415,1542 @@ components:
             delta_percentage:
               type: number
               format: float
+    Listing:
+      type: object
+      required:
+        - listing_id
+        - merchant_id
+        - title
+        - type
+        - is_active
+        - created_at
+        - updated_at
+      properties:
+        listing_id:
+          type: integer
+          format: int64
+        merchant_id:
+          type: integer
+          format: int64
+        location_id:
+          type: integer
+          format: int64
+          nullable: true
+        title:
+          type: string
+        description:
+          type: string
+        type:
+          type: string
+          enum: [hotel, event, restaurant, tour, product, service]
+        gallery_images:
+          type: array
+          items:
+            type: string
+            format: uri
+        base_price:
+          type: number
+          format: float
+          nullable: true
+        currency:
+          type: string
+          nullable: true
+        is_active:
+          type: boolean
+        operating_hours:
+          type: object
+          additionalProperties: true
+          nullable: true
+        min_booking_notice_hours:
+          type: integer
+          nullable: true
+        max_advance_booking_days:
+          type: integer
+          nullable: true
+        service_config:
+          type: object
+          additionalProperties: true
+          nullable: true
+        created_at:
+          type: string
+          format: date-time
+        updated_at:
+          type: string
+          format: date-time
+    ListingCreateRequest:
+      type: object
+      required:
+        - title
+        - type
+        - merchant_id
+      properties:
+        merchant_id:
+          type: integer
+          format: int64
+        title:
+          type: string
+        description:
+          type: string
+        type:
+          type: string
+          enum: [hotel, event, restaurant, tour, product, service]
+        base_price:
+          type: number
+          format: float
+        currency:
+          type: string
+        gallery_images:
+          type: array
+          items:
+            type: string
+            format: uri
+        operating_hours:
+          type: object
+          additionalProperties: true
+        min_booking_notice_hours:
+          type: integer
+        max_advance_booking_days:
+          type: integer
+        service_config:
+          type: object
+          additionalProperties: true
+        primary_location:
+          $ref: '#/components/schemas/ListingLocationRequest'
+    ListingUpdateRequest:
+      type: object
+      properties:
+        title:
+          type: string
+        description:
+          type: string
+        base_price:
+          type: number
+          format: float
+        currency:
+          type: string
+        gallery_images:
+          type: array
+          items:
+            type: string
+            format: uri
+        operating_hours:
+          type: object
+          additionalProperties: true
+        min_booking_notice_hours:
+          type: integer
+        max_advance_booking_days:
+          type: integer
+        service_config:
+          type: object
+          additionalProperties: true
+        is_active:
+          type: boolean
+    ListingStatusUpdateRequest:
+      type: object
+      required:
+        - is_active
+      properties:
+        is_active:
+          type: boolean
+        reason:
+          type: string
+          nullable: true
+    ListingLocationRequest:
+      type: object
+      required:
+        - location_type
+        - address
+      properties:
+        location_type:
+          type: string
+          enum: [primary, branch, service_area, pop_up]
+        address:
+          type: string
+        latitude:
+          type: number
+          format: float
+          nullable: true
+        longitude:
+          type: number
+          format: float
+          nullable: true
+        operating_hours:
+          type: object
+          additionalProperties: true
+          nullable: true
+        is_primary:
+          type: boolean
+        start_date:
+          type: string
+          format: date
+          nullable: true
+        end_date:
+          type: string
+          format: date
+          nullable: true
+    ListingLocation:
+      type: object
+      required:
+        - location_id
+        - listing_id
+        - location_type
+        - address
+        - is_primary
+      properties:
+        location_id:
+          type: integer
+          format: int64
+        listing_id:
+          type: integer
+          format: int64
+        location_type:
+          type: string
+        address:
+          type: string
+        latitude:
+          type: number
+          format: float
+          nullable: true
+        longitude:
+          type: number
+          format: float
+          nullable: true
+        operating_hours:
+          type: object
+          additionalProperties: true
+          nullable: true
+        is_primary:
+          type: boolean
+        start_date:
+          type: string
+          format: date
+          nullable: true
+        end_date:
+          type: string
+          format: date
+          nullable: true
+    ListingAvailabilityEntry:
+      type: object
+      required:
+        - date
+        - available
+      properties:
+        date:
+          type: string
+          format: date
+        available:
+          type: boolean
+        inventory:
+          type: integer
+          nullable: true
+        notes:
+          type: string
+          nullable: true
+    ListingAvailabilityBulkRequest:
+      type: object
+      required:
+        - entries
+      properties:
+        entries:
+          type: array
+          items:
+            $ref: '#/components/schemas/ListingAvailabilityEntry'
+    ListingAvailabilityUpdateRequest:
+      type: object
+      properties:
+        available:
+          type: boolean
+        inventory:
+          type: integer
+        notes:
+          type: string
+    HotelRoomType:
+      type: object
+      required:
+        - room_type_id
+        - listing_id
+        - name
+        - max_occupancy
+        - total_rooms
+        - base_price
+        - created_at
+        - updated_at
+      properties:
+        room_type_id:
+          type: integer
+          format: int64
+        listing_id:
+          type: integer
+          format: int64
+        name:
+          type: string
+        description:
+          type: string
+        max_occupancy:
+          type: integer
+        total_rooms:
+          type: integer
+        amenities:
+          type: array
+          items:
+            type: string
+        board_type:
+          type: string
+          enum: [RO, BB, HB, AI]
+        is_refundable:
+          type: boolean
+        base_price:
+          type: number
+          format: float
+        currency:
+          type: string
+          nullable: true
+        room_config:
+          type: object
+          additionalProperties: true
+          nullable: true
+        created_at:
+          type: string
+          format: date-time
+        updated_at:
+          type: string
+          format: date-time
+    HotelRoomTypeRequest:
+      type: object
+      required:
+        - name
+        - max_occupancy
+        - total_rooms
+        - base_price
+      properties:
+        name:
+          type: string
+        description:
+          type: string
+        max_occupancy:
+          type: integer
+        total_rooms:
+          type: integer
+        amenities:
+          type: array
+          items:
+            type: string
+        board_type:
+          type: string
+          enum: [RO, BB, HB, AI]
+        is_refundable:
+          type: boolean
+        base_price:
+          type: number
+          format: float
+        currency:
+          type: string
+        room_config:
+          type: object
+          additionalProperties: true
+    HotelRoomAvailabilityEntry:
+      type: object
+      required:
+        - date
+        - inventory
+      properties:
+        date:
+          type: string
+          format: date
+        inventory:
+          type: integer
+        closed_to_arrival:
+          type: boolean
+          nullable: true
+        closed_to_departure:
+          type: boolean
+          nullable: true
+        min_stay:
+          type: integer
+          nullable: true
+        max_stay:
+          type: integer
+          nullable: true
+    HotelRoomAvailabilityBulkRequest:
+      type: object
+      required:
+        - entries
+      properties:
+        entries:
+          type: array
+          items:
+            $ref: '#/components/schemas/HotelRoomAvailabilityEntry'
+    HotelRoomAvailabilityUpdateRequest:
+      type: object
+      properties:
+        inventory:
+          type: integer
+        closed_to_arrival:
+          type: boolean
+        closed_to_departure:
+          type: boolean
+        min_stay:
+          type: integer
+        max_stay:
+          type: integer
+    RatePlan:
+      type: object
+      required:
+        - rate_plan_id
+        - room_type_id
+        - name
+        - price
+        - currency
+        - created_at
+        - updated_at
+      properties:
+        rate_plan_id:
+          type: integer
+          format: int64
+        room_type_id:
+          type: integer
+          format: int64
+        name:
+          type: string
+        board_type:
+          type: string
+          enum: [RO, BB, HB, AI]
+        is_refundable:
+          type: boolean
+        price:
+          type: number
+          format: float
+        currency:
+          type: string
+        min_stay:
+          type: integer
+          nullable: true
+        max_stay:
+          type: integer
+          nullable: true
+        restrictions:
+          type: object
+          additionalProperties: true
+          nullable: true
+        blackout_dates:
+          type: array
+          items:
+            type: string
+            format: date
+        created_at:
+          type: string
+          format: date-time
+        updated_at:
+          type: string
+          format: date-time
+    RatePlanRequest:
+      type: object
+      required:
+        - name
+        - price
+        - currency
+      properties:
+        name:
+          type: string
+        board_type:
+          type: string
+          enum: [RO, BB, HB, AI]
+        is_refundable:
+          type: boolean
+        price:
+          type: number
+          format: float
+        currency:
+          type: string
+        min_stay:
+          type: integer
+        max_stay:
+          type: integer
+        restrictions:
+          type: object
+          additionalProperties: true
+        blackout_dates:
+          type: array
+          items:
+            type: string
+            format: date
+    Event:
+      type: object
+      required:
+        - event_id
+        - listing_id
+        - event_name
+        - event_date
+        - total_tickets
+        - available_tickets
+        - created_at
+        - updated_at
+      properties:
+        event_id:
+          type: integer
+          format: int64
+        listing_id:
+          type: integer
+          format: int64
+        event_name:
+          type: string
+        event_date:
+          type: string
+          format: date-time
+        end_date:
+          type: string
+          format: date-time
+          nullable: true
+        venue_name:
+          type: string
+        total_tickets:
+          type: integer
+        available_tickets:
+          type: integer
+        ticket_tiers:
+          type: array
+          items:
+            $ref: '#/components/schemas/TicketTier'
+        is_recurring:
+          type: boolean
+        created_at:
+          type: string
+          format: date-time
+        updated_at:
+          type: string
+          format: date-time
+    EventRequest:
+      type: object
+      required:
+        - event_name
+        - event_date
+        - total_tickets
+      properties:
+        event_name:
+          type: string
+        event_date:
+          type: string
+          format: date-time
+        end_date:
+          type: string
+          format: date-time
+        venue_name:
+          type: string
+        total_tickets:
+          type: integer
+        ticket_tiers:
+          type: array
+          items:
+            $ref: '#/components/schemas/TicketTierRequest'
+        is_recurring:
+          type: boolean
+    TicketTier:
+      type: object
+      required:
+        - tier_id
+        - event_id
+        - name
+        - price
+        - currency
+        - remaining
+      properties:
+        tier_id:
+          type: integer
+          format: int64
+        event_id:
+          type: integer
+          format: int64
+        name:
+          type: string
+        price:
+          type: number
+          format: float
+        currency:
+          type: string
+        remaining:
+          type: integer
+        benefits:
+          type: array
+          items:
+            type: string
+        created_at:
+          type: string
+          format: date-time
+        updated_at:
+          type: string
+          format: date-time
+    TicketTierRequest:
+      type: object
+      required:
+        - name
+        - price
+        - currency
+        - remaining
+      properties:
+        name:
+          type: string
+        description:
+          type: string
+        price:
+          type: number
+          format: float
+        currency:
+          type: string
+        remaining:
+          type: integer
+        benefits:
+          type: array
+          items:
+            type: string
+    RestaurantTable:
+      type: object
+      required:
+        - table_id
+        - listing_id
+        - table_type
+        - capacity
+        - table_count
+        - created_at
+        - updated_at
+      properties:
+        table_id:
+          type: integer
+          format: int64
+        listing_id:
+          type: integer
+          format: int64
+        table_type:
+          type: string
+          enum: [indoor, outdoor, private]
+        capacity:
+          type: integer
+        table_count:
+          type: integer
+        min_booking_duration_minutes:
+          type: integer
+          nullable: true
+        created_at:
+          type: string
+          format: date-time
+        updated_at:
+          type: string
+          format: date-time
+    RestaurantTableRequest:
+      type: object
+      required:
+        - table_type
+        - capacity
+        - table_count
+      properties:
+        table_type:
+          type: string
+          enum: [indoor, outdoor, private]
+        capacity:
+          type: integer
+        table_count:
+          type: integer
+        min_booking_duration_minutes:
+          type: integer
+    TableAvailabilityCheckRequest:
+      type: object
+      required:
+        - start_time
+        - end_time
+        - guest_count
+      properties:
+        start_time:
+          type: string
+          format: date-time
+        end_time:
+          type: string
+          format: date-time
+        guest_count:
+          type: integer
+        table_type:
+          type: string
+          nullable: true
+    TableAvailabilityCheckResult:
+      type: object
+      required:
+        - available
+      properties:
+        available:
+          type: boolean
+        suggested_tables:
+          type: array
+          items:
+            $ref: '#/components/schemas/RestaurantTable'
+        message:
+          type: string
+          nullable: true
+    Product:
+      type: object
+      required:
+        - product_id
+        - listing_id
+        - product_name
+        - status
+        - price
+        - currency
+        - created_at
+        - updated_at
+      properties:
+        product_id:
+          type: integer
+          format: int64
+        listing_id:
+          type: integer
+          format: int64
+        product_name:
+          type: string
+        description:
+          type: string
+        stock_quantity:
+          type: integer
+        variants:
+          type: array
+          items:
+            type: object
+            additionalProperties: true
+        track_inventory:
+          type: boolean
+        price:
+          type: number
+          format: float
+        currency:
+          type: string
+        status:
+          type: string
+          enum: [active, inactive, out_of_stock]
+        created_at:
+          type: string
+          format: date-time
+        updated_at:
+          type: string
+          format: date-time
+    ProductRequest:
+      type: object
+      required:
+        - product_name
+        - price
+        - currency
+      properties:
+        product_name:
+          type: string
+        description:
+          type: string
+        stock_quantity:
+          type: integer
+        variants:
+          type: array
+          items:
+            type: object
+            additionalProperties: true
+        track_inventory:
+          type: boolean
+        price:
+          type: number
+          format: float
+        currency:
+          type: string
+        status:
+          type: string
+          enum: [active, inactive, out_of_stock]
+    ProductInventoryPatchRequest:
+      type: object
+      required:
+        - stock_quantity
+      properties:
+        stock_quantity:
+          type: integer
+        track_inventory:
+          type: boolean
+          nullable: true
+        status:
+          type: string
+          enum: [active, inactive, out_of_stock]
+          nullable: true
+    ServiceOffering:
+      type: object
+      required:
+        - service_id
+        - listing_id
+        - service_name
+        - duration_minutes
+        - price
+        - created_at
+        - updated_at
+      properties:
+        service_id:
+          type: integer
+          format: int64
+        listing_id:
+          type: integer
+          format: int64
+        service_name:
+          type: string
+        description:
+          type: string
+        duration_minutes:
+          type: integer
+        max_concurrent_customers:
+          type: integer
+          nullable: true
+        is_available:
+          type: boolean
+        price:
+          type: number
+          format: float
+        currency:
+          type: string
+          nullable: true
+        created_at:
+          type: string
+          format: date-time
+        updated_at:
+          type: string
+          format: date-time
+    ServiceOfferingRequest:
+      type: object
+      required:
+        - service_name
+        - duration_minutes
+        - price
+      properties:
+        service_name:
+          type: string
+        description:
+          type: string
+        duration_minutes:
+          type: integer
+        max_concurrent_customers:
+          type: integer
+        is_available:
+          type: boolean
+        price:
+          type: number
+          format: float
+        currency:
+          type: string
+    ServiceAvailabilityRequest:
+      type: object
+      required:
+        - slots
+      properties:
+        slots:
+          type: array
+          items:
+            type: object
+            required:
+              - date
+              - start_time
+              - end_time
+            properties:
+              date:
+                type: string
+                format: date
+              start_time:
+                type: string
+              end_time:
+                type: string
+              capacity:
+                type: integer
+                nullable: true
+    ServiceAvailabilityUpdateRequest:
+      type: object
+      properties:
+        start_time:
+          type: string
+        end_time:
+          type: string
+        capacity:
+          type: integer
+        is_available:
+          type: boolean
+    TourPackage:
+      type: object
+      required:
+        - tour_id
+        - listing_id
+        - tour_name
+        - price
+        - currency
+        - capacity
+        - created_at
+        - updated_at
+      properties:
+        tour_id:
+          type: integer
+          format: int64
+        listing_id:
+          type: integer
+          format: int64
+        tour_name:
+          type: string
+        description:
+          type: string
+        images:
+          type: array
+          items:
+            type: string
+            format: uri
+        schedule:
+          type: array
+          items:
+            $ref: '#/components/schemas/TourScheduleEntry'
+        add_ons:
+          type: array
+          items:
+            $ref: '#/components/schemas/TourAddon'
+        price:
+          type: number
+          format: float
+        currency:
+          type: string
+        capacity:
+          type: integer
+        available_slots:
+          type: integer
+        status:
+          type: string
+          nullable: true
+        created_at:
+          type: string
+          format: date-time
+        updated_at:
+          type: string
+          format: date-time
+    TourPackageRequest:
+      type: object
+      required:
+        - tour_name
+        - price
+        - currency
+        - capacity
+      properties:
+        tour_name:
+          type: string
+        description:
+          type: string
+        images:
+          type: array
+          items:
+            type: string
+            format: uri
+        price:
+          type: number
+          format: float
+        currency:
+          type: string
+        capacity:
+          type: integer
+        available_slots:
+          type: integer
+        status:
+          type: string
+        schedule:
+          type: array
+          items:
+            $ref: '#/components/schemas/TourScheduleRequest'
+        add_ons:
+          type: array
+          items:
+            $ref: '#/components/schemas/TourAddonRequest'
+    TourScheduleEntry:
+      type: object
+      required:
+        - schedule_id
+        - tour_id
+        - start_time
+        - end_time
+      properties:
+        schedule_id:
+          type: integer
+          format: int64
+        tour_id:
+          type: integer
+          format: int64
+        start_time:
+          type: string
+          format: date-time
+        end_time:
+          type: string
+          format: date-time
+        capacity:
+          type: integer
+          nullable: true
+        meeting_point:
+          type: string
+          nullable: true
+    TourScheduleRequest:
+      type: object
+      required:
+        - start_time
+        - end_time
+      properties:
+        start_time:
+          type: string
+          format: date-time
+        end_time:
+          type: string
+          format: date-time
+        capacity:
+          type: integer
+        meeting_point:
+          type: string
+    TourAddon:
+      type: object
+      required:
+        - addon_id
+        - tour_id
+        - name
+        - price
+        - currency
+      properties:
+        addon_id:
+          type: integer
+          format: int64
+        tour_id:
+          type: integer
+          format: int64
+        name:
+          type: string
+        description:
+          type: string
+        price:
+          type: number
+          format: float
+        currency:
+          type: string
+        max_quantity:
+          type: integer
+          nullable: true
+        created_at:
+          type: string
+          format: date-time
+        updated_at:
+          type: string
+          format: date-time
+    TourAddonRequest:
+      type: object
+      required:
+        - name
+        - price
+        - currency
+      properties:
+        name:
+          type: string
+        description:
+          type: string
+        price:
+          type: number
+          format: float
+        currency:
+          type: string
+        max_quantity:
+          type: integer
+    BookingType:
+      type: string
+      enum:
+        - hotel_stay
+        - event_ticket
+        - restaurant
+        - tour
+        - product
+        - service
+    BookingStatus:
+      type: string
+      enum:
+        - pending
+        - confirmed
+        - checked_in
+        - completed
+        - cancelled
+        - no_show
+    Booking:
+      type: object
+      required:
+        - booking_id
+        - user_id
+        - listing_id
+        - booking_type
+        - status
+        - start_time
+        - end_time
+        - quantity
+        - guest_count
+        - base_amount
+        - tax_amount
+        - service_fee
+        - total_amount
+        - currency
+        - created_at
+        - updated_at
+      properties:
+        booking_id:
+          type: integer
+          format: int64
+        user_id:
+          type: integer
+          format: int64
+        listing_id:
+          type: integer
+          format: int64
+        resource_id:
+          type: integer
+          format: int64
+          nullable: true
+        booking_type:
+          $ref: '#/components/schemas/BookingType'
+        status:
+          $ref: '#/components/schemas/BookingStatus'
+        start_time:
+          type: string
+          format: date-time
+        end_time:
+          type: string
+          format: date-time
+        quantity:
+          type: integer
+        guest_count:
+          type: integer
+        base_amount:
+          type: number
+          format: float
+        tax_amount:
+          type: number
+          format: float
+        service_fee:
+          type: number
+          format: float
+        total_amount:
+          type: number
+          format: float
+        currency:
+          type: string
+        booking_details:
+          type: object
+          additionalProperties: true
+          nullable: true
+        special_requests:
+          type: string
+          nullable: true
+        cancellation_reason:
+          type: string
+          nullable: true
+        confirmation_code:
+          type: string
+          nullable: true
+        created_at:
+          type: string
+          format: date-time
+        confirmed_at:
+          type: string
+          format: date-time
+          nullable: true
+        cancelled_at:
+          type: string
+          format: date-time
+          nullable: true
+        updated_at:
+          type: string
+          format: date-time
+    BookingCreateRequest:
+      type: object
+      required:
+        - listing_id
+        - booking_type
+        - start_time
+        - end_time
+        - quantity
+        - guest_count
+      properties:
+        listing_id:
+          type: integer
+          format: int64
+        resource_id:
+          type: integer
+          format: int64
+          nullable: true
+        booking_type:
+          $ref: '#/components/schemas/BookingType'
+        start_time:
+          type: string
+          format: date-time
+        end_time:
+          type: string
+          format: date-time
+        quantity:
+          type: integer
+        guest_count:
+          type: integer
+        special_requests:
+          type: string
+        booking_details:
+          type: object
+          additionalProperties: true
+    BookingUpdateRequest:
+      type: object
+      properties:
+        start_time:
+          type: string
+          format: date-time
+        end_time:
+          type: string
+          format: date-time
+        quantity:
+          type: integer
+        guest_count:
+          type: integer
+        special_requests:
+          type: string
+        booking_details:
+          type: object
+          additionalProperties: true
+    BookingStatusUpdateRequest:
+      type: object
+      required:
+        - status
+      properties:
+        status:
+          $ref: '#/components/schemas/BookingStatus'
+        cancellation_reason:
+          type: string
+          nullable: true
+    BookingAvailabilityCheckRequest:
+      type: object
+      required:
+        - listing_id
+        - booking_type
+        - start_time
+        - end_time
+      properties:
+        listing_id:
+          type: integer
+          format: int64
+        resource_id:
+          type: integer
+          format: int64
+          nullable: true
+        booking_type:
+          $ref: '#/components/schemas/BookingType'
+        start_time:
+          type: string
+          format: date-time
+        end_time:
+          type: string
+          format: date-time
+        quantity:
+          type: integer
+        guest_count:
+          type: integer
+          nullable: true
+    BookingAvailabilityCheckResult:
+      type: object
+      required:
+        - available
+        - listing_id
+        - booking_type
+        - start_time
+        - end_time
+      properties:
+        available:
+          type: boolean
+        listing_id:
+          type: integer
+          format: int64
+        resource_id:
+          type: integer
+          format: int64
+          nullable: true
+        booking_type:
+          $ref: '#/components/schemas/BookingType'
+        start_time:
+          type: string
+          format: date-time
+        end_time:
+          type: string
+          format: date-time
+        available_quantity:
+          type: integer
+          nullable: true
+        price_per_unit:
+          type: number
+          format: float
+          nullable: true
+        currency:
+          type: string
+          nullable: true
+        total_price:
+          type: number
+          format: float
+          nullable: true
+        message:
+          type: string
+          nullable: true
+    BookingAvailabilityResult:
+      type: object
+      required:
+        - listing_id
+        - booking_type
+        - available
+      properties:
+        listing_id:
+          type: integer
+          format: int64
+        resource_id:
+          type: integer
+          format: int64
+          nullable: true
+        booking_type:
+          $ref: '#/components/schemas/BookingType'
+        available:
+          type: boolean
+        available_quantity:
+          type: integer
+          nullable: true
+        price_per_unit:
+          type: number
+          format: float
+          nullable: true
+        currency:
+          type: string
+          nullable: true
+    BookingCalendar:
+      type: object
+      required:
+        - listing_id
+        - calendar_entries
+      properties:
+        listing_id:
+          type: integer
+          format: int64
+        booking_type:
+          $ref: '#/components/schemas/BookingType'
+          nullable: true
+        calendar_entries:
+          type: array
+          items:
+            type: object
+            required:
+              - date
+              - available
+            properties:
+              date:
+                type: string
+                format: date
+              available:
+                type: boolean
+              available_quantity:
+                type: integer
+                nullable: true
+              price:
+                type: number
+                format: float
+                nullable: true
+    BookingParticipant:
+      type: object
+      required:
+        - participant_id
+        - booking_id
+        - full_name
+        - is_primary_guest
+        - checked_in
+      properties:
+        participant_id:
+          type: integer
+          format: int64
+        booking_id:
+          type: integer
+          format: int64
+        full_name:
+          type: string
+        email:
+          type: string
+          format: email
+          nullable: true
+        phone_number:
+          type: string
+          nullable: true
+        identification_number:
+          type: string
+          nullable: true
+        dietary_restrictions:
+          type: string
+          nullable: true
+        is_primary_guest:
+          type: boolean
+        checked_in:
+          type: boolean
+        checked_in_at:
+          type: string
+          format: date-time
+          nullable: true
+    BookingParticipantRequest:
+      type: object
+      required:
+        - full_name
+      properties:
+        full_name:
+          type: string
+        email:
+          type: string
+          format: email
+        phone_number:
+          type: string
+        identification_number:
+          type: string
+        dietary_restrictions:
+          type: string
+        is_primary_guest:
+          type: boolean
+    BookingAddon:
+      type: object
+      required:
+        - addon_id
+        - booking_id
+        - addon_name
+        - addon_type
+        - price
+        - quantity
+      properties:
+        addon_id:
+          type: integer
+          format: int64
+        booking_id:
+          type: integer
+          format: int64
+        addon_name:
+          type: string
+        addon_type:
+          type: string
+        price:
+          type: number
+          format: float
+        quantity:
+          type: integer
+        addon_details:
+          type: object
+          additionalProperties: true
+          nullable: true
+    BookingAddonRequest:
+      type: object
+      required:
+        - addon_name
+        - addon_type
+        - price
+        - quantity
+      properties:
+        addon_name:
+          type: string
+        addon_type:
+          type: string
+        price:
+          type: number
+          format: float
+        quantity:
+          type: integer
+        addon_details:
+          type: object
+          additionalProperties: true
+    OrderStatus:
+      type: string
+      enum:
+        - pending
+        - confirmed
+        - shipped
+        - delivered
+        - cancelled
+    Order:
+      type: object
+      required:
+        - order_id
+        - user_id
+        - listing_id
+        - quantity
+        - status
+        - total_amount
+        - currency
+        - created_at
+        - updated_at
+      properties:
+        order_id:
+          type: integer
+          format: int64
+        user_id:
+          type: integer
+          format: int64
+        listing_id:
+          type: integer
+          format: int64
+        product_id:
+          type: integer
+          format: int64
+          nullable: true
+        quantity:
+          type: integer
+        status:
+          $ref: '#/components/schemas/OrderStatus'
+        total_amount:
+          type: number
+          format: float
+        currency:
+          type: string
+        payment_id:
+          type: integer
+          format: int64
+          nullable: true
+        shipping_address:
+          type: object
+          additionalProperties: true
+          nullable: true
+        tracking_number:
+          type: string
+          nullable: true
+        created_at:
+          type: string
+          format: date-time
+        updated_at:
+          type: string
+          format: date-time
+    OrderCreateRequest:
+      type: object
+      required:
+        - listing_id
+        - quantity
+      properties:
+        listing_id:
+          type: integer
+          format: int64
+        product_id:
+          type: integer
+          format: int64
+          nullable: true
+        quantity:
+          type: integer
+        shipping_address:
+          type: object
+          additionalProperties: true
+    OrderUpdateRequest:
+      type: object
+      properties:
+        quantity:
+          type: integer
+        shipping_address:
+          type: object
+          additionalProperties: true
+        tracking_number:
+          type: string
+    OrderStatusUpdateRequest:
+      type: object
+      required:
+        - status
+      properties:
+        status:
+          $ref: '#/components/schemas/OrderStatus'
+        tracking_number:
+          type: string
+          nullable: true
     MerchantCategory:
       type: string
       enum:

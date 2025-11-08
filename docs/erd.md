@@ -186,12 +186,11 @@ erDiagram
         text description
         varchar type "hotel, event, restaurant, tour, product, service"
         jsonb gallery_images
-        decimal base_price
         boolean is_active
-        jsonb operating_hours
-        integer min_booking_notice_hours
+        decimal base_price
+        <!-- integer min_booking_notice_hours
         integer max_advance_booking_days
-        jsonb sercice_config
+        jsonb sercice_config -->
         datetime created_at
         datetime updated_at
     }
@@ -215,10 +214,8 @@ erDiagram
         integer max_occupancy
         integer total_rooms
         jsonb amenities
-        varchar board_type "RO, BB, HB, AI"
-        boolean is_refundable
-        decimal base_price
         jsonb room_config
+        jsonb gallery_images
         datetime created_at
         datetime updated_at
     }
