@@ -61,6 +61,26 @@ tags:
     description: Handle check-in and check-out operations.
   - name: Orders
     description: Manage product orders and deliveries.
+  - name: Payment Processing
+    description: Initiate and confirm payments, handle webhooks.
+  - name: Payment Management
+    description: Manage payments, refunds, and captures.
+  - name: Split Payments
+    description: Handle payment splitting and settlements.
+  - name: Refunds
+    description: Manage refund requests and processing.
+  - name: Reviews & Ratings
+    description: Manage reviews, ratings, and helpful votes.
+  - name: Merchant Replies
+    description: Manage merchant replies to reviews.
+  - name: Review Flags
+    description: Handle review flagging and moderation.
+  - name: Discovery & Search
+    description: Search and discover listings.
+  - name: Curated Collections
+    description: Manage curated listing collections.
+  - name: Community
+    description: Community feed, posts, stories, and guides.
   - name: Merchant Onboarding
     description: Onboarding workflows for new merchants.
   - name: Merchant Profile
@@ -4459,6 +4479,1549 @@ paths:
           $ref: '#/components/responses/NotFoundError'
         '500':
           $ref: '#/components/responses/InternalServerError'
+  /api/v1/payments/initiate:
+    post:
+      tags:
+        - Payment Processing
+      summary: Initiate a payment
+      operationId: initiatePayment
+      security:
+        - BearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PaymentInitiateRequest'
+      responses:
+        '201':
+          description: Payment initiated successfully
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/SuccessResponse'
+                  - type: object
+                    properties:
+                      data:
+                        $ref: '#/components/schemas/Payment'
+              examples:
+                paymentInitiated:
+                  value:
+                    status: success
+                    message: Payment initiated
+                    data:
+                      payment_id: 10001
+                      user_id: 2001
+                      booking_id: 8001
+                      payment_method: momo
+                      payment_type: full
+                      status: pending
+                      amount: 432.0
+                      currency: RWF
+                      transaction_id: TXN-2025-10001
+                      created_at: 2025-11-07T15:30:00Z
+        '400':
+          $ref: '#/components/responses/BadRequestError'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+  /api/v1/payments/confirm:
+    post:
+      tags:
+        - Payment Processing
+      summary: Confirm a payment
+      operationId: confirmPayment
+      security:
+        - BearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PaymentConfirmRequest'
+      responses:
+        '200':
+          description: Payment confirmed successfully
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/SuccessResponse'
+                  - type: object
+                    properties:
+                      data:
+                        $ref: '#/components/schemas/Payment'
+        '400':
+          $ref: '#/components/responses/BadRequestError'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+  /api/v1/payments/webhook/momo:
+    post:
+      tags:
+        - Payment Processing
+      summary: Handle MTN Mobile Money webhook
+      operationId: handleMomoWebhook
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              additionalProperties: true
+      responses:
+        '200':
+          description: Webhook processed successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SuccessResponse'
+        '400':
+          $ref: '#/components/responses/BadRequestError'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+  /api/v1/payments/webhook/airtel:
+    post:
+      tags:
+        - Payment Processing
+      summary: Handle Airtel Money webhook
+      operationId: handleAirtelWebhook
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              additionalProperties: true
+      responses:
+        '200':
+          description: Webhook processed successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SuccessResponse'
+        '400':
+          $ref: '#/components/responses/BadRequestError'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+  /api/v1/payments/webhook/irembo:
+    post:
+      tags:
+        - Payment Processing
+      summary: Handle Irembo Pay webhook
+      operationId: handleIremboWebhook
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              additionalProperties: true
+      responses:
+        '200':
+          description: Webhook processed successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SuccessResponse'
+        '400':
+          $ref: '#/components/responses/BadRequestError'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+  /api/v1/payments:
+    get:
+      tags:
+        - Payment Management
+      summary: List payments with filters
+      operationId: listPayments
+      security:
+        - BearerAuth: []
+      parameters:
+        - $ref: '#/components/parameters/PageParam'
+        - $ref: '#/components/parameters/LimitParam'
+        - $ref: '#/components/parameters/SortParam'
+        - in: query
+          name: status
+          schema:
+            $ref: '#/components/schemas/PaymentStatus'
+          description: Filter by payment status
+        - in: query
+          name: payment_method
+          schema:
+            $ref: '#/components/schemas/PaymentMethod'
+          description: Filter by payment method
+        - in: query
+          name: booking_id
+          schema:
+            type: integer
+            format: int64
+          description: Filter by booking identifier
+        - in: query
+          name: order_id
+          schema:
+            type: integer
+            format: int64
+          description: Filter by order identifier
+      responses:
+        '200':
+          description: Payments retrieved successfully
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/PaginatedSuccessResponse'
+                  - type: object
+                    properties:
+                      data:
+                        type: array
+                        items:
+                          $ref: '#/components/schemas/Payment'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+  /api/v1/payments/{payment_id}:
+    get:
+      tags:
+        - Payment Management
+      summary: Retrieve a payment by identifier
+      operationId: getPaymentById
+      security:
+        - BearerAuth: []
+      parameters:
+        - $ref: '#/components/parameters/PaymentIdParam'
+      responses:
+        '200':
+          description: Payment retrieved successfully
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/SuccessResponse'
+                  - type: object
+                    properties:
+                      data:
+                        $ref: '#/components/schemas/Payment'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '404':
+          $ref: '#/components/responses/NotFoundError'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+  /api/v1/payments/{payment_id}/refund:
+    post:
+      tags:
+        - Payment Management
+      summary: Request a refund for a payment
+      operationId: requestPaymentRefund
+      security:
+        - BearerAuth: []
+      parameters:
+        - $ref: '#/components/parameters/PaymentIdParam'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RefundRequest'
+      responses:
+        '201':
+          description: Refund requested successfully
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/SuccessResponse'
+                  - type: object
+                    properties:
+                      data:
+                        $ref: '#/components/schemas/Refund'
+        '400':
+          $ref: '#/components/responses/BadRequestError'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '404':
+          $ref: '#/components/responses/NotFoundError'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+  /api/v1/payments/{payment_id}/capture:
+    post:
+      tags:
+        - Payment Management
+      summary: Capture a payment
+      operationId: capturePayment
+      security:
+        - BearerAuth: []
+      parameters:
+        - $ref: '#/components/parameters/PaymentIdParam'
+      requestBody:
+        required: false
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                amount:
+                  type: number
+                  format: float
+                  description: Amount to capture (if partial)
+      responses:
+        '200':
+          description: Payment captured successfully
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/SuccessResponse'
+                  - type: object
+                    properties:
+                      data:
+                        $ref: '#/components/schemas/Payment'
+        '400':
+          $ref: '#/components/responses/BadRequestError'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '404':
+          $ref: '#/components/responses/NotFoundError'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+  /api/v1/payments/{payment_id}/split:
+    post:
+      tags:
+        - Split Payments
+      summary: Split a payment among multiple users
+      operationId: splitPayment
+      security:
+        - BearerAuth: []
+      parameters:
+        - $ref: '#/components/parameters/PaymentIdParam'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PaymentSplitRequest'
+      responses:
+        '201':
+          description: Payment split created successfully
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/SuccessResponse'
+                  - type: object
+                    properties:
+                      data:
+                        type: array
+                        items:
+                          $ref: '#/components/schemas/PaymentSplit'
+        '400':
+          $ref: '#/components/responses/BadRequestError'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '404':
+          $ref: '#/components/responses/NotFoundError'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+  /api/v1/payments/{payment_id}/splits:
+    get:
+      tags:
+        - Split Payments
+      summary: List splits for a payment
+      operationId: listPaymentSplits
+      security:
+        - BearerAuth: []
+      parameters:
+        - $ref: '#/components/parameters/PaymentIdParam'
+      responses:
+        '200':
+          description: Payment splits retrieved successfully
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/SuccessResponse'
+                  - type: object
+                    properties:
+                      data:
+                        type: array
+                        items:
+                          $ref: '#/components/schemas/PaymentSplit'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '404':
+          $ref: '#/components/responses/NotFoundError'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+  /api/v1/payments/splits/{split_id}/settle:
+    post:
+      tags:
+        - Split Payments
+      summary: Settle a payment split
+      operationId: settlePaymentSplit
+      security:
+        - BearerAuth: []
+      parameters:
+        - $ref: '#/components/parameters/SplitIdParam'
+      responses:
+        '200':
+          description: Payment split settled successfully
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/SuccessResponse'
+                  - type: object
+                    properties:
+                      data:
+                        $ref: '#/components/schemas/PaymentSplit'
+        '400':
+          $ref: '#/components/responses/BadRequestError'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '404':
+          $ref: '#/components/responses/NotFoundError'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+  /api/v1/refunds:
+    get:
+      tags:
+        - Refunds
+      summary: List refunds with filters
+      operationId: listRefunds
+      security:
+        - BearerAuth: []
+      parameters:
+        - $ref: '#/components/parameters/PageParam'
+        - $ref: '#/components/parameters/LimitParam'
+        - $ref: '#/components/parameters/SortParam'
+        - in: query
+          name: status
+          schema:
+            $ref: '#/components/schemas/RefundStatus'
+          description: Filter by refund status
+        - in: query
+          name: payment_id
+          schema:
+            type: integer
+            format: int64
+          description: Filter by payment identifier
+      responses:
+        '200':
+          description: Refunds retrieved successfully
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/PaginatedSuccessResponse'
+                  - type: object
+                    properties:
+                      data:
+                        type: array
+                        items:
+                          $ref: '#/components/schemas/Refund'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+    post:
+      tags:
+        - Refunds
+      summary: Create a refund request
+      operationId: createRefund
+      security:
+        - BearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RefundRequest'
+      responses:
+        '201':
+          description: Refund request created successfully
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/SuccessResponse'
+                  - type: object
+                    properties:
+                      data:
+                        $ref: '#/components/schemas/Refund'
+        '400':
+          $ref: '#/components/responses/BadRequestError'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+  /api/v1/refunds/{refund_id}:
+    get:
+      tags:
+        - Refunds
+      summary: Retrieve a refund by identifier
+      operationId: getRefundById
+      security:
+        - BearerAuth: []
+      parameters:
+        - $ref: '#/components/parameters/RefundIdParam'
+      responses:
+        '200':
+          description: Refund retrieved successfully
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/SuccessResponse'
+                  - type: object
+                    properties:
+                      data:
+                        $ref: '#/components/schemas/Refund'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '404':
+          $ref: '#/components/responses/NotFoundError'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+    put:
+      tags:
+        - Refunds
+      summary: Update a refund
+      operationId: updateRefund
+      security:
+        - BearerAuth: []
+      parameters:
+        - $ref: '#/components/parameters/RefundIdParam'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RefundUpdateRequest'
+      responses:
+        '200':
+          description: Refund updated successfully
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/SuccessResponse'
+                  - type: object
+                    properties:
+                      data:
+                        $ref: '#/components/schemas/Refund'
+        '400':
+          $ref: '#/components/responses/BadRequestError'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '404':
+          $ref: '#/components/responses/NotFoundError'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+  /api/v1/reviews:
+    get:
+      tags:
+        - Reviews & Ratings
+      summary: List reviews with filters
+      operationId: listReviews
+      parameters:
+        - $ref: '#/components/parameters/PageParam'
+        - $ref: '#/components/parameters/LimitParam'
+        - $ref: '#/components/parameters/SortParam'
+        - in: query
+          name: listing_id
+          schema:
+            type: integer
+            format: int64
+          description: Filter by listing identifier
+        - in: query
+          name: booking_id
+          schema:
+            type: integer
+            format: int64
+          description: Filter by booking identifier
+        - in: query
+          name: order_id
+          schema:
+            type: integer
+            format: int64
+          description: Filter by order identifier
+        - in: query
+          name: min_rating
+          schema:
+            type: integer
+            minimum: 1
+            maximum: 5
+          description: Minimum rating filter
+      responses:
+        '200':
+          description: Reviews retrieved successfully
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/PaginatedSuccessResponse'
+                  - type: object
+                    properties:
+                      data:
+                        type: array
+                        items:
+                          $ref: '#/components/schemas/Review'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+    post:
+      tags:
+        - Reviews & Ratings
+      summary: Create a review
+      operationId: createReview
+      security:
+        - BearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ReviewCreateRequest'
+      responses:
+        '201':
+          description: Review created successfully
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/SuccessResponse'
+                  - type: object
+                    properties:
+                      data:
+                        $ref: '#/components/schemas/Review'
+              examples:
+                reviewCreated:
+                  value:
+                    status: success
+                    message: Review created successfully
+                    data:
+                      review_id: 5001
+                      user_id: 2001
+                      listing_id: 301
+                      booking_id: 8001
+                      rating_overall: 5
+                      rating_quality: 5
+                      rating_value: 4
+                      rating_service: 5
+                      rating_experience: 5
+                      comment: Excellent stay! Great service and beautiful rooms.
+                      is_verified: true
+                      is_featured: false
+                      helpful_count: 0
+                      status: active
+                      created_at: 2025-11-08T10:00:00Z
+                      updated_at: 2025-11-08T10:00:00Z
+        '400':
+          $ref: '#/components/responses/BadRequestError'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+  /api/v1/reviews/{review_id}:
+    get:
+      tags:
+        - Reviews & Ratings
+      summary: Retrieve a review by identifier
+      operationId: getReviewById
+      parameters:
+        - $ref: '#/components/parameters/ReviewIdParam'
+      responses:
+        '200':
+          description: Review retrieved successfully
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/SuccessResponse'
+                  - type: object
+                    properties:
+                      data:
+                        $ref: '#/components/schemas/Review'
+        '404':
+          $ref: '#/components/responses/NotFoundError'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+    put:
+      tags:
+        - Reviews & Ratings
+      summary: Update a review
+      operationId: updateReview
+      security:
+        - BearerAuth: []
+      parameters:
+        - $ref: '#/components/parameters/ReviewIdParam'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ReviewUpdateRequest'
+      responses:
+        '200':
+          description: Review updated successfully
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/SuccessResponse'
+                  - type: object
+                    properties:
+                      data:
+                        $ref: '#/components/schemas/Review'
+        '400':
+          $ref: '#/components/responses/BadRequestError'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '404':
+          $ref: '#/components/responses/NotFoundError'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+    delete:
+      tags:
+        - Reviews & Ratings
+      summary: Delete a review
+      operationId: deleteReview
+      security:
+        - BearerAuth: []
+      parameters:
+        - $ref: '#/components/parameters/ReviewIdParam'
+      responses:
+        '200':
+          description: Review deleted successfully
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/SuccessResponse'
+                  - type: object
+                    properties:
+                      data:
+                        $ref: '#/components/schemas/Acknowledgement'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '404':
+          $ref: '#/components/responses/NotFoundError'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+  /api/v1/reviews/{review_id}/helpful:
+    post:
+      tags:
+        - Reviews & Ratings
+      summary: Mark a review as helpful
+      operationId: markReviewHelpful
+      security:
+        - BearerAuth: []
+      parameters:
+        - $ref: '#/components/parameters/ReviewIdParam'
+      responses:
+        '201':
+          description: Review marked as helpful
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/SuccessResponse'
+                  - type: object
+                    properties:
+                      data:
+                        $ref: '#/components/schemas/Acknowledgement'
+        '400':
+          $ref: '#/components/responses/BadRequestError'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '404':
+          $ref: '#/components/responses/NotFoundError'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+    delete:
+      tags:
+        - Reviews & Ratings
+      summary: Remove helpful vote from a review
+      operationId: unmarkReviewHelpful
+      security:
+        - BearerAuth: []
+      parameters:
+        - $ref: '#/components/parameters/ReviewIdParam'
+      responses:
+        '200':
+          description: Helpful vote removed
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/SuccessResponse'
+                  - type: object
+                    properties:
+                      data:
+                        $ref: '#/components/schemas/Acknowledgement'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '404':
+          $ref: '#/components/responses/NotFoundError'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+  /api/v1/reviews/{review_id}/replies:
+    get:
+      tags:
+        - Merchant Replies
+      summary: List replies for a review
+      operationId: listReviewReplies
+      parameters:
+        - $ref: '#/components/parameters/ReviewIdParam'
+      responses:
+        '200':
+          description: Review replies retrieved successfully
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/SuccessResponse'
+                  - type: object
+                    properties:
+                      data:
+                        type: array
+                        items:
+                          $ref: '#/components/schemas/MerchantReply'
+        '404':
+          $ref: '#/components/responses/NotFoundError'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+    post:
+      tags:
+        - Merchant Replies
+      summary: Add a merchant reply to a review
+      operationId: createReviewReply
+      security:
+        - BearerAuth: []
+      parameters:
+        - $ref: '#/components/parameters/ReviewIdParam'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/MerchantReplyRequest'
+      responses:
+        '201':
+          description: Merchant reply created successfully
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/SuccessResponse'
+                  - type: object
+                    properties:
+                      data:
+                        $ref: '#/components/schemas/MerchantReply'
+        '400':
+          $ref: '#/components/responses/BadRequestError'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '404':
+          $ref: '#/components/responses/NotFoundError'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+  /api/v1/replies/{reply_id}:
+    put:
+      tags:
+        - Merchant Replies
+      summary: Update a merchant reply
+      operationId: updateMerchantReply
+      security:
+        - BearerAuth: []
+      parameters:
+        - $ref: '#/components/parameters/ReplyIdParam'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/MerchantReplyRequest'
+      responses:
+        '200':
+          description: Merchant reply updated successfully
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/SuccessResponse'
+                  - type: object
+                    properties:
+                      data:
+                        $ref: '#/components/schemas/MerchantReply'
+        '400':
+          $ref: '#/components/responses/BadRequestError'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '404':
+          $ref: '#/components/responses/NotFoundError'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+    delete:
+      tags:
+        - Merchant Replies
+      summary: Delete a merchant reply
+      operationId: deleteMerchantReply
+      security:
+        - BearerAuth: []
+      parameters:
+        - $ref: '#/components/parameters/ReplyIdParam'
+      responses:
+        '200':
+          description: Merchant reply deleted successfully
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/SuccessResponse'
+                  - type: object
+                    properties:
+                      data:
+                        $ref: '#/components/schemas/Acknowledgement'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '404':
+          $ref: '#/components/responses/NotFoundError'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+  /api/v1/reviews/{review_id}/flag:
+    post:
+      tags:
+        - Review Flags
+      summary: Flag a review
+      operationId: flagReview
+      security:
+        - BearerAuth: []
+      parameters:
+        - $ref: '#/components/parameters/ReviewIdParam'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ReviewFlagRequest'
+      responses:
+        '201':
+          description: Review flagged successfully
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/SuccessResponse'
+                  - type: object
+                    properties:
+                      data:
+                        $ref: '#/components/schemas/ReviewFlag'
+        '400':
+          $ref: '#/components/responses/BadRequestError'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '404':
+          $ref: '#/components/responses/NotFoundError'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+  /api/v1/review-flags:
+    get:
+      tags:
+        - Review Flags
+      summary: List review flags with filters
+      operationId: listReviewFlags
+      security:
+        - BearerAuth: []
+      parameters:
+        - $ref: '#/components/parameters/PageParam'
+        - $ref: '#/components/parameters/LimitParam'
+        - $ref: '#/components/parameters/SortParam'
+        - in: query
+          name: status
+          schema:
+            $ref: '#/components/schemas/ReviewFlagStatus'
+          description: Filter by flag status
+        - in: query
+          name: review_id
+          schema:
+            type: integer
+            format: int64
+          description: Filter by review identifier
+      responses:
+        '200':
+          description: Review flags retrieved successfully
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/PaginatedSuccessResponse'
+                  - type: object
+                    properties:
+                      data:
+                        type: array
+                        items:
+                          $ref: '#/components/schemas/ReviewFlag'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+  /api/v1/review-flags/{flag_id}:
+    put:
+      tags:
+        - Review Flags
+      summary: Update a review flag status
+      operationId: updateReviewFlag
+      security:
+        - BearerAuth: []
+      parameters:
+        - $ref: '#/components/parameters/FlagIdParam'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ReviewFlagUpdateRequest'
+      responses:
+        '200':
+          description: Review flag updated successfully
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/SuccessResponse'
+                  - type: object
+                    properties:
+                      data:
+                        $ref: '#/components/schemas/ReviewFlag'
+        '400':
+          $ref: '#/components/responses/BadRequestError'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '404':
+          $ref: '#/components/responses/NotFoundError'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+  /api/v1/discover/search:
+    get:
+      tags:
+        - Discovery & Search
+      summary: Search listings
+      operationId: searchListings
+      parameters:
+        - $ref: '#/components/parameters/PageParam'
+        - $ref: '#/components/parameters/LimitParam'
+        - $ref: '#/components/parameters/SortParam'
+        - $ref: '#/components/parameters/SearchParam'
+        - in: query
+          name: category
+          schema:
+            type: string
+          description: Filter by category
+        - in: query
+          name: latitude
+          schema:
+            type: number
+            format: float
+          description: Latitude for location-based search
+        - in: query
+          name: longitude
+          schema:
+            type: number
+            format: float
+          description: Longitude for location-based search
+        - in: query
+          name: radius
+          schema:
+            type: number
+            format: float
+          description: Search radius in kilometers
+        - in: query
+          name: min_price
+          schema:
+            type: number
+            format: float
+          description: Minimum price filter
+        - in: query
+          name: max_price
+          schema:
+            type: number
+            format: float
+          description: Maximum price filter
+      responses:
+        '200':
+          description: Search results retrieved successfully
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/PaginatedSuccessResponse'
+                  - type: object
+                    properties:
+                      data:
+                        type: array
+                        items:
+                          $ref: '#/components/schemas/Listing'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+  /api/v1/discover/nearby:
+    get:
+      tags:
+        - Discovery & Search
+      summary: Find nearby listings
+      operationId: discoverNearby
+      parameters:
+        - in: query
+          name: latitude
+          schema:
+            type: number
+            format: float
+          required: true
+          description: Latitude coordinate
+        - in: query
+          name: longitude
+          schema:
+            type: number
+            format: float
+          required: true
+          description: Longitude coordinate
+        - in: query
+          name: radius
+          schema:
+            type: number
+            format: float
+            default: 5
+          description: Search radius in kilometers
+        - in: query
+          name: category
+          schema:
+            type: string
+          description: Filter by category
+        - $ref: '#/components/parameters/PageParam'
+        - $ref: '#/components/parameters/LimitParam'
+      responses:
+        '200':
+          description: Nearby listings retrieved successfully
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/PaginatedSuccessResponse'
+                  - type: object
+                    properties:
+                      data:
+                        type: array
+                        items:
+                          $ref: '#/components/schemas/Listing'
+        '400':
+          $ref: '#/components/responses/BadRequestError'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+  /api/v1/discover/map-pins:
+    get:
+      tags:
+        - Discovery & Search
+      summary: Get map pins for listings
+      operationId: getMapPins
+      parameters:
+        - in: query
+          name: bounds
+          schema:
+            type: string
+          description: Bounding box coordinates (sw_lat,sw_lng,ne_lat,ne_lng)
+        - in: query
+          name: category
+          schema:
+            type: string
+          description: Filter by category
+      responses:
+        '200':
+          description: Map pins retrieved successfully
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/SuccessResponse'
+                  - type: object
+                    properties:
+                      data:
+                        type: array
+                        items:
+                          $ref: '#/components/schemas/MapPin'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+  /api/v1/discover/categories:
+    get:
+      tags:
+        - Discovery & Search
+      summary: List available categories
+      operationId: listCategories
+      responses:
+        '200':
+          description: Categories retrieved successfully
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/SuccessResponse'
+                  - type: object
+                    properties:
+                      data:
+                        type: array
+                        items:
+                          $ref: '#/components/schemas/Category'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+  /api/v1/discover/categories/{category}/listings:
+    get:
+      tags:
+        - Discovery & Search
+      summary: Get listings by category
+      operationId: getListingsByCategory
+      parameters:
+        - in: path
+          name: category
+          required: true
+          schema:
+            type: string
+          description: Category name
+        - $ref: '#/components/parameters/PageParam'
+        - $ref: '#/components/parameters/LimitParam'
+        - $ref: '#/components/parameters/SortParam'
+      responses:
+        '200':
+          description: Category listings retrieved successfully
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/PaginatedSuccessResponse'
+                  - type: object
+                    properties:
+                      data:
+                        type: array
+                        items:
+                          $ref: '#/components/schemas/Listing'
+        '404':
+          $ref: '#/components/responses/NotFoundError'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+  /api/v1/collections:
+    get:
+      tags:
+        - Curated Collections
+      summary: List curated collections
+      operationId: listCollections
+      parameters:
+        - $ref: '#/components/parameters/PageParam'
+        - $ref: '#/components/parameters/LimitParam'
+        - $ref: '#/components/parameters/SortParam'
+        - in: query
+          name: category
+          schema:
+            type: string
+          description: Filter by category
+      responses:
+        '200':
+          description: Collections retrieved successfully
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/PaginatedSuccessResponse'
+                  - type: object
+                    properties:
+                      data:
+                        type: array
+                        items:
+                          $ref: '#/components/schemas/CuratedCollection'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+    post:
+      tags:
+        - Curated Collections
+      summary: Create a curated collection
+      operationId: createCollection
+      security:
+        - BearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CuratedCollectionRequest'
+      responses:
+        '201':
+          description: Collection created successfully
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/SuccessResponse'
+                  - type: object
+                    properties:
+                      data:
+                        $ref: '#/components/schemas/CuratedCollection'
+        '400':
+          $ref: '#/components/responses/BadRequestError'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+  /api/v1/collections/{collection_id}:
+    get:
+      tags:
+        - Curated Collections
+      summary: Retrieve a collection by identifier
+      operationId: getCollectionById
+      parameters:
+        - $ref: '#/components/parameters/CollectionIdParam'
+      responses:
+        '200':
+          description: Collection retrieved successfully
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/SuccessResponse'
+                  - type: object
+                    properties:
+                      data:
+                        $ref: '#/components/schemas/CuratedCollection'
+        '404':
+          $ref: '#/components/responses/NotFoundError'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+    put:
+      tags:
+        - Curated Collections
+      summary: Update a curated collection
+      operationId: updateCollection
+      security:
+        - BearerAuth: []
+      parameters:
+        - $ref: '#/components/parameters/CollectionIdParam'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CuratedCollectionRequest'
+      responses:
+        '200':
+          description: Collection updated successfully
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/SuccessResponse'
+                  - type: object
+                    properties:
+                      data:
+                        $ref: '#/components/schemas/CuratedCollection'
+        '400':
+          $ref: '#/components/responses/BadRequestError'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '404':
+          $ref: '#/components/responses/NotFoundError'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+    delete:
+      tags:
+        - Curated Collections
+      summary: Delete a curated collection
+      operationId: deleteCollection
+      security:
+        - BearerAuth: []
+      parameters:
+        - $ref: '#/components/parameters/CollectionIdParam'
+      responses:
+        '200':
+          description: Collection deleted successfully
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/SuccessResponse'
+                  - type: object
+                    properties:
+                      data:
+                        $ref: '#/components/schemas/Acknowledgement'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '404':
+          $ref: '#/components/responses/NotFoundError'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+  /api/v1/community/feed:
+    get:
+      tags:
+        - Community
+      summary: Get community feed
+      operationId: getCommunityFeed
+      parameters:
+        - $ref: '#/components/parameters/PageParam'
+        - $ref: '#/components/parameters/LimitParam'
+        - $ref: '#/components/parameters/SortParam'
+      responses:
+        '200':
+          description: Community feed retrieved successfully
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/PaginatedSuccessResponse'
+                  - type: object
+                    properties:
+                      data:
+                        type: array
+                        items:
+                          $ref: '#/components/schemas/CommunityPost'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+  /api/v1/community/posts:
+    post:
+      tags:
+        - Community
+      summary: Create a community post
+      operationId: createCommunityPost
+      security:
+        - BearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CommunityPostRequest'
+      responses:
+        '201':
+          description: Community post created successfully
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/SuccessResponse'
+                  - type: object
+                    properties:
+                      data:
+                        $ref: '#/components/schemas/CommunityPost'
+        '400':
+          $ref: '#/components/responses/BadRequestError'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+  /api/v1/community/posts/{post_id}:
+    get:
+      tags:
+        - Community
+      summary: Retrieve a community post by identifier
+      operationId: getCommunityPostById
+      parameters:
+        - $ref: '#/components/parameters/PostIdParam'
+      responses:
+        '200':
+          description: Community post retrieved successfully
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/SuccessResponse'
+                  - type: object
+                    properties:
+                      data:
+                        $ref: '#/components/schemas/CommunityPost'
+        '404':
+          $ref: '#/components/responses/NotFoundError'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+  /api/v1/community/stories:
+    post:
+      tags:
+        - Community
+      summary: Create a community story
+      operationId: createCommunityStory
+      security:
+        - BearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CommunityStoryRequest'
+      responses:
+        '201':
+          description: Community story created successfully
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/SuccessResponse'
+                  - type: object
+                    properties:
+                      data:
+                        $ref: '#/components/schemas/CommunityStory'
+        '400':
+          $ref: '#/components/responses/BadRequestError'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+  /api/v1/community/guides:
+    get:
+      tags:
+        - Community
+      summary: List community guides
+      operationId: listCommunityGuides
+      parameters:
+        - $ref: '#/components/parameters/PageParam'
+        - $ref: '#/components/parameters/LimitParam'
+        - $ref: '#/components/parameters/SortParam'
+        - $ref: '#/components/parameters/SearchParam'
+      responses:
+        '200':
+          description: Community guides retrieved successfully
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/PaginatedSuccessResponse'
+                  - type: object
+                    properties:
+                      data:
+                        type: array
+                        items:
+                          $ref: '#/components/schemas/CommunityGuide'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+  /api/v1/community/guides/{guide_id}:
+    get:
+      tags:
+        - Community
+      summary: Retrieve a community guide by identifier
+      operationId: getCommunityGuideById
+      parameters:
+        - $ref: '#/components/parameters/GuideIdParam'
+      responses:
+        '200':
+          description: Community guide retrieved successfully
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/SuccessResponse'
+                  - type: object
+                    properties:
+                      data:
+                        $ref: '#/components/schemas/CommunityGuide'
+        '404':
+          $ref: '#/components/responses/NotFoundError'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
   /api/v1/merchants/apply:
     post:
       tags:
@@ -5462,6 +7025,78 @@ components:
         type: integer
         format: int64
       description: Unique booking add-on identifier
+    PaymentIdParam:
+      in: path
+      name: payment_id
+      required: true
+      schema:
+        type: integer
+        format: int64
+      description: Unique payment identifier
+    RefundIdParam:
+      in: path
+      name: refund_id
+      required: true
+      schema:
+        type: integer
+        format: int64
+      description: Unique refund identifier
+    SplitIdParam:
+      in: path
+      name: split_id
+      required: true
+      schema:
+        type: integer
+        format: int64
+      description: Unique payment split identifier
+    ReviewIdParam:
+      in: path
+      name: review_id
+      required: true
+      schema:
+        type: integer
+        format: int64
+      description: Unique review identifier
+    ReplyIdParam:
+      in: path
+      name: reply_id
+      required: true
+      schema:
+        type: integer
+        format: int64
+      description: Unique merchant reply identifier
+    FlagIdParam:
+      in: path
+      name: flag_id
+      required: true
+      schema:
+        type: integer
+        format: int64
+      description: Unique review flag identifier
+    CollectionIdParam:
+      in: path
+      name: collection_id
+      required: true
+      schema:
+        type: integer
+        format: int64
+      description: Unique curated collection identifier
+    PostIdParam:
+      in: path
+      name: post_id
+      required: true
+      schema:
+        type: integer
+        format: int64
+      description: Unique community post identifier
+    GuideIdParam:
+      in: path
+      name: guide_id
+      required: true
+      schema:
+        type: integer
+        format: int64
+      description: Unique community guide identifier
   responses:
     BadRequestError:
       description: The request payload or parameters were invalid
@@ -7951,6 +9586,746 @@ components:
         tracking_number:
           type: string
           nullable: true
+    PaymentMethod:
+      type: string
+      enum:
+        - irembo_pay
+        - momo
+        - airtel
+        - card
+    PaymentType:
+      type: string
+      enum:
+        - full
+        - deposit
+        - installment
+    PaymentStatus:
+      type: string
+      enum:
+        - pending
+        - processing
+        - completed
+        - failed
+        - refunded
+    Payment:
+      type: object
+      required:
+        - payment_id
+        - user_id
+        - payment_method
+        - payment_type
+        - status
+        - amount
+        - currency
+        - created_at
+        - updated_at
+      properties:
+        payment_id:
+          type: integer
+          format: int64
+        user_id:
+          type: integer
+          format: int64
+        booking_id:
+          type: integer
+          format: int64
+          nullable: true
+        order_id:
+          type: integer
+          format: int64
+          nullable: true
+        payment_method:
+          $ref: '#/components/schemas/PaymentMethod'
+        payment_type:
+          $ref: '#/components/schemas/PaymentType'
+        status:
+          $ref: '#/components/schemas/PaymentStatus'
+        amount:
+          type: number
+          format: float
+        currency:
+          type: string
+        amount_refunded:
+          type: number
+          format: float
+          nullable: true
+        transaction_id:
+          type: string
+          nullable: true
+        receipt_url:
+          type: string
+          nullable: true
+        is_split_payment:
+          type: boolean
+        split_group_id:
+          type: string
+          nullable: true
+        payer_name:
+          type: string
+          nullable: true
+        payer_email:
+          type: string
+          format: email
+          nullable: true
+        payer_phone:
+          type: string
+          nullable: true
+        payment_date:
+          type: string
+          format: date-time
+          nullable: true
+        refund_date:
+          type: string
+          format: date-time
+          nullable: true
+        created_at:
+          type: string
+          format: date-time
+        updated_at:
+          type: string
+          format: date-time
+    PaymentInitiateRequest:
+      type: object
+      required:
+        - booking_id
+        - payment_method
+        - payment_type
+        - amount
+        - currency
+      properties:
+        booking_id:
+          type: integer
+          format: int64
+          nullable: true
+        order_id:
+          type: integer
+          format: int64
+          nullable: true
+        payment_method:
+          $ref: '#/components/schemas/PaymentMethod'
+        payment_type:
+          $ref: '#/components/schemas/PaymentType'
+        amount:
+          type: number
+          format: float
+        currency:
+          type: string
+        payer_name:
+          type: string
+        payer_email:
+          type: string
+          format: email
+        payer_phone:
+          type: string
+    PaymentConfirmRequest:
+      type: object
+      required:
+        - payment_id
+        - transaction_id
+      properties:
+        payment_id:
+          type: integer
+          format: int64
+        transaction_id:
+          type: string
+        receipt_url:
+          type: string
+          nullable: true
+    PaymentSplitRequest:
+      type: object
+      required:
+        - splits
+      properties:
+        splits:
+          type: array
+          items:
+            type: object
+            required:
+              - user_id
+              - amount
+              - share_type
+            properties:
+              user_id:
+                type: integer
+                format: int64
+              amount:
+                type: number
+                format: float
+              share_type:
+                type: string
+                enum: [equal, percentage, fixed]
+              percentage:
+                type: number
+                format: float
+                nullable: true
+    PaymentSplitStatus:
+      type: string
+      enum:
+        - pending
+        - paid
+        - cancelled
+    PaymentSplit:
+      type: object
+      required:
+        - split_id
+        - payment_id
+        - user_id
+        - amount
+        - status
+        - share_type
+        - created_at
+      properties:
+        split_id:
+          type: integer
+          format: int64
+        payment_id:
+          type: integer
+          format: int64
+        user_id:
+          type: integer
+          format: int64
+        amount:
+          type: number
+          format: float
+        status:
+          $ref: '#/components/schemas/PaymentSplitStatus'
+        share_type:
+          type: string
+          enum: [equal, percentage, fixed]
+        created_at:
+          type: string
+          format: date-time
+        settled_at:
+          type: string
+          format: date-time
+          nullable: true
+    RefundStatus:
+      type: string
+      enum:
+        - requested
+        - approved
+        - processed
+        - completed
+    Refund:
+      type: object
+      required:
+        - refund_id
+        - payment_id
+        - refund_amount
+        - refund_reason
+        - status
+        - requested_at
+      properties:
+        refund_id:
+          type: integer
+          format: int64
+        payment_id:
+          type: integer
+          format: int64
+        processed_by_user_id:
+          type: integer
+          format: int64
+          nullable: true
+        refund_amount:
+          type: number
+          format: float
+        refund_reason:
+          type: string
+        status:
+          $ref: '#/components/schemas/RefundStatus'
+        transaction_id:
+          type: string
+          nullable: true
+        requested_at:
+          type: string
+          format: date-time
+        processed_at:
+          type: string
+          format: date-time
+          nullable: true
+    RefundRequest:
+      type: object
+      required:
+        - payment_id
+        - refund_amount
+        - refund_reason
+      properties:
+        payment_id:
+          type: integer
+          format: int64
+        refund_amount:
+          type: number
+          format: float
+        refund_reason:
+          type: string
+    RefundUpdateRequest:
+      type: object
+      required:
+        - status
+      properties:
+        status:
+          $ref: '#/components/schemas/RefundStatus'
+        transaction_id:
+          type: string
+          nullable: true
+    ReviewStatus:
+      type: string
+      enum:
+        - active
+        - flagged
+        - removed
+    Review:
+      type: object
+      required:
+        - review_id
+        - user_id
+        - listing_id
+        - rating_overall
+        - status
+        - created_at
+        - updated_at
+      properties:
+        review_id:
+          type: integer
+          format: int64
+        user_id:
+          type: integer
+          format: int64
+        listing_id:
+          type: integer
+          format: int64
+        booking_id:
+          type: integer
+          format: int64
+          nullable: true
+        order_id:
+          type: integer
+          format: int64
+          nullable: true
+        rating_overall:
+          type: integer
+          minimum: 1
+          maximum: 5
+        rating_quality:
+          type: integer
+          minimum: 1
+          maximum: 5
+          nullable: true
+        rating_value:
+          type: integer
+          minimum: 1
+          maximum: 5
+          nullable: true
+        rating_service:
+          type: integer
+          minimum: 1
+          maximum: 5
+          nullable: true
+        rating_experience:
+          type: integer
+          minimum: 1
+          maximum: 5
+          nullable: true
+        comment:
+          type: string
+          nullable: true
+        review_photos:
+          type: array
+          items:
+            type: string
+          nullable: true
+        is_verified:
+          type: boolean
+        is_featured:
+          type: boolean
+        helpful_count:
+          type: integer
+        status:
+          $ref: '#/components/schemas/ReviewStatus'
+        created_at:
+          type: string
+          format: date-time
+        updated_at:
+          type: string
+          format: date-time
+    ReviewCreateRequest:
+      type: object
+      required:
+        - listing_id
+        - rating_overall
+      properties:
+        listing_id:
+          type: integer
+          format: int64
+        booking_id:
+          type: integer
+          format: int64
+          nullable: true
+        order_id:
+          type: integer
+          format: int64
+          nullable: true
+        rating_overall:
+          type: integer
+          minimum: 1
+          maximum: 5
+        rating_quality:
+          type: integer
+          minimum: 1
+          maximum: 5
+        rating_value:
+          type: integer
+          minimum: 1
+          maximum: 5
+        rating_service:
+          type: integer
+          minimum: 1
+          maximum: 5
+        rating_experience:
+          type: integer
+          minimum: 1
+          maximum: 5
+        comment:
+          type: string
+        review_photos:
+          type: array
+          items:
+            type: string
+    ReviewUpdateRequest:
+      type: object
+      properties:
+        rating_overall:
+          type: integer
+          minimum: 1
+          maximum: 5
+        rating_quality:
+          type: integer
+          minimum: 1
+          maximum: 5
+        rating_value:
+          type: integer
+          minimum: 1
+          maximum: 5
+        rating_service:
+          type: integer
+          minimum: 1
+          maximum: 5
+        rating_experience:
+          type: integer
+          minimum: 1
+          maximum: 5
+        comment:
+          type: string
+        review_photos:
+          type: array
+          items:
+            type: string
+    MerchantReply:
+      type: object
+      required:
+        - reply_id
+        - review_id
+        - merchant_id
+        - reply_text
+        - is_public
+        - replied_at
+      properties:
+        reply_id:
+          type: integer
+          format: int64
+        review_id:
+          type: integer
+          format: int64
+        merchant_id:
+          type: integer
+          format: int64
+        reply_text:
+          type: string
+        is_public:
+          type: boolean
+        replied_at:
+          type: string
+          format: date-time
+        updated_at:
+          type: string
+          format: date-time
+          nullable: true
+    MerchantReplyRequest:
+      type: object
+      required:
+        - reply_text
+      properties:
+        reply_text:
+          type: string
+        is_public:
+          type: boolean
+    ReviewFlagReason:
+      type: string
+      enum:
+        - inappropriate
+        - fake
+        - harassment
+    ReviewFlagStatus:
+      type: string
+      enum:
+        - pending
+        - reviewed
+        - resolved
+    ReviewFlag:
+      type: object
+      required:
+        - flag_id
+        - review_id
+        - user_id
+        - flag_reason
+        - status
+        - created_at
+      properties:
+        flag_id:
+          type: integer
+          format: int64
+        review_id:
+          type: integer
+          format: int64
+        user_id:
+          type: integer
+          format: int64
+        flag_reason:
+          $ref: '#/components/schemas/ReviewFlagReason'
+        flag_details:
+          type: string
+          nullable: true
+        status:
+          $ref: '#/components/schemas/ReviewFlagStatus'
+        created_at:
+          type: string
+          format: date-time
+    ReviewFlagRequest:
+      type: object
+      required:
+        - flag_reason
+      properties:
+        flag_reason:
+          $ref: '#/components/schemas/ReviewFlagReason'
+        flag_details:
+          type: string
+    ReviewFlagUpdateRequest:
+      type: object
+      required:
+        - status
+      properties:
+        status:
+          $ref: '#/components/schemas/ReviewFlagStatus'
+    MapPin:
+      type: object
+      required:
+        - listing_id
+        - latitude
+        - longitude
+      properties:
+        listing_id:
+          type: integer
+          format: int64
+        latitude:
+          type: number
+          format: float
+        longitude:
+          type: number
+          format: float
+        title:
+          type: string
+          nullable: true
+        category:
+          type: string
+          nullable: true
+    Category:
+      type: object
+      required:
+        - name
+        - display_name
+      properties:
+        name:
+          type: string
+        display_name:
+          type: string
+        description:
+          type: string
+          nullable: true
+        icon:
+          type: string
+          nullable: true
+    CuratedCollection:
+      type: object
+      required:
+        - collection_id
+        - title
+        - category
+        - is_active
+        - created_at
+        - updated_at
+      properties:
+        collection_id:
+          type: integer
+          format: int64
+        title:
+          type: string
+        description:
+          type: string
+          nullable: true
+        category:
+          type: string
+        cover_image:
+          type: string
+          nullable: true
+        listing_ids:
+          type: array
+          items:
+            type: integer
+            format: int64
+        is_active:
+          type: boolean
+        created_at:
+          type: string
+          format: date-time
+        updated_at:
+          type: string
+          format: date-time
+    CuratedCollectionRequest:
+      type: object
+      required:
+        - title
+        - category
+      properties:
+        title:
+          type: string
+        description:
+          type: string
+        category:
+          type: string
+        cover_image:
+          type: string
+        listing_ids:
+          type: array
+          items:
+            type: integer
+            format: int64
+        is_active:
+          type: boolean
+    CommunityPost:
+      type: object
+      required:
+        - post_id
+        - user_id
+        - content
+        - created_at
+        - updated_at
+      properties:
+        post_id:
+          type: integer
+          format: int64
+        user_id:
+          type: integer
+          format: int64
+        content:
+          type: string
+        media_urls:
+          type: array
+          items:
+            type: string
+          nullable: true
+        listing_id:
+          type: integer
+          format: int64
+          nullable: true
+        likes_count:
+          type: integer
+        comments_count:
+          type: integer
+        created_at:
+          type: string
+          format: date-time
+        updated_at:
+          type: string
+          format: date-time
+    CommunityPostRequest:
+      type: object
+      required:
+        - content
+      properties:
+        content:
+          type: string
+        media_urls:
+          type: array
+          items:
+            type: string
+        listing_id:
+          type: integer
+          format: int64
+    CommunityStory:
+      type: object
+      required:
+        - story_id
+        - user_id
+        - media_url
+        - created_at
+      properties:
+        story_id:
+          type: integer
+          format: int64
+        user_id:
+          type: integer
+          format: int64
+        media_url:
+          type: string
+        expires_at:
+          type: string
+          format: date-time
+        created_at:
+          type: string
+          format: date-time
+    CommunityStoryRequest:
+      type: object
+      required:
+        - media_url
+      properties:
+        media_url:
+          type: string
+        expires_at:
+          type: string
+          format: date-time
+    CommunityGuide:
+      type: object
+      required:
+        - guide_id
+        - title
+        - content
+        - created_at
+        - updated_at
+      properties:
+        guide_id:
+          type: integer
+          format: int64
+        title:
+          type: string
+        content:
+          type: string
+        author_id:
+          type: integer
+          format: int64
+          nullable: true
+        cover_image:
+          type: string
+          nullable: true
+        views_count:
+          type: integer
+        likes_count:
+          type: integer
+        created_at:
+          type: string
+          format: date-time
+        updated_at:
+          type: string
+          format: date-time
     MerchantCategory:
       type: string
       enum:
