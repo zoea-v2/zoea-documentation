@@ -111,6 +111,18 @@ tags:
     description: Admin system management and monitoring.
   - name: Admin Financial
     description: Admin financial reports and transactions.
+  - name: Payment Webhooks
+    description: Payment provider webhook endpoints.
+  - name: Channel Manager Webhooks
+    description: Channel manager webhook endpoints.
+  - name: Notification Webhooks
+    description: SMS and email delivery webhook endpoints.
+  - name: Push Notifications
+    description: Mobile push notification management.
+  - name: Offline Sync
+    description: Offline data synchronization for mobile apps.
+  - name: Location Services
+    description: Location search, geocoding, and reverse geocoding.
   - name: Merchant Onboarding
     description: Onboarding workflows for new merchants.
   - name: Merchant Profile
@@ -8420,6 +8432,535 @@ paths:
           $ref: '#/components/responses/UnauthorizedError'
         '500':
           $ref: '#/components/responses/InternalServerError'
+  /api/v1/webhooks/payments/momo:
+    post:
+      tags:
+        - Payment Webhooks
+      summary: Handle MTN Mobile Money webhook
+      operationId: handleMomoPaymentWebhook
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              additionalProperties: true
+      responses:
+        '200':
+          description: Webhook processed successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SuccessResponse'
+        '400':
+          $ref: '#/components/responses/BadRequestError'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+  /api/v1/webhooks/payments/airtel:
+    post:
+      tags:
+        - Payment Webhooks
+      summary: Handle Airtel Money webhook
+      operationId: handleAirtelPaymentWebhook
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              additionalProperties: true
+      responses:
+        '200':
+          description: Webhook processed successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SuccessResponse'
+        '400':
+          $ref: '#/components/responses/BadRequestError'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+  /api/v1/webhooks/payments/irembo:
+    post:
+      tags:
+        - Payment Webhooks
+      summary: Handle Irembo Pay webhook
+      operationId: handleIremboPaymentWebhook
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              additionalProperties: true
+      responses:
+        '200':
+          description: Webhook processed successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SuccessResponse'
+        '400':
+          $ref: '#/components/responses/BadRequestError'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+  /api/v1/webhooks/payments/card:
+    post:
+      tags:
+        - Payment Webhooks
+      summary: Handle card payment webhook
+      operationId: handleCardPaymentWebhook
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              additionalProperties: true
+      responses:
+        '200':
+          description: Webhook processed successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SuccessResponse'
+        '400':
+          $ref: '#/components/responses/BadRequestError'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+  /api/v1/webhooks/channel-manager/reservation:
+    post:
+      tags:
+        - Channel Manager Webhooks
+      summary: Handle channel manager reservation webhook
+      operationId: handleChannelManagerReservationWebhook
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              additionalProperties: true
+      responses:
+        '200':
+          description: Webhook processed successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SuccessResponse'
+        '400':
+          $ref: '#/components/responses/BadRequestError'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+  /api/v1/webhooks/channel-manager/inventory:
+    post:
+      tags:
+        - Channel Manager Webhooks
+      summary: Handle channel manager inventory webhook
+      operationId: handleChannelManagerInventoryWebhook
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              additionalProperties: true
+      responses:
+        '200':
+          description: Webhook processed successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SuccessResponse'
+        '400':
+          $ref: '#/components/responses/BadRequestError'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+  /api/v1/webhooks/channel-manager/rates:
+    post:
+      tags:
+        - Channel Manager Webhooks
+      summary: Handle channel manager rates webhook
+      operationId: handleChannelManagerRatesWebhook
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              additionalProperties: true
+      responses:
+        '200':
+          description: Webhook processed successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SuccessResponse'
+        '400':
+          $ref: '#/components/responses/BadRequestError'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+  /api/v1/webhooks/sms/delivery:
+    post:
+      tags:
+        - Notification Webhooks
+      summary: Handle SMS delivery webhook
+      operationId: handleSMSDeliveryWebhook
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SMSDeliveryWebhook'
+      responses:
+        '200':
+          description: Webhook processed successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SuccessResponse'
+        '400':
+          $ref: '#/components/responses/BadRequestError'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+  /api/v1/webhooks/email/delivery:
+    post:
+      tags:
+        - Notification Webhooks
+      summary: Handle email delivery webhook
+      operationId: handleEmailDeliveryWebhook
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/EmailDeliveryWebhook'
+      responses:
+        '200':
+          description: Webhook processed successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SuccessResponse'
+        '400':
+          $ref: '#/components/responses/BadRequestError'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+  /api/v1/notifications/register-device:
+    post:
+      tags:
+        - Push Notifications
+      summary: Register a device for push notifications
+      operationId: registerDeviceForNotifications
+      security:
+        - BearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/DeviceRegistrationRequest'
+      responses:
+        '201':
+          description: Device registered successfully
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/SuccessResponse'
+                  - type: object
+                    properties:
+                      data:
+                        $ref: '#/components/schemas/DeviceRegistration'
+              examples:
+                deviceRegistered:
+                  value:
+                    status: success
+                    message: Device registered successfully
+                    data:
+                      device_id: DEV-2025-001
+                      user_id: 2001
+                      device_token: abc123xyz789
+                      platform: ios
+                      device_name: iPhone 14 Pro
+                      registered_at: 2025-11-07T16:00:00Z
+        '400':
+          $ref: '#/components/responses/BadRequestError'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+  /api/v1/notifications/device/{device_token}:
+    delete:
+      tags:
+        - Push Notifications
+      summary: Unregister a device from push notifications
+      operationId: unregisterDevice
+      security:
+        - BearerAuth: []
+      parameters:
+        - $ref: '#/components/parameters/DeviceTokenParam'
+      responses:
+        '200':
+          description: Device unregistered successfully
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/SuccessResponse'
+                  - type: object
+                    properties:
+                      data:
+                        $ref: '#/components/schemas/Acknowledgement'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '404':
+          $ref: '#/components/responses/NotFoundError'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+  /api/v1/notifications/send:
+    post:
+      tags:
+        - Push Notifications
+      summary: Send push notification
+      operationId: sendPushNotification
+      security:
+        - BearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PushNotificationRequest'
+      responses:
+        '200':
+          description: Push notification sent successfully
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/SuccessResponse'
+                  - type: object
+                    properties:
+                      data:
+                        $ref: '#/components/schemas/PushNotificationResult'
+        '400':
+          $ref: '#/components/responses/BadRequestError'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+  /api/v1/sync/last-update:
+    get:
+      tags:
+        - Offline Sync
+      summary: Get last sync timestamp
+      operationId: getLastSyncUpdate
+      security:
+        - BearerAuth: []
+      parameters:
+        - in: query
+          name: entity_type
+          schema:
+            type: string
+          description: Filter by entity type (listings, bookings, orders, etc.)
+      responses:
+        '200':
+          description: Last sync timestamp retrieved successfully
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/SuccessResponse'
+                  - type: object
+                    properties:
+                      data:
+                        $ref: '#/components/schemas/LastSyncUpdate'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+  /api/v1/sync/pull:
+    post:
+      tags:
+        - Offline Sync
+      summary: Pull data for offline sync
+      operationId: pullSyncData
+      security:
+        - BearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SyncPullRequest'
+      responses:
+        '200':
+          description: Sync data pulled successfully
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/SuccessResponse'
+                  - type: object
+                    properties:
+                      data:
+                        $ref: '#/components/schemas/SyncPullResult'
+        '400':
+          $ref: '#/components/responses/BadRequestError'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+  /api/v1/sync/push:
+    post:
+      tags:
+        - Offline Sync
+      summary: Push offline changes to server
+      operationId: pushSyncData
+      security:
+        - BearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SyncPushRequest'
+      responses:
+        '200':
+          description: Sync data pushed successfully
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/SuccessResponse'
+                  - type: object
+                    properties:
+                      data:
+                        $ref: '#/components/schemas/SyncPushResult'
+        '400':
+          $ref: '#/components/responses/BadRequestError'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+  /api/v1/location/suggest:
+    get:
+      tags:
+        - Location Services
+      summary: Get location suggestions
+      operationId: suggestLocation
+      parameters:
+        - $ref: '#/components/parameters/SearchParam'
+        - in: query
+          name: limit
+          schema:
+            type: integer
+            minimum: 1
+            maximum: 20
+            default: 10
+          description: Maximum number of suggestions to return
+        - in: query
+          name: latitude
+          schema:
+            type: number
+            format: float
+          description: Latitude for location-based suggestions
+        - in: query
+          name: longitude
+          schema:
+            type: number
+            format: float
+          description: Longitude for location-based suggestions
+      responses:
+        '200':
+          description: Location suggestions retrieved successfully
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/SuccessResponse'
+                  - type: object
+                    properties:
+                      data:
+                        type: array
+                        items:
+                          $ref: '#/components/schemas/LocationSuggestion'
+        '400':
+          $ref: '#/components/responses/BadRequestError'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+  /api/v1/location/geocode:
+    get:
+      tags:
+        - Location Services
+      summary: Geocode an address to coordinates
+      operationId: geocodeAddress
+      parameters:
+        - in: query
+          name: address
+          schema:
+            type: string
+          required: true
+          description: Address to geocode
+        - in: query
+          name: country
+          schema:
+            type: string
+          description: Country code for better accuracy
+      responses:
+        '200':
+          description: Address geocoded successfully
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/SuccessResponse'
+                  - type: object
+                    properties:
+                      data:
+                        $ref: '#/components/schemas/GeocodeResult'
+        '400':
+          $ref: '#/components/responses/BadRequestError'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+  /api/v1/location/reverse-geocode:
+    get:
+      tags:
+        - Location Services
+      summary: Reverse geocode coordinates to address
+      operationId: reverseGeocode
+      parameters:
+        - in: query
+          name: latitude
+          schema:
+            type: number
+            format: float
+          required: true
+          description: Latitude coordinate
+        - in: query
+          name: longitude
+          schema:
+            type: number
+            format: float
+          required: true
+          description: Longitude coordinate
+      responses:
+        '200':
+          description: Coordinates reverse geocoded successfully
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/SuccessResponse'
+                  - type: object
+                    properties:
+                      data:
+                        $ref: '#/components/schemas/ReverseGeocodeResult'
+        '400':
+          $ref: '#/components/responses/BadRequestError'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
   /api/v1/merchants/apply:
     post:
       tags:
@@ -9527,6 +10068,13 @@ components:
         type: integer
         format: int64
       description: Unique subscription plan identifier
+    DeviceTokenParam:
+      in: path
+      name: device_token
+      required: true
+      schema:
+        type: string
+      description: Unique device token identifier
   responses:
     BadRequestError:
       description: The request payload or parameters were invalid
@@ -13610,6 +14158,308 @@ components:
             end_date:
               type: string
               format: date
+    SMSDeliveryWebhook:
+      type: object
+      required:
+        - message_id
+        - phone_number
+        - status
+      properties:
+        message_id:
+          type: string
+        phone_number:
+          type: string
+        status:
+          type: string
+          enum: [delivered, failed, pending]
+        delivery_timestamp:
+          type: string
+          format: date-time
+          nullable: true
+        error_message:
+          type: string
+          nullable: true
+    EmailDeliveryWebhook:
+      type: object
+      required:
+        - message_id
+        - email
+        - status
+      properties:
+        message_id:
+          type: string
+        email:
+          type: string
+          format: email
+        status:
+          type: string
+          enum: [delivered, failed, bounced, pending]
+        delivery_timestamp:
+          type: string
+          format: date-time
+          nullable: true
+        error_message:
+          type: string
+          nullable: true
+    DevicePlatform:
+      type: string
+      enum:
+        - ios
+        - android
+    DeviceRegistration:
+      type: object
+      required:
+        - device_id
+        - user_id
+        - device_token
+        - platform
+        - registered_at
+      properties:
+        device_id:
+          type: string
+        user_id:
+          type: integer
+          format: int64
+        device_token:
+          type: string
+        platform:
+          $ref: '#/components/schemas/DevicePlatform'
+        device_name:
+          type: string
+          nullable: true
+        app_version:
+          type: string
+          nullable: true
+        registered_at:
+          type: string
+          format: date-time
+    DeviceRegistrationRequest:
+      type: object
+      required:
+        - device_token
+        - platform
+      properties:
+        device_token:
+          type: string
+        platform:
+          $ref: '#/components/schemas/DevicePlatform'
+        device_name:
+          type: string
+        app_version:
+          type: string
+    PushNotificationRequest:
+      type: object
+      required:
+        - title
+        - body
+      properties:
+        user_id:
+          type: integer
+          format: int64
+          nullable: true
+        device_token:
+          type: string
+          nullable: true
+        title:
+          type: string
+        body:
+          type: string
+        data:
+          type: object
+          additionalProperties: true
+          nullable: true
+        image_url:
+          type: string
+          nullable: true
+        sound:
+          type: string
+          nullable: true
+        priority:
+          type: string
+          enum: [normal, high]
+    PushNotificationResult:
+      type: object
+      required:
+        - sent
+      properties:
+        sent:
+          type: boolean
+        message_id:
+          type: string
+          nullable: true
+        error_message:
+          type: string
+          nullable: true
+    LastSyncUpdate:
+      type: object
+      required:
+        - entity_type
+        - last_updated_at
+      properties:
+        entity_type:
+          type: string
+        last_updated_at:
+          type: string
+          format: date-time
+        version:
+          type: integer
+          nullable: true
+    SyncPullRequest:
+      type: object
+      required:
+        - entity_types
+      properties:
+        entity_types:
+          type: array
+          items:
+            type: string
+          description: List of entity types to sync (listings, bookings, orders, etc.)
+        last_sync_timestamp:
+          type: string
+          format: date-time
+          nullable: true
+          description: Last sync timestamp for incremental sync
+    SyncPullResult:
+      type: object
+      required:
+        - entities
+        - sync_timestamp
+      properties:
+        entities:
+          type: object
+          additionalProperties:
+            type: array
+            items:
+              type: object
+              additionalProperties: true
+        sync_timestamp:
+          type: string
+          format: date-time
+        version:
+          type: integer
+    SyncPushRequest:
+      type: object
+      required:
+        - changes
+      properties:
+        changes:
+          type: array
+          items:
+            type: object
+            required:
+              - entity_type
+              - entity_id
+              - action
+            properties:
+              entity_type:
+                type: string
+              entity_id:
+                type: integer
+                format: int64
+              action:
+                type: string
+                enum: [create, update, delete]
+              data:
+                type: object
+                additionalProperties: true
+        sync_timestamp:
+          type: string
+          format: date-time
+    SyncPushResult:
+      type: object
+      required:
+        - processed
+        - failed
+      properties:
+        processed:
+          type: integer
+        failed:
+          type: integer
+        errors:
+          type: array
+          items:
+            type: object
+            properties:
+              entity_id:
+                type: integer
+                format: int64
+              error:
+                type: string
+          nullable: true
+    LocationSuggestion:
+      type: object
+      required:
+        - address
+        - latitude
+        - longitude
+      properties:
+        address:
+          type: string
+        latitude:
+          type: number
+          format: float
+        longitude:
+          type: number
+          format: float
+        city:
+          type: string
+          nullable: true
+        district:
+          type: string
+          nullable: true
+        country:
+          type: string
+          nullable: true
+        formatted_address:
+          type: string
+          nullable: true
+    GeocodeResult:
+      type: object
+      required:
+        - latitude
+        - longitude
+        - formatted_address
+      properties:
+        latitude:
+          type: number
+          format: float
+        longitude:
+          type: number
+          format: float
+        formatted_address:
+          type: string
+        address_components:
+          type: object
+          additionalProperties: true
+          nullable: true
+        place_id:
+          type: string
+          nullable: true
+    ReverseGeocodeResult:
+      type: object
+      required:
+        - formatted_address
+      properties:
+        formatted_address:
+          type: string
+        address_components:
+          type: object
+          properties:
+            street:
+              type: string
+              nullable: true
+            city:
+              type: string
+              nullable: true
+            district:
+              type: string
+              nullable: true
+            country:
+              type: string
+              nullable: true
+        place_id:
+          type: string
+          nullable: true
     MerchantCategory:
       type: string
       enum:
